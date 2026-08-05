@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0f172a">
+<title>부대 병력 위치현황 로그인</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="config.js"></script>
+<script src="toast.js"></script>
+<script src="auth.js"></script>
+
+<style>
+:root{
+    --bg:#eef2f7;
+    --surface:#ffffff;
+    --line:#e2e8f0;
+    --text:#0f172a;
+    --muted:#64748b;
+    --primary:#2563eb;
+    --primary-dark:#1e3a8a;
+    --navy:#0f172a;
+    --shadow:0 10px 28px rgba(15,23,42,.08);
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Pretendard,"Noto Sans KR",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html{-webkit-text-size-adjust:100%;}
+
+body{
+    min-height:100vh;
+    min-height:100dvh;
+    padding:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow-x:hidden;
+    color:var(--text);
+    background:
+        radial-gradient(circle at top,rgba(37,99,235,.11),transparent 34%),
+        var(--bg);
+}
+
+button,input{font:inherit;}
+
+.login-box{
+    width:100%;
+    max-width:420px;
+    padding:35px 25px;
+    border:1px solid rgba(226,232,240,.95);
+    border-radius:18px;
+    background:var(--surface);
+    box-shadow:var(--shadow);
+}
+
+.title{
+    margin-bottom:30px;
+    text-align:center;
+    color:var(--text);
+    font-size:28px;
+    font-weight:700;
+    letter-spacing:-.45px;
+}
+
+.input{
+    width:100%;
+    height:54px;
+    margin-bottom:15px;
+    padding:0 16px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    outline:none;
+    background:#fff;
+    color:var(--text);
+    font-size:16px;
+    transition:border-color .16s ease,box-shadow .16s ease;
+}
+
+.input::placeholder{color:#94a3b8;}
+
+.input:focus{
+    border-color:#93c5fd;
+    box-shadow:0 0 0 4px rgba(37,99,235,.10);
+}
+
+.login-btn{
+    width:100%;
+    height:54px;
+    margin-top:5px;
+    border:0;
+    border-radius:10px;
+    background:linear-gradient(145deg,var(--navy),var(--primary-dark) 70%,var(--primary));
+    color:#fff;
+    font-size:18px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow:0 8px 20px rgba(30,58,138,.20);
+}
+
+.login-btn:active{transform:scale(.98);}
+.login-btn:disabled{cursor:default;opacity:.65;transform:none;}
+
+.bottom{
+    margin-top:20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-evenly;
+}
+
+.user-link,
+.admin-link{
+    color:var(--primary);
+    text-decoration:none;
+    font-size:15px;
+    font-weight:600;
+}
+
+.admin-link{color:var(--primary-dark);}
+.user-link:hover,.admin-link:hover{text-decoration:underline;}
+
+.reapply-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:60;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(15,23,42,.56);
+    backdrop-filter:blur(3px);
+}
+
+.reapply-backdrop.open{display:flex;}
+
+.reapply-dialog{
+    width:100%;
+    max-width:420px;
+    max-height:min(720px,calc(100dvh - 40px));
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    border:1px solid rgba(226,232,240,.95);
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 24px 60px rgba(15,23,42,.24);
+}
+
+.reapply-head{padding:22px 20px 14px;text-align:center;}
+.reapply-head h2{font-size:22px;font-weight:800;letter-spacing:-.4px;}
+.reapply-head p{margin-top:8px;color:var(--muted);font-size:14px;line-height:1.55;}
+.reapply-search-wrap{padding:0 18px 14px;}
+.reapply-search{margin:0;}
+.reapply-unit-list{min-height:110px;overflow-y:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.reapply-state{padding:32px 18px;text-align:center;color:var(--muted);font-size:14px;}
+.reapply-unit{
+    width:100%;
+    padding:15px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border:0;
+    border-bottom:1px solid #f1f5f9;
+    background:#fff;
+    text-align:left;
+    cursor:pointer;
+}
+.reapply-unit:last-child{border-bottom:0;}
+.reapply-unit:active{background:#eff6ff;}
+.reapply-unit-name{font-size:15px;font-weight:750;color:var(--text);}
+.reapply-unit-code{margin-top:3px;color:var(--muted);font-size:12px;}
+.reapply-unit-action{flex:0 0 auto;color:var(--primary);font-size:13px;font-weight:800;}
+.reapply-footer{padding:14px 18px 18px;}
+.reapply-logout{
+    width:100%;
+    height:48px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#f8fafc;
+    color:#475569;
+    font-weight:700;
+    cursor:pointer;
+}
+
+@media(max-width:420px){
+    .login-box{padding:30px 20px;}
+    .title{font-size:26px;}
+}
+</style>
+</head>
+<body>
+
+<div id="login-box" class="login-box">
+    <div class="title">로그인</div>
+    <input type="email" id="email" class="input" placeholder="이메일" autocomplete="email">
+    <input type="password" id="password" class="input" placeholder="비밀번호" autocomplete="current-password">
+    <button id="loginBtn" class="login-btn" type="button">로그인</button>
+
+    <div class="bottom">
+        <a href="register_user.html" class="user-link">회원가입</a>
+        <a href="register_admin.html" class="admin-link">관리자 회원가입</a>
+    </div>
+</div>
+
+<div id="reapplyBackdrop" class="reapply-backdrop" role="dialog" aria-modal="true" aria-labelledby="reapplyTitle">
+    <section class="reapply-dialog">
+        <header class="reapply-head">
+            <h2 id="reapplyTitle">부대 재가입 신청</h2>
+            <p>가입 신청이 반려되었습니다.<br>가입할 부대를 다시 검색해 선택해주세요.</p>
+        </header>
+        <div class="reapply-search-wrap">
+            <input id="reapplyUnitSearch" type="search" class="input reapply-search" placeholder="부대명 또는 부대코드 검색" autocomplete="off">
+        </div>
+        <div id="reapplyUnitList" class="reapply-unit-list">
+            <div class="reapply-state">부대를 불러오는 중입니다.</div>
+        </div>
+        <footer class="reapply-footer">
+            <button id="reapplyLogoutBtn" class="reapply-logout" type="button">로그아웃</button>
+        </footer>
+    </section>
+</div>
+
+<script>
+const USER_HOME_PAGE="location_user.html";
+const ADMIN_HOME_PAGE="location_admin.html";
+
+const email=document.getElementById("email");
+const password=document.getElementById("password");
+const loginBtn=document.getElementById("loginBtn");
+const reapplyBackdrop=document.getElementById("reapplyBackdrop");
+const reapplyUnitSearch=document.getElementById("reapplyUnitSearch");
+const reapplyUnitList=document.getElementById("reapplyUnitList");
+const reapplyLogoutBtn=document.getElementById("reapplyLogoutBtn");
+
+let loggingIn=false;
+let reapplying=false;
+let reapplySearchTimer=null;
+
+function confirmReapplyWithToast(unitName){
+    return new Promise(resolve=>{
+        document.getElementById("custom-toast")?.remove();
+        document.getElementById("reapply-confirm-toast")?.remove();
+
+        const backdrop=document.createElement("div");
+        backdrop.id="reapply-confirm-toast";
+        backdrop.className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/60 p-6";
+        backdrop.style.opacity="0";
+        backdrop.style.transition="opacity 220ms ease";
+
+        const panel=document.createElement("section");
+        panel.className="w-full max-w-xs rounded-2xl bg-white p-6 text-center shadow-2xl";
+        panel.setAttribute("role","alertdialog");
+        panel.setAttribute("aria-modal","true");
+        panel.style.opacity="0";
+        panel.style.transform="translateY(24px) scale(.98)";
+        panel.style.transition="transform 300ms cubic-bezier(.22,1,.36,1), opacity 220ms ease";
+
+        const title=document.createElement("h3");
+        title.className="text-lg font-extrabold text-slate-900";
+        title.textContent="재가입 신청";
+
+        const message=document.createElement("p");
+        message.className="mt-3 whitespace-pre-line text-sm font-semibold leading-6 text-slate-600";
+        message.textContent=`${unitName}(으)로\n재가입 신청하시겠습니까?`;
+
+        const actions=document.createElement("div");
+        actions.className="mt-5 grid grid-cols-2 gap-2";
+
+        const cancelButton=document.createElement("button");
+        cancelButton.type="button";
+        cancelButton.className="h-12 rounded-xl bg-slate-200 text-sm font-extrabold text-slate-700 active:scale-[.98]";
+        cancelButton.textContent="취소";
+
+        const confirmButton=document.createElement("button");
+        confirmButton.type="button";
+        confirmButton.className="h-12 rounded-xl bg-blue-600 text-sm font-extrabold text-white active:scale-[.98]";
+        confirmButton.textContent="신청";
+
+        actions.append(cancelButton,confirmButton);
+        panel.append(title,message,actions);
+        backdrop.appendChild(panel);
+        document.body.appendChild(backdrop);
+
+        let finished=false;
+        const finish=value=>{
+            if(finished) return;
+            finished=true;
+            document.removeEventListener("keydown",onKeydown);
+            backdrop.style.opacity="0";
+            panel.style.opacity="0";
+            panel.style.transform="translateY(34px) scale(.98)";
+            setTimeout(()=>{
+                backdrop.remove();
+                resolve(value);
+            },260);
+        };
+
+        const onKeydown=event=>{
+            if(event.key==="Escape") finish(false);
+            if(event.key==="Enter") finish(true);
+        };
+
+        cancelButton.addEventListener("click",()=>finish(false));
+        confirmButton.addEventListener("click",()=>finish(true));
+        backdrop.addEventListener("click",event=>{
+            if(event.target===backdrop) finish(false);
+        });
+        document.addEventListener("keydown",onKeydown);
+
+        requestAnimationFrame(()=>requestAnimationFrame(()=>{
+            backdrop.style.opacity="1";
+            panel.style.opacity="1";
+            panel.style.transform="translateY(0) scale(1)";
+            confirmButton.focus();
+        }));
+    });
+}
+
+function setReapplyState(message, isError=false){
+    reapplyUnitList.innerHTML="";
+    const state=document.createElement("div");
+    state.className="reapply-state";
+    if(isError) state.style.color="#dc2626";
+    state.textContent=message;
+    reapplyUnitList.appendChild(state);
+}
+
+async function loadReapplyUnits(keyword=""){
+    setReapplyState("부대를 불러오는 중입니다.");
+
+    let query=sb
+        .from("units")
+        .select("id,unit_name,unit_code")
+        .order("unit_name",{ascending:true});
+
+    const normalized=keyword.trim();
+    if(normalized!==""){
+        const safeKeyword=normalized.replace(/[,%()]/g," ").trim();
+        if(safeKeyword!==""){
+            query=query.or(`unit_name.ilike.*${safeKeyword}*,unit_code.ilike.*${safeKeyword}*`);
+        }
+    }
+
+    const {data,error}=await query;
+
+    if(error){
+        console.error("부대 재검색 실패:",error);
+        setReapplyState("부대를 불러오지 못했습니다.",true);
+        return;
+    }
+
+    const units=Array.isArray(data) ? data : [];
+    if(units.length===0){
+        setReapplyState("검색 결과가 없습니다.");
+        return;
+    }
+
+    reapplyUnitList.innerHTML="";
+    units.forEach(item=>{
+        const button=document.createElement("button");
+        button.type="button";
+        button.className="reapply-unit";
+
+        const textWrap=document.createElement("span");
+        const unitName=document.createElement("div");
+        unitName.className="reapply-unit-name";
+        unitName.textContent=item.unit_name || "이름 없는 부대";
+        const unitCode=document.createElement("div");
+        unitCode.className="reapply-unit-code";
+        unitCode.textContent=item.unit_code ? `부대코드 ${item.unit_code}` : "부대코드 없음";
+        textWrap.append(unitName,unitCode);
+
+        const action=document.createElement("span");
+        action.className="reapply-unit-action";
+        action.textContent="신청";
+        button.append(textWrap,action);
+
+        button.addEventListener("click",()=>submitUnitReapplication(item));
+        reapplyUnitList.appendChild(button);
+    });
+}
+
+async function openReapplyUnitPicker(){
+    reapplyBackdrop.classList.add("open");
+    reapplyUnitSearch.value="";
+    await loadReapplyUnits();
+    setTimeout(()=>reapplyUnitSearch.focus(),80);
+}
+
+async function submitUnitReapplication(unitInfo){
+    if(reapplying) return;
+
+    const unitName=unitInfo?.unit_name || "선택한 부대";
+    if(!await confirmReapplyWithToast(unitName)) return;
+
+    reapplying=true;
+    reapplyUnitSearch.disabled=true;
+    [...reapplyUnitList.querySelectorAll("button")].forEach(button=>button.disabled=true);
+
+    try{
+        const {error}=await sb.rpc("reapply_user_application",{
+            p_unit_id:unitInfo.id
+        });
+
+        if(error) throw error;
+
+        triggerToast("재가입 신청이 완료되었습니다.\n관리자의 승인을 기다려주세요.");
+        await logout();
+        setTimeout(()=>location.replace("index.html"),1200);
+    }catch(error){
+        console.error("재가입 신청 실패:",error);
+        triggerToast(error?.message || "재가입 신청에 실패했습니다.");
+        await loadReapplyUnits(reapplyUnitSearch.value);
+    }finally{
+        reapplying=false;
+        reapplyUnitSearch.disabled=false;
+    }
+}
+
+async function moveByRole(user){
+    const {data:profile,error:profileError}=await getProfile(user.id);
+
+    if(profileError || !profile){
+        await logout();
+        triggerToast("회원 정보를\n불러오지 못했습니다.");
+        return;
+    }
+
+    if(profile.role==="user"){
+        if(
+            profile.user_approved===true &&
+            profile.approval_status==="approved"
+        ){
+            location.replace(USER_HOME_PAGE);
+            return;
+        }
+
+        if(profile.approval_status==="rejected"){
+            triggerToast("회원가입 신청이 반려되었습니다.\n가입할 부대를 다시 선택해주세요.");
+            await openReapplyUnitPicker();
+            return;
+        }
+
+        await logout();
+        triggerToast("회원가입 승인 대기중입니다.\n관리자의 승인을 기다려주세요.");
+        return;
+    }
+
+    if(profile.role!=="admin"){
+        await logout();
+        triggerToast("등록되지 않은 회원 유형입니다.");
+        return;
+    }
+
+    const {data:admin,error:adminError}=await getAdminApproval(user.id);
+
+    if(adminError){
+        await logout();
+        triggerToast("관리자 정보를\n확인할 수 없습니다.");
+        return;
+    }
+
+    if(admin?.isadmin===true){
+        location.replace(ADMIN_HOME_PAGE);
+        return;
+    }
+
+    await logout();
+    triggerToast("관리자 승인 대기중입니다.\n개발자의 승인을 기다려주세요.");
+}
+
+loginBtn.addEventListener("click",async()=>{
+    if(loggingIn) return;
+
+    const emailValue=email.value.trim();
+
+    if(emailValue===""){
+        triggerToast("이메일을 입력하세요.");
+        email.focus();
+        return;
+    }
+
+    if(password.value===""){
+        triggerToast("비밀번호를 입력하세요.");
+        password.focus();
+        return;
+    }
+
+    loggingIn=true;
+    loginBtn.disabled=true;
+    loginBtn.textContent="로그인 중...";
+
+    try{
+        const {data,error}=await login(emailValue,password.value);
+
+        if(error){
+            triggerToast("이메일 또는 비밀번호가\n올바르지 않습니다.");
+            return;
+        }
+
+        await moveByRole(data.user);
+    }finally{
+        loggingIn=false;
+        loginBtn.disabled=false;
+        loginBtn.textContent="로그인";
+    }
+});
+
+[email,password].forEach(element=>{
+    element.addEventListener("keydown",event=>{
+        if(event.key==="Enter") loginBtn.click();
+    });
+});
+
+reapplyUnitSearch.addEventListener("input",()=>{
+    clearTimeout(reapplySearchTimer);
+    reapplySearchTimer=setTimeout(()=>loadReapplyUnits(reapplyUnitSearch.value),180);
+});
+
+reapplyLogoutBtn.addEventListener("click",async()=>{
+    await logout();
+    reapplyBackdrop.classList.remove("open");
+    email.value="";
+    password.value="";
+    email.focus();
+});
+
+window.addEventListener("load",async()=>{
+    const {data:{session},error}=await getSession();
+    if(!error && session) await moveByRole(session.user);
+});
+</script>
+</body>
+</html>

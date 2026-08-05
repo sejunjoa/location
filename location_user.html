@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f172a" />
+  <title>부대 병력 위치현황</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="toast.js"></script>
+  <style>
+    :root {
+      --bg: #eef2f7;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --line: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #2563eb;
+      --primary-soft: #dbeafe;
+      --danger: #dc2626;
+      --shadow: 0 10px 28px rgba(15, 23, 42, .08);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top, rgba(37, 99, 235, .11), transparent 34%),
+        var(--bg);
+      color: var(--text);
+      font-family: Pretendard, "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body.overlay-open {
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled,
+    input:disabled {
+      cursor: not-allowed;
+      opacity: .58;
+    }
+
+    .app {
+      width: min(100%, 480px);
+      min-height: 100vh;
+      margin: 0 auto;
+      background: rgba(248, 250, 252, .95);
+      border-left: 1px solid rgba(226, 232, 240, .9);
+      border-right: 1px solid rgba(226, 232, 240, .9);
+      position: relative;
+    }
+
+    .header {
+      position: relative;
+      z-index: 60;
+      min-height: calc(100px + env(safe-area-inset-top));
+      padding: calc(18px + env(safe-area-inset-top)) 18px 20px;
+      color: #fff;
+      background: linear-gradient(145deg, #0f172a, #1e3a8a 70%, #2563eb);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, .16);
+    }
+
+    .header-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      min-height: 40px;
+    }
+
+    .title-area {
+      min-width: 0;
+    }
+
+    .title-area h1 {
+      margin: 0;
+      font-size: 22px;
+      letter-spacing: -.45px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(255, 255, 255, .16);
+      border-radius: 13px;
+      color: #fff;
+      background: rgba(255, 255, 255, .10);
+      font-size: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .icon-btn:active {
+      background: rgba(255, 255, 255, .18);
+      transform: scale(.97);
+    }
+
+    .refresh-icon {
+      display: inline-block;
+      line-height: 1;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      transform: translateY(-3px);
+    }
+
+    .refresh-icon.syncing {
+      animation: syncPulse .7s ease-in-out infinite alternate;
+    }
+
+    @keyframes syncPulse {
+      from { opacity: .45; }
+      to { opacity: 1; }
+    }
+
+    .sync-line {
+      position: absolute;
+      left: 18px;
+      bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 18px;
+      color: rgba(255, 255, 255, .72);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .sync-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 0 4px rgba(74, 222, 128, .12);
+    }
+
+    .sync-dot.error {
+      background: #f87171;
+      box-shadow: 0 0 0 4px rgba(248, 113, 113, .13);
+    }
+
+    main {
+      padding: 0 14px calc(28px + env(safe-area-inset-bottom));
+    }
+
+    .sticky-dashboard {
+      position: sticky;
+      top: 0;
+      z-index: 45;
+      width: calc(100% + 28px);
+      margin: 0 -14px;
+      padding: 12px 14px 10px;
+      background: rgba(248, 250, 252, .95);
+      border-bottom: 1px solid rgba(226, 232, 240, .92);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, .04);
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      min-height: 69px;
+    }
+
+    .metric {
+      min-height: 69px;
+      padding: 13px 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 21px;
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .content-section {
+      padding-top: 16px;
+    }
+
+    .location-list {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .location-card {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid var(--card-border, var(--line));
+      border-radius: 19px;
+      background: var(--card-bg, var(--surface));
+      box-shadow: var(--shadow);
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    }
+
+    .location-card:active {
+      transform: scale(.975);
+      box-shadow: 0 5px 16px rgba(15, 23, 42, .09);
+    }
+
+    .location-card.current {
+      border-width: 2px;
+      box-shadow: 0 10px 28px rgba(37, 99, 235, .13);
+    }
+
+    .current-badge {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      z-index: 2;
+      transform: translateY(-50%);
+      padding: 4px 6px;
+      border-radius: 999px;
+      background: var(--title-color, var(--primary));
+      color: #fff;
+      font-size: 8px;
+      font-weight: 900;
+      letter-spacing: -.1px;
+    }
+
+    .location-main {
+      width: 100%;
+      min-height: 112px;
+      border: 0;
+      padding: 13px 11px;
+      background: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: space-between;
+      gap: 10px;
+      color: inherit;
+      text-align: left;
+    }
+
+    .location-title {
+      display: block;
+      padding-right: 42px;
+      color: var(--title-color, var(--primary));
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: -.25px;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+
+    .location-sub {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1.35;
+      word-break: keep-all;
+    }
+
+    .location-count {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      text-align: left;
+    }
+
+    .location-count strong {
+      color: var(--title-color, var(--primary));
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    .location-count span {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .empty-location-state {
+      padding: 54px 10px 34px;
+      text-align: center;
+    }
+
+    .empty-location-state strong {
+      display: block;
+      color: var(--text);
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: -.4px;
+    }
+
+    .empty-location-state span {
+      display: block;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.6;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      background: rgba(15, 23, 42, .44);
+      backdrop-filter: blur(3px);
+    }
+
+    .modal-backdrop.open {
+      display: block;
+      animation: fadeIn .18s ease;
+    }
+
+    .modal-backdrop.closing {
+      animation: fadeOut .2s ease forwards;
+    }
+
+    .dialog {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 10000;
+      width: min(calc(100% - 28px), 440px);
+      max-height: min(90vh, 760px);
+      max-height: min(90dvh, 760px);
+      transform: translate(-50%, -50%);
+      border-radius: 22px;
+      background: var(--surface);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, .24);
+      overflow: hidden;
+      animation: dialogIn .2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dialog.closing {
+      animation: dialogOut .2s ease forwards;
+    }
+
+    .dialog:focus {
+      outline: none;
+    }
+
+    .dialog-head {
+      padding: 18px 18px 14px;
+      border-bottom: 1px solid var(--line);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .dialog-head h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.25px;
+    }
+
+    .dialog-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .dialog-close-btn {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .dialog-body {
+      padding: 18px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .field-group + .field-group {
+      margin-top: 14px;
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .text-input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 0 14px;
+      outline: none;
+      background: #fff;
+      color: var(--text);
+    }
+
+    .text-input:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, .10);
+    }
+
+    .field-note {
+      margin: 8px 2px 0;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .arrival-input-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+    }
+
+    .arrival-input-grid > div,
+    .arrival-input-grid .text-input {
+      min-width: 0;
+    }
+
+    .arrival-input-grid .field-label {
+      margin-top: 0;
+    }
+
+    .time-quick-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .time-quick-btn {
+      min-width: 0;
+      min-height: 38px;
+      border: 1px solid #bfdbfe;
+      border-radius: 11px;
+      padding: 0 4px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .time-quick-btn:active {
+      background: #dbeafe;
+      transform: scale(.98);
+    }
+
+
+
+    .user-tab-view[hidden] {
+      display: none !important;
+    }
+
+    .tab-search-dashboard {
+      padding-bottom: 12px;
+    }
+
+    .personnel-search-wrap {
+      position: relative;
+      width: 100%;
+      height: 48px;
+      margin-top: 10px;
+    }
+
+    .personnel-search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 16px;
+      font-weight: 900;
+      pointer-events: none;
+    }
+
+    .personnel-search-input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 0 42px;
+      outline: none;
+      color: var(--text);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      font-weight: 750;
+      transition: border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .personnel-search-input::placeholder {
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .personnel-search-input:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.10), var(--shadow);
+    }
+
+    /* 브라우저 기본 검색 취소 버튼과 커스텀 X가 겹치지 않도록 기본 버튼을 숨깁니다. */
+    .personnel-search-input::-webkit-search-cancel-button,
+    .personnel-search-input::-webkit-search-decoration {
+      -webkit-appearance: none;
+      appearance: none;
+      display: none;
+    }
+
+    .personnel-search-input::-ms-clear,
+    .personnel-search-input::-ms-reveal {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .personnel-search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      width: 32px;
+      height: 32px;
+      transform: translateY(-50%);
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 16px;
+      font-weight: 900;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .personnel-search-clear.visible {
+      display: inline-flex;
+    }
+
+    .personnel-content,
+    .records-content {
+      padding-top: 14px;
+    }
+
+    /* 검색창 아래의 기존 점선 안내 상자를 제거합니다. */
+    .personnel-state,
+    .records-state {
+      min-height: 86px;
+      padding: 24px 12px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.6;
+    }
+
+    .personnel-list,
+    .records-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .personnel-card,
+    .record-card {
+      min-width: 0;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .personnel-card-head,
+    .record-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .personnel-card-name,
+    .record-card-name {
+      min-width: 0;
+      margin: 0;
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: -.3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .personnel-zone-badge {
+      flex: 0 0 auto;
+      max-width: 48%;
+      padding: 6px 9px;
+      border: 1px solid color-mix(in srgb, var(--zone-color, #2563eb) 24%, var(--line));
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--zone-color, #2563eb) 8%, white);
+      color: var(--zone-color, #2563eb);
+      font-size: 11px;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .personnel-card-info,
+    .record-card-info {
+      display: grid;
+      grid-template-columns: minmax(92px, auto) 1fr;
+      gap: 11px 12px;
+      margin: 14px 0 0;
+    }
+
+    .personnel-card-info dt,
+    .personnel-card-info dd,
+    .record-card-info dt,
+    .record-card-info dd {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .personnel-card-info dt,
+    .record-card-info dt {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .personnel-card-info dd,
+    .record-card-info dd {
+      min-width: 0;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 850;
+      text-align: right;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .personnel-time-value,
+    .record-time-value {
+      color: #1d4ed8 !important;
+    }
+
+    .record-arrival-time.missing,
+    .record-elapsed-time.overdue {
+      color: #dc2626;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 70;
+      width: min(100%, 480px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(226,232,240,.92);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 -8px 22px rgba(15,23,42,.08);
+    }
+
+    .nav-btn {
+      min-height: 54px;
+      border: 0;
+      border-radius: 15px;
+      background: transparent;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .nav-btn.active {
+      background: var(--primary-soft);
+      color: #1d4ed8;
+    }
+
+    .nav-icon {
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    .home-zone-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .home-zone-option {
+      width: 100%;
+      min-height: 58px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      font-weight: 900;
+    }
+
+    .home-zone-option::after {
+      content: '선택';
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .home-zone-state {
+      padding: 18px 4px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 370px) {
+      .time-quick-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 350px) {
+      .arrival-input-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .dialog-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .primary-btn,
+    .secondary-btn,
+    .danger-btn {
+      min-height: 48px;
+      border-radius: 15px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .primary-btn {
+      border: 0;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .secondary-btn {
+      border: 0;
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .danger-btn {
+      width: 100%;
+      border: 1px solid #fecaca;
+      background: #fff1f2;
+      color: var(--danger);
+    }
+
+    .full-btn {
+      width: 100%;
+    }
+
+    .settings-section {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: #fff;
+    }
+
+    .settings-section + .settings-section {
+      margin-top: 12px;
+    }
+
+    .settings-title {
+      margin: 0;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .profile-summary {
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr);
+      gap: 9px 12px;
+      margin: 14px 0 0;
+      font-size: 12px;
+    }
+
+    .profile-summary dt {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .profile-summary dd {
+      margin: 0;
+      color: var(--text);
+      font-weight: 900;
+      word-break: break-word;
+    }
+
+    .settings-company-form {
+      margin-top: 14px;
+    }
+
+    .settings-close-bottom {
+      width: 100%;
+      min-height: 48px;
+      margin-top: 14px;
+      border: 0;
+      border-radius: 15px;
+      background: #e2e8f0;
+      color: #334155;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .message-dialog .dialog-body {
+      text-align: center;
+    }
+
+    .message-icon {
+      width: 46px;
+      height: 46px;
+      margin: 0 auto 13px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-soft);
+      color: #1d4ed8;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .message-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .message-text {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+
+    .loading-cover {
+      position: fixed;
+      inset: 0;
+      z-index: 15000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef2f7;
+      color: #1e3a8a;
+      font-size: 14px;
+      font-weight: 900;
+      transition: opacity .2s ease;
+    }
+
+    .loading-cover.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    @keyframes dialogIn {
+      from { opacity: 0; transform: translate(-50%, -47%) scale(.97); }
+      to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    @keyframes dialogOut {
+      from { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      to { opacity: 0; transform: translate(-50%, -47%) scale(.97); }
+    }
+
+
+
+    .user-tab-view[hidden] {
+      display: none !important;
+    }
+
+    .tab-search-dashboard {
+      padding-bottom: 12px;
+    }
+
+    .personnel-search-wrap {
+      position: relative;
+      width: 100%;
+      height: 48px;
+      margin-top: 10px;
+    }
+
+    .personnel-search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      font-size: 16px;
+      font-weight: 900;
+      pointer-events: none;
+    }
+
+    .personnel-search-input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 0 42px;
+      outline: none;
+      color: var(--text);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      font-size: 14px;
+      font-weight: 750;
+      transition: border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .personnel-search-input::placeholder {
+      color: #94a3b8;
+      font-weight: 700;
+    }
+
+    .personnel-search-input:focus {
+      border-color: #93c5fd;
+      box-shadow: 0 0 0 4px rgba(37,99,235,.10), var(--shadow);
+    }
+
+    /* 브라우저 기본 검색 취소 버튼과 커스텀 X가 겹치지 않도록 기본 버튼을 숨깁니다. */
+    .personnel-search-input::-webkit-search-cancel-button,
+    .personnel-search-input::-webkit-search-decoration {
+      -webkit-appearance: none;
+      appearance: none;
+      display: none;
+    }
+
+    .personnel-search-input::-ms-clear,
+    .personnel-search-input::-ms-reveal {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .personnel-search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      width: 32px;
+      height: 32px;
+      transform: translateY(-50%);
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: #94a3b8;
+      font-size: 16px;
+      font-weight: 900;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .personnel-search-clear.visible {
+      display: inline-flex;
+    }
+
+    .personnel-content,
+    .records-content {
+      padding-top: 14px;
+    }
+
+    /* 검색창 아래의 기존 점선 안내 상자를 제거합니다. */
+    .personnel-state,
+    .records-state {
+      min-height: 86px;
+      padding: 24px 12px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.6;
+    }
+
+    .personnel-list,
+    .records-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .personnel-card,
+    .record-card {
+      min-width: 0;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+
+    .personnel-card-head,
+    .record-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 13px;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .personnel-card-name,
+    .record-card-name {
+      min-width: 0;
+      margin: 0;
+      color: var(--text);
+      font-size: 20px;
+      font-weight: 950;
+      letter-spacing: -.3px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .personnel-zone-badge {
+      flex: 0 0 auto;
+      max-width: 48%;
+      padding: 6px 9px;
+      border: 1px solid color-mix(in srgb, var(--zone-color, #2563eb) 24%, var(--line));
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--zone-color, #2563eb) 8%, white);
+      color: var(--zone-color, #2563eb);
+      font-size: 11px;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .personnel-card-info,
+    .record-card-info {
+      display: grid;
+      grid-template-columns: minmax(92px, auto) 1fr;
+      gap: 11px 12px;
+      margin: 14px 0 0;
+    }
+
+    .personnel-card-info dt,
+    .personnel-card-info dd,
+    .record-card-info dt,
+    .record-card-info dd {
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .personnel-card-info dt,
+    .record-card-info dt {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .personnel-card-info dd,
+    .record-card-info dd {
+      min-width: 0;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 850;
+      text-align: right;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .personnel-time-value,
+    .record-time-value {
+      color: #1d4ed8 !important;
+    }
+
+    .record-arrival-time.missing,
+    .record-elapsed-time.overdue {
+      color: #dc2626;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      bottom: 0;
+      z-index: 70;
+      width: min(100%, 480px);
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
+      border-top: 1px solid rgba(226,232,240,.92);
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(18px);
+      box-shadow: 0 -8px 22px rgba(15,23,42,.08);
+    }
+
+    .nav-btn {
+      min-height: 54px;
+      border: 0;
+      border-radius: 15px;
+      background: transparent;
+      color: #64748b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 850;
+    }
+
+    .nav-btn.active {
+      background: var(--primary-soft);
+      color: #1d4ed8;
+    }
+
+    .nav-icon {
+      font-size: 19px;
+      line-height: 1;
+    }
+
+    .home-zone-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .home-zone-option {
+      width: 100%;
+      min-height: 58px;
+      padding: 13px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      font-weight: 900;
+    }
+
+    .home-zone-option::after {
+      content: '선택';
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .home-zone-state {
+      padding: 18px 4px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 370px) {
+      main {
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .sticky-dashboard {
+        width: calc(100% + 20px);
+        margin-left: -10px;
+        margin-right: -10px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+
+      .metrics,
+      .location-list {
+        gap: 7px;
+      }
+
+      .metric {
+        padding-left: 3px;
+        padding-right: 3px;
+      }
+
+      .metric strong {
+        font-size: 19px;
+      }
+
+      .location-main {
+        padding: 12px 9px;
+      }
+
+      .location-title {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loading-cover" id="loadingCover">위치현황을 불러오는 중...</div>
+
+  <div class="app">
+    <header class="header">
+      <div class="header-top">
+        <div class="title-area">
+          <h1 id="pageTitle">부대 위치현황</h1>
+        </div>
+        <div class="header-actions">
+          <button class="icon-btn" id="refreshBtn" type="button" aria-label="동기화">
+            <span class="refresh-icon" id="refreshIcon">...</span>
+          </button>
+          <button class="icon-btn" id="settingsBtn" type="button" aria-label="설정">⚙</button>
+        </div>
+      </div>
+      <div class="sync-line">
+        <span class="sync-dot" id="syncDot"></span>
+        <span id="syncText">동기화 중...</span>
+      </div>
+    </header>
+
+    <main id="userTabMain">
+      <section class="user-tab-view" id="view-dashboard" data-user-tab-view="dashboard">
+        <div class="sticky-dashboard">
+          <section class="metrics" aria-label="병력 현황표">
+            <article class="metric"><strong id="metricTotal">0</strong><span>총원</span></article>
+            <article class="metric"><strong id="metricInside">0</strong><span>현재원</span></article>
+            <article class="metric"><strong id="metricDuty">0</strong><span>근무</span></article>
+            <article class="metric"><strong id="metricOutside">0</strong><span>열외</span></article>
+            <article class="metric"><strong id="metricBarracksOutside">0</strong><span>막사외부</span></article>
+          </section>
+        </div>
+
+        <section class="content-section">
+          <div class="empty-location-state" id="emptyLocationState" hidden>
+            <strong>등록된 구역이 없습니다.</strong>
+            <span>관리자가 구역을 추가하면 이곳에 표시됩니다.</span>
+          </div>
+          <div class="location-list" id="locationList"></div>
+        </section>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- 최초 중대 입력: 저장 전에는 닫을 수 없음 -->
+  <div class="modal-backdrop" id="companyModal">
+    <section class="dialog" id="companyDialog" role="dialog" aria-modal="true" aria-labelledby="companyDialogTitle">
+      <div class="dialog-head" style="grid-template-columns:1fr;">
+        <div>
+          <h3 id="companyDialogTitle">중대를 입력해주세요.</h3>
+          <p>입력한 중대는 병력 현황에 표시됩니다.</p>
+        </div>
+      </div>
+      <form class="dialog-body" id="companyForm" novalidate>
+        <div class="field-group">
+          <label class="field-label" for="companyInput">중대</label>
+          <input class="text-input" id="companyInput" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대" />
+        </div>
+        <button class="primary-btn full-btn" id="companySaveBtn" type="submit" style="margin-top:18px;">저장</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- 최초 생활관 선택: 저장 전에는 닫을 수 없음 -->
+  <div class="modal-backdrop" id="homeZoneModal">
+    <section class="dialog" id="homeZoneDialog" role="dialog" aria-modal="true" aria-labelledby="homeZoneDialogTitle">
+      <div class="dialog-head" style="grid-template-columns:1fr;">
+        <div>
+          <h3 id="homeZoneDialogTitle">생활관 선택</h3>
+          <p>본인의 초기 위치로 사용할 생활관을 선택해주세요.</p>
+        </div>
+      </div>
+      <div class="dialog-body">
+        <div class="home-zone-list" id="homeZoneList"></div>
+        <div class="home-zone-state" id="homeZoneState" hidden></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 위치 이동 -->
+  <div class="modal-backdrop" id="moveModal">
+    <section class="dialog" id="moveDialog" role="dialog" aria-modal="true" aria-labelledby="moveDialogTitle">
+      <div class="dialog-head">
+        <div>
+          <h3 id="moveDialogTitle">위치이동</h3>
+        </div>
+        <button class="dialog-close-btn" id="moveCloseBtn" type="button" aria-label="위치이동 닫기">✕</button>
+      </div>
+      <form class="dialog-body" id="moveForm" novalidate>
+        <div class="field-group">
+          <div class="arrival-input-grid">
+            <div>
+              <label class="field-label" for="arrivalDateInput">도착 예정 날짜</label>
+              <input class="text-input" id="arrivalDateInput" type="date" />
+            </div>
+            <div>
+              <label class="field-label" for="arrivalTimeInput">도착 예정 시간</label>
+              <input class="text-input" id="arrivalTimeInput" type="text" inputmode="numeric" maxlength="5" autocomplete="off" placeholder="00:00" aria-label="도착 예정 시간 24시간제" />
+            </div>
+          </div>
+          <div class="time-quick-grid" id="timeQuickGrid" aria-label="도착 예정 시간 빠른 추가">
+            <button class="time-quick-btn" type="button" data-add-minutes="5">+5분</button>
+            <button class="time-quick-btn" type="button" data-add-minutes="10">+10분</button>
+            <button class="time-quick-btn" type="button" data-add-minutes="30">+30분</button>
+            <button class="time-quick-btn" type="button" data-add-minutes="60">+1시간</button>
+            <button class="time-quick-btn" type="button" data-add-minutes="120">+2시간</button>
+          </div>
+          <p class="field-note" id="arrivalTimeNote" hidden></p>
+        </div>
+        <div class="dialog-actions">
+          <button class="secondary-btn" id="moveCancelBtn" type="button">취소</button>
+          <button class="primary-btn" id="moveConfirmBtn" type="submit">이동하기</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <!-- 설정 -->
+  <div class="modal-backdrop" id="settingsModal">
+    <section class="dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsDialogTitle" tabindex="-1">
+      <div class="dialog-head">
+        <div>
+          <h3 id="settingsDialogTitle">설정</h3>
+          <p>내 정보와 로그인 상태를 관리합니다.</p>
+        </div>
+        <button class="dialog-close-btn" id="settingsCloseBtn" type="button" aria-label="설정 닫기">✕</button>
+      </div>
+      <div class="dialog-body">
+        <section class="settings-section">
+          <h4 class="settings-title">내 정보</h4>
+          <dl class="profile-summary">
+            <dt>이름</dt><dd id="settingsNameText">-</dd>
+            <dt>소속 부대</dt><dd id="settingsUnitText">-</dd>
+            <dt>생활관</dt><dd id="settingsHomeZoneText">-</dd>
+            <dt>현위치</dt><dd id="settingsZoneText">-</dd>
+          </dl>
+          <form class="settings-company-form" id="settingsCompanyForm" novalidate>
+            <label class="field-label" for="settingsCompanyInput">중대</label>
+            <input class="text-input" id="settingsCompanyInput" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대" />
+            <button class="primary-btn full-btn" id="settingsCompanySaveBtn" type="submit" style="margin-top:12px;">중대 저장</button>
+          </form>
+          <form class="settings-company-form" id="settingsHomeZoneForm" novalidate style="margin-top:18px;">
+            <label class="field-label" for="settingsHomeZoneSelect">생활관</label>
+            <select class="text-input" id="settingsHomeZoneSelect"></select>
+            <button class="primary-btn full-btn" id="settingsHomeZoneSaveBtn" type="submit" style="margin-top:12px;">생활관 저장</button>
+          </form>
+        </section>
+
+        <section class="settings-section">
+          <h4 class="settings-title">로그아웃</h4>
+          <button class="danger-btn" id="logoutBtn" type="button" style="margin-top:14px;">로그아웃</button>
+        </section>
+
+        <button class="settings-close-bottom" id="settingsBottomCloseBtn" type="button">닫기</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- 안내 -->
+  <div class="modal-backdrop" id="messageModal">
+    <section class="dialog message-dialog" id="messageDialog" role="alertdialog" aria-modal="true" aria-labelledby="messageTitle">
+      <div class="dialog-body">
+        <div class="message-icon" aria-hidden="true">!</div>
+        <h3 class="message-title" id="messageTitle">안내</h3>
+        <p class="message-text" id="messageText"></p>
+        <button class="primary-btn full-btn" id="messageCloseBtn" type="button" style="margin-top:18px;">확인</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- 로그아웃 확인 -->
+  <div class="modal-backdrop" id="confirmModal">
+    <section class="dialog message-dialog" id="confirmDialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle">
+      <div class="dialog-body">
+        <div class="message-icon" aria-hidden="true">!</div>
+        <h3 class="message-title" id="confirmTitle">로그아웃</h3>
+        <p class="message-text" id="confirmText">정말 로그아웃하시겠습니까?</p>
+        <div class="dialog-actions">
+          <button class="secondary-btn" id="confirmCancelBtn" type="button">취소</button>
+          <button class="primary-btn" id="confirmOkBtn" type="button">로그아웃</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const pageTitle = document.getElementById('pageTitle');
+    const syncText = document.getElementById('syncText');
+    const syncDot = document.getElementById('syncDot');
+    const refreshIcon = document.getElementById('refreshIcon');
+    const loadingCover = document.getElementById('loadingCover');
+    const locationList = document.getElementById('locationList');
+    const emptyLocationState = document.getElementById('emptyLocationState');
+
+    const metricGroups = [
+      {
+        total: document.getElementById('metricTotal'),
+        inside: document.getElementById('metricInside'),
+        duty: document.getElementById('metricDuty'),
+        outside: document.getElementById('metricOutside'),
+        barracksOutside: document.getElementById('metricBarracksOutside')
+      }
+    ];
+
+
+    const companyModal = document.getElementById('companyModal');
+    const companyDialog = document.getElementById('companyDialog');
+    const companyForm = document.getElementById('companyForm');
+    const companyInput = document.getElementById('companyInput');
+    const companySaveBtn = document.getElementById('companySaveBtn');
+
+    const homeZoneModal = document.getElementById('homeZoneModal');
+    const homeZoneDialog = document.getElementById('homeZoneDialog');
+    const homeZoneList = document.getElementById('homeZoneList');
+    const homeZoneState = document.getElementById('homeZoneState');
+
+    const moveModal = document.getElementById('moveModal');
+    const moveDialog = document.getElementById('moveDialog');
+    const moveForm = document.getElementById('moveForm');
+    const moveDialogTitle = document.getElementById('moveDialogTitle');
+    const arrivalDateInput = document.getElementById('arrivalDateInput');
+    const arrivalTimeInput = document.getElementById('arrivalTimeInput');
+    const timeQuickButtons = [...document.querySelectorAll('[data-add-minutes]')];
+    const arrivalTimeNote = document.getElementById('arrivalTimeNote');
+    const moveConfirmBtn = document.getElementById('moveConfirmBtn');
+
+    const settingsModal = document.getElementById('settingsModal');
+    const settingsDialog = document.getElementById('settingsDialog');
+    const settingsCompanyForm = document.getElementById('settingsCompanyForm');
+    const settingsCompanyInput = document.getElementById('settingsCompanyInput');
+    const settingsCompanySaveBtn = document.getElementById('settingsCompanySaveBtn');
+    const settingsHomeZoneForm = document.getElementById('settingsHomeZoneForm');
+    const settingsHomeZoneSelect = document.getElementById('settingsHomeZoneSelect');
+    const settingsHomeZoneSaveBtn = document.getElementById('settingsHomeZoneSaveBtn');
+    const settingsNameText = document.getElementById('settingsNameText');
+    const settingsUnitText = document.getElementById('settingsUnitText');
+    const settingsHomeZoneText = document.getElementById('settingsHomeZoneText');
+    const settingsZoneText = document.getElementById('settingsZoneText');
+
+    const messageModal = document.getElementById('messageModal');
+    const messageDialog = document.getElementById('messageDialog');
+    const messageTitle = document.getElementById('messageTitle');
+    const messageText = document.getElementById('messageText');
+
+    const confirmModal = document.getElementById('confirmModal');
+    const confirmDialog = document.getElementById('confirmDialog');
+    const confirmOkBtn = document.getElementById('confirmOkBtn');
+
+    let userAccess = null;
+    let currentUnit = null;
+    let zones = [];
+    let people = [];
+    let ownLocation = null;
+    let selectedMoveZone = null;
+    let realtimeChannel = null;
+    let reloadTimer = null;
+    let loadSequence = 0;
+
+    function setSyncStatus(message, isError = false) {
+      syncText.textContent = message;
+      syncDot.classList.toggle('error', isError);
+    }
+
+    function formatSyncTime() {
+      const formatted = new Intl.DateTimeFormat('ko-KR', {
+        hour: '2-digit', minute: '2-digit', hour12: false, timeZone: 'Asia/Seoul'
+      }).format(new Date());
+      return `${formatted} 동기화 완료`;
+    }
+
+    function escapeMessage(error, fallback = '요청을 처리하지 못했습니다.') {
+      if (!error) return fallback;
+      const message = String(error.message || error.error_description || error.details || '').trim();
+      return message || fallback;
+    }
+
+    function isMissingFunctionError(error, functionName) {
+      const text = `${error?.code || ''} ${error?.message || ''} ${error?.details || ''}`.toLowerCase();
+      return text.includes('42883')
+        || text.includes('pgrst202')
+        || text.includes(`could not find the function public.${String(functionName).toLowerCase()}`)
+        || text.includes(`function public.${String(functionName).toLowerCase()}`);
+    }
+
+    function updateBodyOverlayLock() {
+      const hasOpenOverlay = Boolean(document.querySelector('.modal-backdrop.open'));
+      document.body.classList.toggle('overlay-open', hasOpenOverlay);
+    }
+
+    function openModal(backdrop, dialog) {
+      backdrop.classList.remove('closing');
+      dialog.classList.remove('closing');
+      backdrop.classList.add('open');
+      updateBodyOverlayLock();
+    }
+
+    function closeModal(backdrop, dialog) {
+      if (!backdrop.classList.contains('open')) return;
+      backdrop.classList.add('closing');
+      dialog.classList.add('closing');
+      window.setTimeout(() => {
+        backdrop.classList.remove('open', 'closing');
+        dialog.classList.remove('closing');
+        updateBodyOverlayLock();
+      }, 200);
+    }
+
+    function showMessage(message, title = '안내') {
+      messageTitle.textContent = title;
+      messageText.textContent = message;
+      openModal(messageModal, messageDialog);
+    }
+
+    function attributeLabel(attribute) {
+      return {
+        inside: '생활관',
+        barracks_inside: '막사 내부',
+        duty: '근무',
+        outside: '열외',
+        barracks_outside: '막사외부'
+      }[attribute] || '기타';
+    }
+
+    function hexToRgba(hex, alpha) {
+      const normalized = String(hex || '#2563eb').replace('#', '');
+      const safe = /^[0-9a-fA-F]{6}$/.test(normalized) ? normalized : '2563eb';
+      const red = Number.parseInt(safe.slice(0, 2), 16);
+      const green = Number.parseInt(safe.slice(2, 4), 16);
+      const blue = Number.parseInt(safe.slice(4, 6), 16);
+      return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+    }
+
+    function getZone(zoneId) {
+      return zones.find(zone => zone.id === zoneId) || null;
+    }
+
+    function getZonePeople(zoneId) {
+      return people.filter(person => person.zoneId === zoneId);
+    }
+
+    function getOwnZone() {
+      return ownLocation?.zoneId ? getZone(ownLocation.zoneId) : null;
+    }
+
+    function getHomeZone() {
+      const zoneId = userAccess?.profile?.home_zone_id;
+      return zoneId ? getZone(zoneId) : null;
+    }
+
+    function isOwnHomeZone(zone) {
+      return Boolean(zone?.id && userAccess?.profile?.home_zone_id === zone.id);
+    }
+
+    function isPersonAtHome(person) {
+      if (!person) return false;
+      if (person.homeZoneId) return person.zoneId === person.homeZoneId;
+      return getZone(person.zoneId)?.attribute === 'inside';
+    }
+
+    function updatePageTitle() {
+      pageTitle.textContent = currentUnit?.unit_name
+        ? `${currentUnit.unit_name} 위치현황`
+        : '부대 위치현황';
+      document.title = pageTitle.textContent;
+    }
+
+    function updateMetrics() {
+      const total = people.length;
+      const countByAttribute = attribute => zones.reduce((sum, zone) => (
+        zone.attribute === attribute ? sum + getZonePeople(zone.id).length : sum
+      ), 0);
+      const outside = countByAttribute('outside');
+      const duty = countByAttribute('duty');
+      const barracksOutside = countByAttribute('barracks_outside');
+      const inside = Math.max(0, total - outside);
+
+      metricGroups.forEach(group => {
+        group.total.textContent = String(total);
+        group.inside.textContent = String(inside);
+        group.duty.textContent = String(duty);
+        group.outside.textContent = String(outside);
+        group.barracksOutside.textContent = String(barracksOutside);
+      });
+    }
+
+    function renderZones() {
+      locationList.innerHTML = '';
+      emptyLocationState.hidden = zones.length > 0;
+
+      zones.forEach(zone => {
+        const card = document.createElement('article');
+        card.className = 'location-card';
+        card.dataset.zoneId = zone.id;
+        card.style.setProperty('--title-color', zone.color);
+        card.style.setProperty('--card-bg', hexToRgba(zone.color, .075));
+        card.style.setProperty('--card-border', hexToRgba(zone.color, .24));
+
+        const isCurrent = ownLocation?.zoneId === zone.id;
+        if (isCurrent) card.classList.add('current');
+
+        const button = document.createElement('button');
+        button.className = 'location-main';
+        button.type = 'button';
+        button.setAttribute('aria-label', `${zone.name}으로 위치 이동`);
+
+        const top = document.createElement('span');
+        const title = document.createElement('span');
+        title.className = 'location-title';
+        title.textContent = zone.name;
+        const sub = document.createElement('span');
+        sub.className = 'location-sub';
+        sub.textContent = attributeLabel(zone.attribute);
+        top.append(title, sub);
+
+        const count = document.createElement('span');
+        count.className = 'location-count';
+        const strong = document.createElement('strong');
+        strong.textContent = String(getZonePeople(zone.id).length);
+        const unit = document.createElement('span');
+        unit.textContent = '명';
+        count.append(strong, unit);
+
+        button.append(top, count);
+        button.addEventListener('click', () => openMoveModal(zone.id));
+        card.appendChild(button);
+
+        if (isCurrent) {
+          const badge = document.createElement('span');
+          badge.className = 'current-badge';
+          badge.textContent = '현재 위치';
+          card.appendChild(badge);
+        }
+
+        locationList.appendChild(card);
+      });
+
+      updateMetrics();
+    }
+
+
+    function getKstParts(value = new Date()) {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      }).formatToParts(value);
+      return Object.fromEntries(
+        parts
+          .filter(part => part.type !== 'literal')
+          .map(part => [part.type, Number(part.value)])
+      );
+    }
+
+    function kstPartsToDate(year, month, day, hour, minute) {
+      return new Date(Date.UTC(year, month - 1, day, hour - 9, minute, 0, 0));
+    }
+
+    function formatDateInputForDate(date) {
+      const parts = getKstParts(date);
+      return `${String(parts.year).padStart(4, '0')}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}`;
+    }
+
+    function formatTimeInputForDate(date) {
+      const parts = getKstParts(date);
+      return `${String(parts.hour).padStart(2, '0')}:${String(parts.minute).padStart(2, '0')}`;
+    }
+
+    function getDefaultArrivalDateTime(zone) {
+      const now = new Date();
+      if (isOwnHomeZone(zone)) {
+        return { date: formatDateInputForDate(now), time: '' };
+      }
+
+      let base;
+      if (zone.attribute === 'duty') {
+        base = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+        const parts = getKstParts(base);
+        base = kstPartsToDate(parts.year, parts.month, parts.day, parts.hour, 55);
+      } else {
+        base = new Date(now.getTime() + (60 * 60 * 1000));
+        const fiveMinutes = 5 * 60 * 1000;
+        base = new Date(Math.ceil(base.getTime() / fiveMinutes) * fiveMinutes);
+      }
+
+      return {
+        date: formatDateInputForDate(base),
+        time: formatTimeInputForDate(base)
+      };
+    }
+
+    function parseTimeValue(timeValue) {
+      const matched = String(timeValue || '').trim().match(/^(\d{2}):(\d{2})$/);
+      if (!matched) return null;
+
+      const hour = Number(matched[1]);
+      const minute = Number(matched[2]);
+      if (!Number.isInteger(hour) || !Number.isInteger(minute)) return null;
+      if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+
+      return { hour, minute };
+    }
+
+    function parseDateValue(dateValue) {
+      const matched = String(dateValue || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+      if (!matched) return null;
+
+      const year = Number(matched[1]);
+      const month = Number(matched[2]);
+      const day = Number(matched[3]);
+      const candidate = kstPartsToDate(year, month, day, 0, 0);
+      const verified = getKstParts(candidate);
+
+      if (verified.year !== year || verified.month !== month || verified.day !== day) {
+        return null;
+      }
+
+      return { year, month, day };
+    }
+
+    function resolveArrivalIso(dateValue, timeValue) {
+      const dateParts = parseDateValue(dateValue);
+      const timeParts = parseTimeValue(timeValue);
+      if (!dateParts || !timeParts) return null;
+
+      return kstPartsToDate(
+        dateParts.year,
+        dateParts.month,
+        dateParts.day,
+        timeParts.hour,
+        timeParts.minute
+      ).toISOString();
+    }
+
+    function setArrivalInputsFromDate(date) {
+      arrivalDateInput.value = formatDateInputForDate(date);
+      arrivalTimeInput.value = formatTimeInputForDate(date);
+    }
+
+    function setArrivalAfterMinutes(minutesToAdd) {
+      setArrivalInputsFromDate(new Date(Date.now() + (minutesToAdd * 60 * 1000)));
+    }
+
+    function normalizeArrivalTimeInput() {
+      const digits = arrivalTimeInput.value.replace(/\D/g, '').slice(0, 4);
+      arrivalTimeInput.value = digits.length <= 2
+        ? digits
+        : `${digits.slice(0, 2)}:${digits.slice(2)}`;
+    }
+
+    function setArrivalControlsDisabled(disabled) {
+      arrivalDateInput.disabled = disabled;
+      arrivalTimeInput.disabled = disabled;
+      timeQuickButtons.forEach(button => {
+        button.disabled = disabled;
+      });
+    }
+
+    function openMoveModal(zoneId) {
+      const zone = getZone(zoneId);
+      if (!zone) return;
+
+      selectedMoveZone = zone;
+      moveDialogTitle.textContent = zone.name;
+
+      const defaults = getDefaultArrivalDateTime(zone);
+      arrivalDateInput.value = defaults.date;
+      arrivalTimeInput.value = defaults.time;
+
+      if (isOwnHomeZone(zone)) {
+        setArrivalControlsDisabled(true);
+        arrivalDateInput.required = false;
+        arrivalTimeInput.required = false;
+        arrivalTimeNote.hidden = false;
+        arrivalTimeNote.textContent = '본인의 생활관으로 복귀하면 출발 시간과 도착 예정 시간이 지워집니다.';
+      } else {
+        setArrivalControlsDisabled(false);
+        arrivalDateInput.required = true;
+        arrivalTimeInput.required = true;
+        arrivalTimeNote.hidden = zone.attribute !== 'duty';
+        arrivalTimeNote.textContent = zone.attribute === 'duty'
+          ? '근무 시간은 자동 입력되며 직접 수정할 수 있습니다.'
+          : '';
+      }
+
+      openModal(moveModal, moveDialog);
+    }
+
+    function closeMoveModal() {
+      selectedMoveZone = null;
+      closeModal(moveModal, moveDialog);
+    }
+
+    async function saveCompany(company) {
+      const normalized = String(company || '').trim();
+      if (!normalized) throw new Error('중대를 입력해주세요.');
+      if (normalized.length > 30) throw new Error('중대는 30자 이하로 입력해주세요.');
+      const result = await sb.rpc('set_my_company', { p_company: normalized });
+      if (result.error) {
+        if (isMissingFunctionError(result.error, 'set_my_company')) {
+          throw new Error('중대 저장 함수가 설치되지 않았습니다. location_home_zone_upgrade.sql을 먼저 실행해주세요.');
+        }
+        throw result.error;
+      }
+      userAccess.profile.company = normalized;
+      companyInput.value = normalized;
+      settingsCompanyInput.value = normalized;
+      return normalized;
+    }
+
+    async function saveHomeZone(zoneId, setCurrentLocation = false) {
+      const result = await sb.rpc('set_my_home_zone', {
+        p_zone_id: zoneId,
+        p_set_current_location: setCurrentLocation
+      });
+      if (result.error) {
+        if (isMissingFunctionError(result.error, 'set_my_home_zone')) {
+          throw new Error('생활관 저장 함수가 설치되지 않았습니다. location_home_zone_upgrade.sql을 먼저 실행해주세요.');
+        }
+        throw result.error;
+      }
+      userAccess.profile.home_zone_id = zoneId;
+      return zoneId;
+    }
+
+    async function moveOwnLocation(zone, arrivalIso) {
+      const rpcResult = await sb.rpc('move_my_location', {
+        p_zone_id: zone.id,
+        p_return_time: arrivalIso
+      });
+      if (!rpcResult.error) return;
+      if (!isMissingFunctionError(rpcResult.error, 'move_my_location')) throw rpcResult.error;
+
+      const payload = {
+        user_id: userAccess.user.id,
+        unit_id: userAccess.profile.unit_id,
+        zone_id: zone.id,
+        return_time: isOwnHomeZone(zone) ? null : arrivalIso,
+        updated_by: userAccess.user.id
+      };
+      const fallback = await sb.from('user_locations').upsert(payload, { onConflict: 'user_id' });
+      if (fallback.error) {
+        throw new Error(`위치 이동 함수를 설치해주세요.\n${fallback.error.message}`);
+      }
+    }
+
+    async function ensureInitialLocation() {
+      const result = await sb.rpc('ensure_my_initial_location');
+      if (!result.error) return;
+      if (!isMissingFunctionError(result.error, 'ensure_my_initial_location')) {
+        console.warn('최초 위치 확인 실패:', result.error);
+      }
+    }
+
+    async function loadLocationMembers(unitId) {
+      return sb.rpc('get_location_members', { p_unit_id: unitId });
+    }
+
+    async function loadProfile() {
+      const { data, error } = await getProfile(userAccess.user.id);
+      if (error || !data) throw error || new Error('프로필을 찾을 수 없습니다.');
+      if (data.role !== 'user' || data.user_approved !== true || data.approval_status !== 'approved') {
+        throw new Error('승인된 일반회원만 접근할 수 있습니다.');
+      }
+      userAccess.profile = data;
+    }
+
+    async function loadPageData({ quiet = false } = {}) {
+      const requestId = ++loadSequence;
+      if (!quiet) setSyncStatus('동기화 중...');
+      await loadProfile();
+      const unitId = userAccess.profile.unit_id;
+      if (!unitId) throw new Error('소속 부대가 지정되어 있지 않습니다.');
+
+      const [unitResult, zoneResult] = await Promise.all([
+        sb.from('units').select('id, unit_name, unit_code').eq('id', unitId).single(),
+        sb.from('location_zones')
+          .select('id, unit_id, name, attribute, color, sort_order, created_at')
+          .eq('unit_id', unitId)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: true })
+      ]);
+      const firstError = unitResult.error || zoneResult.error;
+      if (firstError) throw firstError;
+      if (requestId !== loadSequence) return;
+
+      currentUnit = unitResult.data;
+      zones = (zoneResult.data || []).map(zone => ({
+        id: zone.id, unitId: zone.unit_id, name: zone.name,
+        attribute: zone.attribute, color: zone.color, sortOrder: zone.sort_order
+      }));
+
+      await ensureInitialLocation();
+
+      const [locationResult, memberResult] = await Promise.all([
+        sb.from('user_locations')
+          .select('user_id, unit_id, zone_id, departure_time, return_time, updated_at')
+          .eq('unit_id', unitId),
+        loadLocationMembers(unitId)
+      ]);
+      const secondError = locationResult.error || memberResult.error;
+      if (secondError) throw secondError;
+      if (requestId !== loadSequence) return;
+
+      const memberMap = new Map((memberResult.data || []).map(member => [member.user_id, member]));
+      people = (locationResult.data || []).map(location => {
+        const member = memberMap.get(location.user_id);
+        if (!member || !location.zone_id) return null;
+        return {
+          id: location.user_id,
+          name: member.display_name,
+          role: member.member_role,
+          zoneId: location.zone_id,
+          departureTime: location.departure_time,
+          returnTime: location.return_time,
+          updatedAt: location.updated_at
+        };
+      }).filter(Boolean);
+
+
+      const ownRow = (locationResult.data || []).find(location => location.user_id === userAccess.user.id);
+      ownLocation = ownRow ? {
+        zoneId: ownRow.zone_id,
+        departureTime: ownRow.departure_time,
+        returnTime: ownRow.return_time,
+        updatedAt: ownRow.updated_at
+      } : null;
+
+      updatePageTitle();
+      renderZones();
+      renderHomeZoneChoices();
+      setSyncStatus(formatSyncTime());
+    }
+
+    function renderHomeZoneChoices() {
+      const livingZones = zones.filter(zone => zone.attribute === 'inside');
+      homeZoneList.innerHTML = '';
+      homeZoneState.hidden = livingZones.length > 0;
+      if (!livingZones.length) {
+        homeZoneState.textContent = '관리자가 생활관 속성의 구역을 만든 뒤 선택할 수 있습니다.';
+      }
+      livingZones.forEach(zone => {
+        const button = document.createElement('button');
+        button.className = 'home-zone-option';
+        button.type = 'button';
+        button.textContent = zone.name;
+        button.addEventListener('click', async () => {
+          button.disabled = true;
+          try {
+            await saveHomeZone(zone.id, true);
+            closeModal(homeZoneModal, homeZoneDialog);
+            await loadPageData({ quiet: true });
+            triggerToast(`${zone.name}(으)로 생활관과 초기 위치를 설정했습니다.`);
+          } catch (error) {
+            showMessage(escapeMessage(error), '생활관 저장 실패');
+          } finally {
+            button.disabled = false;
+          }
+        });
+        homeZoneList.appendChild(button);
+      });
+    }
+
+    function promptRequiredProfileSetup() {
+      const company = String(userAccess?.profile?.company || '').trim();
+      if (!company) {
+        openModal(companyModal, companyDialog);
+        return;
+      }
+      if (!userAccess?.profile?.home_zone_id) {
+        renderHomeZoneChoices();
+        openModal(homeZoneModal, homeZoneDialog);
+      }
+    }
+
+    function scheduleRealtimeReload() {
+      window.clearTimeout(reloadTimer);
+      reloadTimer = window.setTimeout(() => {
+        loadPageData({ quiet: true }).catch(error => {
+          console.error('실시간 동기화 실패:', error);
+          setSyncStatus('실시간 연결 재시도 중...', true);
+        });
+      }, 140);
+    }
+
+    async function subscribeToRealtime() {
+      if (realtimeChannel) await sb.removeChannel(realtimeChannel);
+      realtimeChannel = sb
+        .channel(`location-user-${userAccess.user.id}`)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'location_zones', filter: `unit_id=eq.${userAccess.profile.unit_id}` }, scheduleRealtimeReload)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'user_locations', filter: `unit_id=eq.${userAccess.profile.unit_id}` }, scheduleRealtimeReload)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'units', filter: `id=eq.${userAccess.profile.unit_id}` }, scheduleRealtimeReload)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${userAccess.user.id}` }, scheduleRealtimeReload)
+        .subscribe(status => {
+          if (status === 'SUBSCRIBED') setSyncStatus(formatSyncTime());
+          else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSyncStatus('실시간 연결 재시도 중...', true);
+        });
+    }
+
+    function fillSettings() {
+      const livingZones = zones.filter(zone => zone.attribute === 'inside');
+      settingsNameText.textContent = userAccess?.profile?.name || '미입력';
+      settingsUnitText.textContent = currentUnit?.unit_name || '미지정';
+      settingsHomeZoneText.textContent = getHomeZone()?.name || '미지정';
+      settingsZoneText.textContent = getOwnZone()?.name || '미지정';
+      settingsCompanyInput.value = userAccess?.profile?.company || '';
+      settingsHomeZoneSelect.innerHTML = '';
+      livingZones.forEach(zone => {
+        const option = document.createElement('option');
+        option.value = zone.id;
+        option.textContent = zone.name;
+        option.selected = zone.id === userAccess?.profile?.home_zone_id;
+        settingsHomeZoneSelect.appendChild(option);
+      });
+      const disabled = livingZones.length === 0;
+      settingsHomeZoneSelect.disabled = disabled;
+      settingsHomeZoneSaveBtn.disabled = disabled;
+    }
+
+    function openSettings() {
+      fillSettings();
+      openModal(settingsModal, settingsDialog);
+      window.setTimeout(() => settingsDialog.focus({ preventScroll: true }), 0);
+    }
+
+
+    companyForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      companySaveBtn.disabled = true;
+      try {
+        await saveCompany(companyInput.value);
+        closeModal(companyModal, companyDialog);
+        triggerToast('중대가 저장되었습니다.');
+        window.setTimeout(() => {
+          renderHomeZoneChoices();
+          openModal(homeZoneModal, homeZoneDialog);
+        }, 220);
+      } catch (error) {
+        showMessage(escapeMessage(error), '중대 저장 실패');
+      } finally {
+        companySaveBtn.disabled = false;
+      }
+    });
+
+    moveForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const zone = selectedMoveZone;
+      if (!zone) return;
+      let arrivalIso = null;
+      if (!isOwnHomeZone(zone)) {
+        if (!parseDateValue(arrivalDateInput.value)) {
+          showMessage('도착 예정 날짜를 입력해주세요.', '입력 확인');
+          arrivalDateInput.focus();
+          return;
+        }
+        arrivalIso = resolveArrivalIso(arrivalDateInput.value, arrivalTimeInput.value);
+        if (!arrivalIso) {
+          showMessage('도착 예정 시간을 24시간제 HH:MM 형식으로 입력해주세요.', '입력 확인');
+          arrivalTimeInput.focus();
+          return;
+        }
+      }
+
+      moveConfirmBtn.disabled = true;
+      document.getElementById('moveCancelBtn').disabled = true;
+      try {
+        await moveOwnLocation(zone, arrivalIso);
+        closeMoveModal();
+        await loadPageData({ quiet: true });
+        triggerToast(`${zone.name}(으)로 위치를 이동했습니다.`);
+      } catch (error) {
+        showMessage(escapeMessage(error), '위치이동 실패');
+      } finally {
+        moveConfirmBtn.disabled = false;
+        document.getElementById('moveCancelBtn').disabled = false;
+      }
+    });
+
+    arrivalTimeInput.addEventListener('input', normalizeArrivalTimeInput);
+    arrivalTimeInput.addEventListener('blur', () => {
+      const parsed = parseTimeValue(arrivalTimeInput.value);
+      if (parsed) arrivalTimeInput.value = `${String(parsed.hour).padStart(2, '0')}:${String(parsed.minute).padStart(2, '0')}`;
+    });
+    timeQuickButtons.forEach(button => button.addEventListener('click', () => {
+      const minutes = Number(button.dataset.addMinutes);
+      if (Number.isFinite(minutes)) setArrivalAfterMinutes(minutes);
+    }));
+
+    settingsCompanyForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      settingsCompanySaveBtn.disabled = true;
+      try {
+        await saveCompany(settingsCompanyInput.value);
+        fillSettings();
+        triggerToast('중대가 수정되었습니다.');
+      } catch (error) {
+        showMessage(escapeMessage(error), '중대 저장 실패');
+      } finally {
+        settingsCompanySaveBtn.disabled = false;
+      }
+    });
+
+    settingsHomeZoneForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const zoneId = settingsHomeZoneSelect.value;
+      if (!zoneId) return;
+      settingsHomeZoneSaveBtn.disabled = true;
+      try {
+        await saveHomeZone(zoneId, false);
+        await loadPageData({ quiet: true });
+        fillSettings();
+        triggerToast('생활관이 수정되었습니다.');
+      } catch (error) {
+        showMessage(escapeMessage(error), '생활관 저장 실패');
+      } finally {
+        settingsHomeZoneSaveBtn.disabled = false;
+      }
+    });
+
+
+    document.getElementById('refreshBtn').addEventListener('click', async () => {
+      refreshIcon.classList.add('syncing');
+      try {
+        await loadPageData();
+      } catch (error) {
+        setSyncStatus('동기화 실패', true);
+        showMessage(escapeMessage(error), '동기화 실패');
+      } finally {
+        refreshIcon.classList.remove('syncing');
+      }
+    });
+
+    document.getElementById('settingsBtn').addEventListener('click', openSettings);
+    document.getElementById('settingsCloseBtn').addEventListener('click', () => closeModal(settingsModal, settingsDialog));
+    document.getElementById('settingsBottomCloseBtn').addEventListener('click', () => closeModal(settingsModal, settingsDialog));
+    document.getElementById('moveCloseBtn').addEventListener('click', closeMoveModal);
+    document.getElementById('moveCancelBtn').addEventListener('click', closeMoveModal);
+    document.getElementById('messageCloseBtn').addEventListener('click', () => closeModal(messageModal, messageDialog));
+    document.getElementById('confirmCancelBtn').addEventListener('click', () => closeModal(confirmModal, confirmDialog));
+
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      closeModal(settingsModal, settingsDialog);
+      openModal(confirmModal, confirmDialog);
+    });
+
+    confirmOkBtn.addEventListener('click', async () => {
+      confirmOkBtn.disabled = true;
+      try { await sb.auth.signOut(); }
+      finally { location.replace('index.html'); }
+    });
+
+    [moveModal, settingsModal, messageModal, confirmModal].forEach(backdrop => {
+      backdrop.addEventListener('click', event => {
+        if (event.target !== backdrop) return;
+        if (backdrop === moveModal) closeMoveModal();
+        if (backdrop === settingsModal) closeModal(settingsModal, settingsDialog);
+        if (backdrop === messageModal) closeModal(messageModal, messageDialog);
+        if (backdrop === confirmModal) closeModal(confirmModal, confirmDialog);
+      });
+    });
+
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      if (messageModal.classList.contains('open')) closeModal(messageModal, messageDialog);
+      else if (confirmModal.classList.contains('open')) closeModal(confirmModal, confirmDialog);
+      else if (moveModal.classList.contains('open')) closeMoveModal();
+      else if (settingsModal.classList.contains('open')) closeModal(settingsModal, settingsDialog);
+      // 필수 중대 및 생활관 선택 팝업은 Esc로 닫히지 않습니다.
+    });
+
+    window.addEventListener('beforeunload', () => {
+      if (realtimeChannel) sb.removeChannel(realtimeChannel);
+    });
+
+    async function initializeUserPage() {
+      try {
+        userAccess = await requireUser();
+        if (!userAccess) return;
+        await loadPageData();
+        await subscribeToRealtime();
+        promptRequiredProfileSetup();
+      } catch (error) {
+        console.error('일반 사용자 페이지 초기화 실패:', error);
+        setSyncStatus('불러오기 실패', true);
+        showMessage(escapeMessage(error), '페이지 불러오기 실패');
+      } finally {
+        loadingCover.classList.add('hidden');
+        window.setTimeout(() => loadingCover.remove(), 230);
+      }
+    }
+
+    initializeUserPage();
+  </script>
+</body>
+</html>
