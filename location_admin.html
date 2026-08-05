@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" data-location-admin-build="fixed-20260805-2209">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -718,21 +718,6 @@
       font-size: 20px;
       font-weight: 950;
       letter-spacing: -.3px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .personnel-zone-badge {
-      flex: 0 0 auto;
-      max-width: 48%;
-      padding: 6px 9px;
-      border: 1px solid color-mix(in srgb, var(--zone-color, #2563eb) 24%, var(--line));
-      border-radius: 999px;
-      background: color-mix(in srgb, var(--zone-color, #2563eb) 8%, white);
-      color: var(--zone-color, #2563eb);
-      font-size: 10px;
-      font-weight: 900;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -1835,10 +1820,20 @@
     }
 
     .settings-dialog-body {
+      flex: 1 1 auto;
+      min-height: 0;
       overflow-y: auto;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       padding: 16px 18px 18px;
+    }
+
+    .settings-dialog-footer {
+      flex: 0 0 auto;
+      padding: 12px 18px calc(12px + env(safe-area-inset-bottom));
+      border-top: 1px solid var(--line);
+      background: #ffffff;
+      box-shadow: 0 -8px 20px rgba(15, 23, 42, .06);
     }
 
     .settings-section {
@@ -1920,7 +1915,7 @@
     .settings-close-bottom {
       width: 100%;
       min-height: 48px;
-      margin-top: 14px;
+      margin-top: 0;
       border: 0;
       border-radius: 15px;
       background: #e2e8f0;
@@ -2661,7 +2656,8 @@
       grid-template-rows: 69px 100px !important;
     }
 
-    .sticky-dashboard .sticky-actions.tab-search-actions {
+    #view-personnel .sticky-actions.tab-search-actions,
+    #view-records .sticky-actions.tab-search-actions {
       height: 100px !important;
       min-height: 100px !important;
       max-height: 100px !important;
@@ -2671,12 +2667,554 @@
       gap: 8px !important;
     }
 
+    .records-filter-row {
+      height: 44px !important;
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      grid-template-rows: 44px !important;
+      gap: 6px !important;
+    }
+
+    /* 검색·필터 섹션과 첫 카드 사이를 고정 전후 모두 16px로 유지합니다. */
+    #view-personnel > .personnel-content,
+    #view-records > .records-content,
+    body.personnel-tab-active #view-personnel > .sticky-dashboard.tab-dashboard-fixed ~ .personnel-content,
+    body.records-tab-active #view-records > .sticky-dashboard.tab-dashboard-fixed ~ .records-content {
+      margin: 16px 0 0 !important;
+      padding: 0 !important;
+    }
+
+    .personnel-list,
+    .records-list {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* 결과가 있을 때 빈 상태 안내가 한 픽셀도 차지하지 않도록 합니다. */
+    .personnel-state,
+    .records-state {
+      min-height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    .personnel-state[hidden],
+    .records-state[hidden],
+    .personnel-list[hidden],
+    .records-list[hidden] {
+      display: none !important;
+    }
+
+    .filter-picker-wrap {
+      min-width: 0;
+      width: 100%;
+    }
+
+    .search-filter-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 7px;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .search-filter-trigger-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .search-filter-trigger-arrow {
+      flex: 0 0 auto;
+      font-size: 12px;
+      line-height: 1;
+    }
+
+    .filter-picker-dialog,
+    .period-filter-dialog {
+      max-width: 400px;
+      max-height: min(82vh, 680px);
+      max-height: min(82dvh, 680px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .filter-picker-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-picker-search {
+      padding: 14px 16px 10px;
+    }
+
+    .filter-picker-list {
+      min-height: 120px;
+      max-height: 52vh;
+      overflow-y: auto;
+      padding: 0 12px 14px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-picker-option {
+      width: 100%;
+      min-height: 48px;
+      border: 0;
+      border-bottom: 1px solid #eef2f7;
+      background: #ffffff;
+      color: var(--text);
+      padding: 12px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+      font-size: 14px;
+      font-weight: 850;
+    }
+
+    .filter-picker-option.selected {
+      color: var(--primary);
+      background: #eff6ff;
+    }
+
+    .filter-picker-option-mark {
+      flex: 0 0 auto;
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .filter-picker-empty {
+      padding: 28px 10px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .period-filter-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .period-filter-field {
+      min-width: 0;
+    }
+
+    .period-quick-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .period-quick-btn {
+      min-height: 40px;
+      border: 1px solid #bfdbfe;
+      border-radius: 13px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+
+    /* 2026-08-05 병력·기록 필터 및 카드 최종 레이아웃 */
+    .search-filter-row {
+      gap: 6px !important;
+    }
+
+    .search-filter-select {
+      width: 100% !important;
+      min-width: 0 !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      max-height: 44px !important;
+      box-sizing: border-box !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 13px !important;
+      padding: 0 26px 0 10px !important;
+      outline: none !important;
+      color: #334155 !important;
+      background-color: var(--surface) !important;
+      box-shadow: 0 5px 14px rgba(15,23,42,.05) !important;
+      font-size: 11px !important;
+      font-weight: 850 !important;
+      line-height: 42px !important;
+      text-align: left !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    select.search-filter-select {
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%23334155' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+      background-position: calc(100% - 8px) center !important;
+      background-size: 12px 12px !important;
+      background-repeat: no-repeat !important;
+    }
+
+    button.search-filter-select {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 4px !important;
+      line-height: 1.2 !important;
+    }
+
+    .search-filter-trigger-arrow {
+      flex: 0 0 12px !important;
+      width: 12px !important;
+      height: 12px !important;
+      color: transparent !important;
+      font-size: 0 !important;
+      line-height: 0 !important;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%23334155' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px 12px no-repeat !important;
+    }
+
+    .records-filter-row .search-filter-select {
+      padding-left: 8px !important;
+      padding-right: 20px !important;
+      font-size: 10px !important;
+    }
+
+    .records-filter-row select.search-filter-select {
+      background-position: calc(100% - 6px) center !important;
+    }
+
+    .records-filter-row button.search-filter-select {
+      padding-right: 8px !important;
+    }
+
+    .personnel-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+    }
+
+    .personnel-card {
+      min-width: 0 !important;
+      padding: 13px 12px !important;
+      border-radius: 18px !important;
+    }
+
+    .personnel-card-head {
+      display: block !important;
+      padding-bottom: 10px !important;
+    }
+
+    .personnel-card-title-line {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 3px !important;
+      overflow: visible !important;
+    }
+
+    .personnel-card-name {
+      width: 100% !important;
+      font-size: 17px !important;
+      line-height: 1.25 !important;
+    }
+
+    .personnel-card-phone {
+      width: 100% !important;
+      font-size: 10px !important;
+      line-height: 1.25 !important;
+    }
+
+    .personnel-card-info {
+      grid-template-columns: minmax(44px, auto) minmax(0, 1fr) !important;
+      gap: 8px 6px !important;
+      margin-top: 11px !important;
+      align-items: center !important;
+    }
+
+    .personnel-card-info dt {
+      font-size: 11px !important;
+      line-height: 1.3 !important;
+    }
+
+    .personnel-card-info dd {
+      font-size: 11px !important;
+      line-height: 1.3 !important;
+    }
+
+    .personnel-location-badge {
+      justify-self: end !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      max-width: 100% !important;
+      min-height: 25px !important;
+      padding: 4px 7px !important;
+      border: 1px solid color-mix(in srgb, var(--badge-color, #64748b) 26%, var(--line)) !important;
+      border-radius: 999px !important;
+      background: color-mix(in srgb, var(--badge-color, #64748b) 9%, white) !important;
+      color: var(--badge-color, #64748b) !important;
+      font-size: 9px !important;
+      font-weight: 900 !important;
+      line-height: 1.15 !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    @media (max-width: 360px) {
+      .personnel-card {
+        padding: 11px 9px !important;
+      }
+
+      .personnel-card-name {
+        font-size: 15px !important;
+      }
+
+      .personnel-card-info {
+        grid-template-columns: 42px minmax(0, 1fr) !important;
+        gap: 7px 4px !important;
+      }
+
+      .personnel-location-badge {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+      }
+    }
+
+    /* LOCATION_ADMIN_FIXED_LAYOUT_20260805_2209 */
+    /* 필터 박스 공통 외형을 선택 요소와 버튼 요소에 동일하게 강제합니다. */
+    #view-personnel .search-filter-row,
+    #view-records .search-filter-row {
+      display: grid !important;
+      width: 100% !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      max-height: 44px !important;
+      gap: 6px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      align-items: stretch !important;
+    }
+
+    #view-personnel .search-filter-row {
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    #view-records .records-filter-row {
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      grid-template-rows: 44px !important;
+      grid-auto-flow: column !important;
+    }
+
+    #view-personnel .filter-picker-wrap,
+    #view-records .filter-picker-wrap {
+      width: 100% !important;
+      min-width: 0 !important;
+      height: 44px !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    #view-personnel .search-filter-select,
+    #view-records .search-filter-select {
+      width: 100% !important;
+      min-width: 0 !important;
+      height: 44px !important;
+      min-height: 44px !important;
+      max-height: 44px !important;
+      margin: 0 !important;
+      box-sizing: border-box !important;
+      border: 1px solid var(--line) !important;
+      border-radius: 13px !important;
+      background-color: var(--surface) !important;
+      color: #334155 !important;
+      box-shadow: 0 5px 14px rgba(15,23,42,.05) !important;
+      font-size: 10px !important;
+      font-weight: 850 !important;
+      line-height: 1.2 !important;
+      text-align: left !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #view-personnel select.search-filter-select,
+    #view-records select.search-filter-select {
+      appearance: none !important;
+      -webkit-appearance: none !important;
+      padding: 0 22px 0 9px !important;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%23334155' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+      background-position: calc(100% - 7px) center !important;
+      background-size: 12px 12px !important;
+      background-repeat: no-repeat !important;
+    }
+
+    #view-personnel button.search-filter-select,
+    #view-records button.search-filter-select {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      gap: 4px !important;
+      padding: 0 8px 0 9px !important;
+    }
+
+    #view-personnel .search-filter-trigger-arrow,
+    #view-records .search-filter-trigger-arrow {
+      flex: 0 0 12px !important;
+      width: 12px !important;
+      height: 12px !important;
+      color: transparent !important;
+      font-size: 0 !important;
+      line-height: 0 !important;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%23334155' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px 12px no-repeat !important;
+    }
+
+    /* 검색·필터 고정 영역과 카드 목록 사이 간격 */
     #view-personnel > .personnel-content,
     #view-records > .records-content {
-      margin-top: 16px !important;
-      padding-top: 0 !important;
+      margin: 16px 0 0 !important;
+      padding: 0 !important;
     }
-</style>
+
+    #view-personnel .personnel-state[hidden],
+    #view-records .records-state[hidden] {
+      display: none !important;
+      min-height: 0 !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    /* 병력 카드는 모바일 폭에서도 한 행에 정확히 두 장 */
+    #view-personnel .personnel-list {
+      display: grid !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      grid-auto-flow: row !important;
+      gap: 10px !important;
+      width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+
+    #view-personnel .personnel-list[hidden] {
+      display: none !important;
+    }
+
+    #view-personnel .personnel-card {
+      width: 100% !important;
+      min-width: 0 !important;
+      padding: 13px 11px !important;
+      border-radius: 18px !important;
+    }
+
+    #view-personnel .personnel-card-head {
+      display: block !important;
+      padding-bottom: 10px !important;
+    }
+
+    /* 이름 우측 상단에 남아 있던 기존 구역 마크 제거 */
+    #view-personnel .personnel-card-head .personnel-zone-badge {
+      display: none !important;
+    }
+
+    #view-personnel .personnel-card-title-line {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 3px !important;
+      min-width: 0 !important;
+      overflow: visible !important;
+    }
+
+    #view-personnel .personnel-card-name {
+      width: 100% !important;
+      min-width: 0 !important;
+      font-size: 17px !important;
+      line-height: 1.25 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #view-personnel .personnel-card-phone {
+      width: 100% !important;
+      min-width: 0 !important;
+      font-size: 10px !important;
+      line-height: 1.25 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    #view-personnel .personnel-card-info {
+      display: grid !important;
+      grid-template-columns: minmax(43px, auto) minmax(0, 1fr) !important;
+      gap: 8px 5px !important;
+      margin: 11px 0 0 !important;
+      align-items: center !important;
+    }
+
+    #view-personnel .personnel-card-info dt,
+    #view-personnel .personnel-card-info dd {
+      min-width: 0 !important;
+      font-size: 11px !important;
+      line-height: 1.3 !important;
+    }
+
+    /* 생활관·현위치 행의 구역색 배지 */
+    #view-personnel .personnel-location-badge {
+      justify-self: end !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      width: auto !important;
+      max-width: 100% !important;
+      min-height: 25px !important;
+      margin: 0 !important;
+      padding: 4px 7px !important;
+      border: 1px solid color-mix(in srgb, var(--badge-color, #64748b) 26%, var(--line)) !important;
+      border-radius: 999px !important;
+      background: color-mix(in srgb, var(--badge-color, #64748b) 9%, white) !important;
+      color: var(--badge-color, #64748b) !important;
+      font-size: 9px !important;
+      font-weight: 900 !important;
+      line-height: 1.15 !important;
+      text-align: center !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+    }
+
+    @media (max-width: 360px) {
+      #view-personnel .personnel-card { padding: 11px 8px !important; }
+      #view-personnel .personnel-card-name { font-size: 15px !important; }
+      #view-personnel .personnel-card-info {
+        grid-template-columns: 40px minmax(0, 1fr) !important;
+        gap: 7px 4px !important;
+      }
+      #view-records .search-filter-select { font-size: 9px !important; }
+    }
+    /* END_LOCATION_ADMIN_FIXED_LAYOUT_20260805_2209 */
+
+
+    /* 부대관리: 조회 기능 제거, 이동 기능만 표시 */
+    .unit-search-result-actions {
+      min-width: 82px;
+    }
+
+    .unit-search-result-actions .unit-result-button.join {
+      width: 100%;
+      min-width: 82px;
+    }
+
+  </style>
 </head>
 <body class="detail-tab-active">
   <div class="app">
@@ -2799,9 +3337,15 @@
                 <option value="">전체 상태</option>
                 <option value="unreturned">미복귀만</option>
               </select>
-              <select class="search-filter-select" id="personnelZoneFilter" aria-label="구역 필터">
-                <option value="">전체 구역</option>
-              </select>
+              <div class="filter-picker-wrap">
+                <button class="search-filter-select search-filter-trigger" id="personnelZoneFilterButton" type="button" aria-label="병력 구역 필터 선택">
+                  <span class="search-filter-trigger-label">전체 구역</span>
+                  <span class="search-filter-trigger-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <select id="personnelZoneFilter" aria-hidden="true" tabindex="-1" hidden>
+                  <option value="">전체 구역</option>
+                </select>
+              </div>
             </div>
           </section>
         </div>
@@ -2836,7 +3380,7 @@
               />
               <button class="personnel-search-clear" id="recordsSearchClearBtn" type="button" aria-label="검색어 지우기">✕</button>
             </div>
-            <div class="search-filter-row" aria-label="기록 검색 필터">
+            <div class="search-filter-row records-filter-row" aria-label="기록 검색 필터">
               <select class="search-filter-select" id="recordsCompanyFilter" aria-label="중대 필터">
                 <option value="">전체 중대</option>
               </select>
@@ -2844,9 +3388,19 @@
                 <option value="">전체 상태</option>
                 <option value="unreturned">미복귀만</option>
               </select>
-              <select class="search-filter-select" id="recordsZoneFilter" aria-label="구역 필터">
-                <option value="">전체 구역</option>
-              </select>
+              <div class="filter-picker-wrap">
+                <button class="search-filter-select search-filter-trigger" id="recordsZoneFilterButton" type="button" aria-label="기록 구역 필터 선택">
+                  <span class="search-filter-trigger-label">전체 구역</span>
+                  <span class="search-filter-trigger-arrow" aria-hidden="true">⌄</span>
+                </button>
+                <select id="recordsZoneFilter" aria-hidden="true" tabindex="-1" hidden>
+                  <option value="">전체 구역</option>
+                </select>
+              </div>
+              <button class="search-filter-select search-filter-trigger" id="recordsPeriodFilterButton" type="button" aria-label="기록 기간 설정">
+                <span class="search-filter-trigger-label">기간 설정</span>
+                <span class="search-filter-trigger-arrow" aria-hidden="true">⌄</span>
+              </button>
             </div>
           </section>
         </div>
@@ -2900,16 +3454,16 @@
           <section class="unit-management-card" aria-labelledby="unitSearchTitle">
             <div class="unit-management-card-head">
               <div>
-                <h2 id="unitSearchTitle">부대 조회 . 부대이동</h2>
+                <h2 id="unitSearchTitle">부대 이동</h2>
               </div>
             </div>
             <div class="unit-search-box personnel-search-wrap">
               <span class="personnel-search-icon" aria-hidden="true">⌕</span>
-              <input class="personnel-search-input" id="unitSearchInput" type="search" placeholder="부대명 또는 부대 코드 검색" autocomplete="off" enterkeyhint="search" aria-label="부대 검색" />
+              <input class="personnel-search-input" id="unitSearchInput" type="search" placeholder="이동할 부대명 또는 부대 코드 검색" autocomplete="off" enterkeyhint="search" aria-label="이동할 부대 검색" />
               <button class="personnel-search-clear" id="unitSearchClearBtn" type="button" aria-label="검색어 지우기">✕</button>
             </div>
             <div class="unit-search-results" id="unitSearchResults">
-              <div class="unit-search-state">부대 목록을 불러오는 중입니다.</div>
+              <div class="unit-search-state">이동할 부대를 검색해주세요.</div>
             </div>
           </section>
 
@@ -2942,6 +3496,58 @@
       </div>
       <div class="sheet-content" id="zonePeopleContent">
         <div class="sheet-empty-state">등록된 인원이 없습니다.</div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="zoneFilterModal">
+    <section class="dialog filter-picker-dialog" id="zoneFilterDialog" role="dialog" aria-modal="true" aria-labelledby="zoneFilterTitle">
+      <div class="dialog-head filter-picker-head">
+        <div>
+          <h3 id="zoneFilterTitle">구역 필터</h3>
+          <p>구역명을 검색하거나 목록에서 선택하세요.</p>
+        </div>
+        <button class="dialog-close-btn" id="zoneFilterCloseButton" type="button" aria-label="구역 필터 닫기">✕</button>
+      </div>
+      <div class="filter-picker-search">
+        <div class="personnel-search-wrap">
+          <span class="personnel-search-icon" aria-hidden="true">⌕</span>
+          <input class="personnel-search-input" id="zoneFilterSearchInput" type="search" placeholder="구역 검색" autocomplete="off" enterkeyhint="search" aria-label="구역 검색" />
+        </div>
+      </div>
+      <div class="filter-picker-list" id="zoneFilterOptionList"></div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="recordsPeriodModal">
+    <section class="dialog period-filter-dialog" id="recordsPeriodDialog" role="dialog" aria-modal="true" aria-labelledby="recordsPeriodTitle">
+      <div class="dialog-head filter-picker-head">
+        <div>
+          <h3 id="recordsPeriodTitle">기간 설정</h3>
+          <p>선택한 날짜 사이에 출발한 기록만 표시합니다.</p>
+        </div>
+        <button class="dialog-close-btn" id="recordsPeriodCloseButton" type="button" aria-label="기간 설정 닫기">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div class="period-filter-fields">
+          <div class="period-filter-field">
+            <label class="field-label" for="recordsPeriodStartInput">시작일</label>
+            <input class="text-input" id="recordsPeriodStartInput" type="date" />
+          </div>
+          <div class="period-filter-field">
+            <label class="field-label" for="recordsPeriodEndInput">종료일</label>
+            <input class="text-input" id="recordsPeriodEndInput" type="date" />
+          </div>
+        </div>
+        <div class="period-quick-buttons" aria-label="종료일 빠른 설정">
+          <button class="period-quick-btn" type="button" data-period-add-days="1">+1일</button>
+          <button class="period-quick-btn" type="button" data-period-add-days="5">+5일</button>
+          <button class="period-quick-btn" type="button" data-period-add-days="7">+7일</button>
+        </div>
+        <div class="dialog-actions">
+          <button class="cancel-btn" id="recordsPeriodCancelButton" type="button">취소</button>
+          <button class="confirm-btn" id="recordsPeriodApplyButton" type="button">적용</button>
+        </div>
       </div>
     </section>
   </div>
@@ -3066,45 +3672,6 @@
     </section>
   </div>
 
-
-  <div class="modal-backdrop" id="unitViewerModal">
-    <section class="dialog unit-viewer-dialog" id="unitViewerDialog" role="dialog" aria-modal="true" aria-labelledby="unitViewerTitle">
-      <div class="unit-viewer-head">
-        <div>
-          <h3 id="unitViewerTitle">타부대 현황</h3>
-          <p id="unitViewerSubtitle">읽기 전용</p>
-        </div>
-        <button class="dialog-close-btn" id="unitViewerCloseBtn" type="button" aria-label="타부대 현황 닫기">✕</button>
-      </div>
-      <div class="unit-viewer-body">
-        <div class="unit-viewer-readonly-note">이 화면은 읽기 전용이며 구역·인원·기록을 수정할 수 없습니다.</div>
-
-        <section class="metrics unit-viewer-metrics" aria-label="타부대 인원 현황">
-          <article class="metric"><strong id="unitViewerMetricTotal">0</strong><span>총원</span></article>
-          <article class="metric"><strong id="unitViewerMetricInside">0</strong><span>현재원</span></article>
-          <article class="metric"><strong id="unitViewerMetricDuty">0</strong><span>근무</span></article>
-          <article class="metric"><strong id="unitViewerMetricOutside">0</strong><span>열외</span></article>
-          <article class="metric"><strong id="unitViewerMetricBarracksOutside">0</strong><span>막사외부</span></article>
-        </section>
-
-        <div class="unit-viewer-tabs" role="tablist" aria-label="타부대 현황 탭">
-          <button class="unit-viewer-tab active" type="button" data-unit-viewer-tab="detail" role="tab" aria-selected="true">상세현황</button>
-          <button class="unit-viewer-tab" type="button" data-unit-viewer-tab="dashboard" role="tab" aria-selected="false">현황판</button>
-          <button class="unit-viewer-tab" type="button" data-unit-viewer-tab="personnel" role="tab" aria-selected="false">병력</button>
-          <button class="unit-viewer-tab" type="button" data-unit-viewer-tab="records" role="tab" aria-selected="false">기록</button>
-        </div>
-
-        <section class="unit-viewer-panel" id="unitViewerDetail" data-unit-viewer-panel="detail"></section>
-        <section class="unit-viewer-panel" id="unitViewerDashboard" data-unit-viewer-panel="dashboard" hidden></section>
-        <section class="unit-viewer-panel" id="unitViewerPersonnel" data-unit-viewer-panel="personnel" hidden></section>
-        <section class="unit-viewer-panel" id="unitViewerRecords" data-unit-viewer-panel="records" hidden></section>
-
-        <button class="unit-viewer-close-bottom" id="unitViewerBottomCloseBtn" type="button">닫기</button>
-      </div>
-    </section>
-  </div>
-
-
   <div class="modal-backdrop" id="settingsModal">
     <section class="dialog settings-dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsDialogTitle">
       <div class="dialog-head settings-dialog-head">
@@ -3158,6 +3725,8 @@
           <button class="settings-action-btn withdraw" id="deleteAccountSettingsBtn" type="button">회원탈퇴</button>
         </section>
 
+      </div>
+      <div class="settings-dialog-footer">
         <button class="settings-close-bottom" id="settingsBottomCloseBtn" type="button">닫기</button>
       </div>
     </section>
@@ -3203,9 +3772,27 @@
     const personnelCompanyFilter = document.getElementById('personnelCompanyFilter');
     const personnelReturnFilter = document.getElementById('personnelReturnFilter');
     const personnelZoneFilter = document.getElementById('personnelZoneFilter');
+    const personnelZoneFilterButton = document.getElementById('personnelZoneFilterButton');
     const recordsCompanyFilter = document.getElementById('recordsCompanyFilter');
     const recordsReturnFilter = document.getElementById('recordsReturnFilter');
     const recordsZoneFilter = document.getElementById('recordsZoneFilter');
+    const recordsZoneFilterButton = document.getElementById('recordsZoneFilterButton');
+    const recordsPeriodFilterButton = document.getElementById('recordsPeriodFilterButton');
+
+    const zoneFilterModal = document.getElementById('zoneFilterModal');
+    const zoneFilterDialog = document.getElementById('zoneFilterDialog');
+    const zoneFilterTitle = document.getElementById('zoneFilterTitle');
+    const zoneFilterCloseButton = document.getElementById('zoneFilterCloseButton');
+    const zoneFilterSearchInput = document.getElementById('zoneFilterSearchInput');
+    const zoneFilterOptionList = document.getElementById('zoneFilterOptionList');
+
+    const recordsPeriodModal = document.getElementById('recordsPeriodModal');
+    const recordsPeriodDialog = document.getElementById('recordsPeriodDialog');
+    const recordsPeriodCloseButton = document.getElementById('recordsPeriodCloseButton');
+    const recordsPeriodStartInput = document.getElementById('recordsPeriodStartInput');
+    const recordsPeriodEndInput = document.getElementById('recordsPeriodEndInput');
+    const recordsPeriodCancelButton = document.getElementById('recordsPeriodCancelButton');
+    const recordsPeriodApplyButton = document.getElementById('recordsPeriodApplyButton');
 
     const unitCurrentName = document.getElementById('unitCurrentName');
     const unitCurrentCode = document.getElementById('unitCurrentCode');
@@ -3218,20 +3805,6 @@
     const unitDeleteRequestBtn = document.getElementById('unitDeleteRequestBtn');
     const unitApprovalCount = document.getElementById('unitApprovalCount');
     const unitApprovalList = document.getElementById('unitApprovalList');
-
-    const unitViewerModal = document.getElementById('unitViewerModal');
-    const unitViewerDialog = document.getElementById('unitViewerDialog');
-    const unitViewerTitle = document.getElementById('unitViewerTitle');
-    const unitViewerSubtitle = document.getElementById('unitViewerSubtitle');
-    const unitViewerDetail = document.getElementById('unitViewerDetail');
-    const unitViewerDashboard = document.getElementById('unitViewerDashboard');
-    const unitViewerPersonnel = document.getElementById('unitViewerPersonnel');
-    const unitViewerRecords = document.getElementById('unitViewerRecords');
-    const unitViewerMetricTotal = document.getElementById('unitViewerMetricTotal');
-    const unitViewerMetricInside = document.getElementById('unitViewerMetricInside');
-    const unitViewerMetricDuty = document.getElementById('unitViewerMetricDuty');
-    const unitViewerMetricOutside = document.getElementById('unitViewerMetricOutside');
-    const unitViewerMetricBarracksOutside = document.getElementById('unitViewerMetricBarracksOutside');
 
     const metricTotal = document.getElementById('metricTotal');
     const metricInside = document.getElementById('metricInside');
@@ -3322,12 +3895,13 @@
 
     let unitManagementState = null;
     let unitSearchTimer = null;
-    let readonlyUnitSnapshot = null;
-    let readonlyUnitId = null;
     let pendingUnitTargetId = null;
     let pendingUnitTargetName = '';
     let pendingApplicantId = null;
     let pendingApplicantName = '';
+    let activeZoneFilterTarget = 'personnel';
+    let appliedRecordsStartDate = '';
+    let appliedRecordsEndDate = '';
 
     const LAST_ZONE_COLOR_KEY_PREFIX = 'location-admin:last-zone-color:';
 
@@ -3593,15 +4167,17 @@
     function renderUnitSearchResults(rows) {
       unitSearchResults.innerHTML = '';
 
-      if (!rows.length) {
-        unitSearchResults.appendChild(createUnitState('검색된 부대가 없습니다.'));
+      // 부대 이동 섹션에는 현재 소속 부대를 표시하지 않습니다.
+      const movableRows = (rows || []).filter(row => !row.is_current);
+
+      if (!movableRows.length) {
+        unitSearchResults.appendChild(createUnitState('이동할 수 있는 다른 부대가 없습니다.'));
         return;
       }
 
-      rows.forEach(row => {
+      movableRows.forEach(row => {
         const card = document.createElement('article');
         card.className = 'unit-search-result-card';
-        card.classList.toggle('current', Boolean(row.is_current));
         card.dataset.unitId = row.unit_id;
 
         const info = document.createElement('div');
@@ -3612,26 +4188,19 @@
 
         const meta = document.createElement('span');
         const code = row.unit_code || '코드 없음';
-        meta.textContent = `${code}, 총원 ${Number(row.member_count || 0)}명`;
+        meta.textContent = code;
         info.append(name, meta);
 
         const actions = document.createElement('div');
         actions.className = 'unit-search-result-actions';
 
-        const viewButton = document.createElement('button');
-        viewButton.className = 'unit-result-button view';
-        viewButton.type = 'button';
-        viewButton.dataset.unitAction = 'view';
-        viewButton.textContent = '현황 조회';
-
         const joinButton = document.createElement('button');
         joinButton.className = 'unit-result-button join';
         joinButton.type = 'button';
         joinButton.dataset.unitAction = 'join';
-        joinButton.textContent = row.is_current ? '소속 중' : '부대 가입';
-        joinButton.disabled = Boolean(row.is_current);
+        joinButton.textContent = '부대 이동';
 
-        actions.append(viewButton, joinButton);
+        actions.append(joinButton);
         card.append(info, actions);
         unitSearchResults.appendChild(card);
       });
@@ -3688,287 +4257,14 @@
       }
     }
 
-    function setUnitViewerTab(type) {
-      document.querySelectorAll('[data-unit-viewer-tab]').forEach(button => {
-        const active = button.dataset.unitViewerTab === type;
-        button.classList.toggle('active', active);
-        button.setAttribute('aria-selected', String(active));
-      });
-
-      document.querySelectorAll('[data-unit-viewer-panel]').forEach(panel => {
-        panel.hidden = panel.dataset.unitViewerPanel !== type;
-      });
-    }
-
-    function appendReadonlyEmpty(container, message) {
-      container.innerHTML = '';
-      const empty = document.createElement('div');
-      empty.className = 'readonly-empty';
-      empty.textContent = message;
-      container.appendChild(empty);
-    }
-
-    function getReadonlyPeopleByZone(snapshot, zoneId) {
-      return (snapshot.people || []).filter(person => person.zone_id === zoneId);
-    }
-
-    function renderReadonlyMetrics(snapshot) {
-      const peopleRows = snapshot.people || [];
-      const outside = peopleRows.filter(person => person.zone_attribute === 'outside').length;
-      const duty = peopleRows.filter(person => person.zone_attribute === 'duty').length;
-      const barracksOutside = peopleRows.filter(person => person.zone_attribute === 'barracks_outside').length;
-      const total = peopleRows.length;
-
-      unitViewerMetricTotal.textContent = total;
-      unitViewerMetricInside.textContent = Math.max(0, total - outside);
-      unitViewerMetricDuty.textContent = duty;
-      unitViewerMetricOutside.textContent = outside;
-      unitViewerMetricBarracksOutside.textContent = barracksOutside;
-    }
-
-    function renderReadonlyDetail(snapshot) {
-      unitViewerDetail.innerHTML = '';
-      const zonesRows = snapshot.zones || [];
-      if (!zonesRows.length) {
-        appendReadonlyEmpty(unitViewerDetail, '등록된 구역이 없습니다.');
-        return;
-      }
-
-      const grid = document.createElement('div');
-      grid.className = 'readonly-zone-grid';
-
-      zonesRows.forEach(zone => {
-        const members = getReadonlyPeopleByZone(snapshot, zone.id);
-        const card = document.createElement('article');
-        card.className = 'readonly-zone-card';
-        card.style.setProperty('--readonly-zone-color', zone.color || '#2563eb');
-
-        const head = document.createElement('div');
-        head.className = 'readonly-zone-card-head';
-        const title = document.createElement('strong');
-        title.textContent = zone.name || '이름 없는 구역';
-        const badge = document.createElement('span');
-        badge.textContent = `${attributeLabel(zone.attribute)} · ${members.length}명`;
-        head.append(title, badge);
-        card.appendChild(head);
-
-        if (members.length) {
-          const chips = document.createElement('div');
-          chips.className = 'readonly-member-chips';
-          members.forEach(member => {
-            const chip = document.createElement('span');
-            chip.className = 'readonly-member-chip';
-            chip.textContent = member.display_name || '이름 미입력';
-            chips.appendChild(chip);
-          });
-          card.appendChild(chips);
-        }
-
-        grid.appendChild(card);
-      });
-
-      unitViewerDetail.appendChild(grid);
-    }
-
-    function renderReadonlyDashboard(snapshot) {
-      unitViewerDashboard.innerHTML = '';
-      const zonesRows = snapshot.zones || [];
-      if (!zonesRows.length) {
-        appendReadonlyEmpty(unitViewerDashboard, '등록된 구역이 없습니다.');
-        return;
-      }
-
-      const list = document.createElement('div');
-      list.className = 'readonly-dashboard-list';
-
-      zonesRows.forEach(zone => {
-        const members = getReadonlyPeopleByZone(snapshot, zone.id);
-        const card = document.createElement('article');
-        card.className = 'readonly-dashboard-card';
-        card.style.setProperty('--readonly-zone-color', zone.color || '#2563eb');
-
-        const head = document.createElement('div');
-        head.className = 'readonly-dashboard-card-head';
-        const title = document.createElement('strong');
-        title.textContent = zone.name || '이름 없는 구역';
-        const count = document.createElement('span');
-        count.textContent = `${members.length}명`;
-        head.append(title, count);
-        card.appendChild(head);
-
-        const chips = document.createElement('div');
-        chips.className = 'readonly-member-chips';
-        if (!members.length) {
-          const empty = document.createElement('span');
-          empty.className = 'readonly-member-chip';
-          empty.textContent = '배치 인원 없음';
-          chips.appendChild(empty);
-        } else {
-          members.forEach(member => {
-            const chip = document.createElement('span');
-            chip.className = 'readonly-member-chip';
-            chip.textContent = member.display_name || '이름 미입력';
-            chips.appendChild(chip);
-          });
-        }
-        card.appendChild(chips);
-        list.appendChild(card);
-      });
-
-      unitViewerDashboard.appendChild(list);
-    }
-
-    function renderReadonlyPersonnel(snapshot) {
-      unitViewerPersonnel.innerHTML = '';
-      const peopleRows = snapshot.people || [];
-      if (!peopleRows.length) {
-        appendReadonlyEmpty(unitViewerPersonnel, '등록된 인원이 없습니다.');
-        return;
-      }
-
-      const list = document.createElement('div');
-      list.className = 'readonly-personnel-list';
-
-      peopleRows.forEach(person => {
-        const card = document.createElement('article');
-        card.className = 'readonly-person-card';
-        const title = document.createElement('h4');
-        title.textContent = person.display_name || '이름 미입력';
-        card.appendChild(title);
-
-        const info = document.createElement('dl');
-        info.className = 'readonly-person-info';
-        const rows = [
-          ['중대', person.company || '미입력'],
-          ['생활관', person.home_zone_name || '미지정'],
-          ['현위치', person.zone_name || '미배치']
-        ];
-
-        const atHome = person.home_zone_id
-          ? person.zone_id === person.home_zone_id
-          : person.zone_attribute === 'inside';
-        if (person.zone_attribute && !atHome) {
-          rows.push(['출발 시간', person.departure_time ? formatRecordDateTime(person.departure_time) : '-']);
-          rows.push(['복귀 예정', person.return_time ? formatRecordDateTime(person.return_time) : '-']);
-        }
-
-        rows.forEach(([label, value]) => {
-          const dt = document.createElement('dt');
-          dt.textContent = label;
-          const dd = document.createElement('dd');
-          dd.textContent = value;
-          info.append(dt, dd);
-        });
-
-        card.appendChild(info);
-        list.appendChild(card);
-      });
-
-      unitViewerPersonnel.appendChild(list);
-    }
-
-    function renderReadonlyRecords(snapshot) {
-      unitViewerRecords.innerHTML = '';
-      const logs = [...(snapshot.logs || [])].sort(
-        (a, b) => new Date(b.departure_time).getTime() - new Date(a.departure_time).getTime()
-      );
-
-      if (!logs.length) {
-        appendReadonlyEmpty(unitViewerRecords, '최근 일주일 동안 저장된 이동 기록이 없습니다.');
-        return;
-      }
-
-      const list = document.createElement('div');
-      list.className = 'readonly-record-list';
-
-      logs.forEach(log => {
-        const returned = Boolean(log.arrival_time);
-        const elapsedText = getRecordOverdueMinutes(
-          log.expected_return_time || log.return_time,
-          log.arrival_time
-        );
-        const card = document.createElement('article');
-        card.className = 'record-card';
-        card.innerHTML = `
-          <div class="record-card-head">
-            <h3 class="record-card-name"></h3>
-          </div>
-          <dl class="record-card-info">
-            <dt>현위치</dt><dd class="record-current-zone"></dd>
-            <dt>출발 시간</dt><dd class="record-departure-time"></dd>
-            <dt>도착 예정 시간</dt><dd class="record-expected-time"></dd>
-            <dt>도착 시간</dt><dd class="record-arrival-time"></dd>
-            <dt>지난 시간</dt><dd class="record-elapsed-time"></dd>
-          </dl>
-        `;
-        card.querySelector('.record-card-name').textContent = log.display_name || '이름 미입력';
-        card.querySelector('.record-current-zone').textContent = log.zone_name || '위치 정보 없음';
-        card.querySelector('.record-departure-time').textContent = formatRecordDateTime(log.departure_time);
-        card.querySelector('.record-expected-time').textContent = formatRecordDateTime(log.expected_return_time || log.return_time);
-        const arrival = card.querySelector('.record-arrival-time');
-        arrival.textContent = returned ? formatRecordDateTime(log.arrival_time) : '미복귀';
-        arrival.classList.toggle('missing', !returned);
-        const elapsed = card.querySelector('.record-elapsed-time');
-        elapsed.textContent = elapsedText;
-        elapsed.style.color = elapsedText !== '-' && elapsedText !== '0분' ? '#dc2626' : '';
-        list.appendChild(card);
-      });
-
-      unitViewerRecords.appendChild(list);
-    }
-
-    function renderReadonlyUnitSnapshot(snapshot) {
-      const unit = snapshot.unit || {};
-      unitViewerTitle.textContent = `${unit.unit_name || '이름 없는 부대'} 현황`;
-      unitViewerSubtitle.textContent = `${formatUnitCode(unit.unit_code)} · 읽기 전용`;
-      renderReadonlyMetrics(snapshot);
-      renderReadonlyDetail(snapshot);
-      renderReadonlyDashboard(snapshot);
-      renderReadonlyPersonnel(snapshot);
-      renderReadonlyRecords(snapshot);
-      setUnitViewerTab('detail');
-    }
-
-    async function openUnitViewer(unitId) {
-      if (!unitId) return;
-      readonlyUnitId = unitId;
-      unitViewerTitle.textContent = '타부대 현황 불러오는 중...';
-      unitViewerSubtitle.textContent = '읽기 전용';
-      appendReadonlyEmpty(unitViewerDetail, '현황을 불러오는 중입니다.');
-      unitViewerDashboard.innerHTML = '';
-      unitViewerPersonnel.innerHTML = '';
-      unitViewerRecords.innerHTML = '';
-      setUnitViewerTab('detail');
-      animateOpen(unitViewerModal, unitViewerDialog);
-
-      try {
-        const { data, error } = await sb.rpc('get_unit_readonly_snapshot', {
-          p_unit_id: unitId
-        });
-        if (error) throw error;
-        if (readonlyUnitId !== unitId) return;
-        readonlyUnitSnapshot = data || {};
-        renderReadonlyUnitSnapshot(readonlyUnitSnapshot);
-      } catch (error) {
-        console.error('타부대 현황 조회 실패:', error);
-        appendReadonlyEmpty(unitViewerDetail, error.message || '타부대 현황을 불러오지 못했습니다.');
-      }
-    }
-
-    function closeUnitViewer() {
-      readonlyUnitId = null;
-      readonlyUnitSnapshot = null;
-      animateClose(unitViewerModal, unitViewerDialog);
-    }
-
     function requestJoinUnit(unitId, unitName) {
       pendingUnitTargetId = unitId;
       pendingUnitTargetName = unitName || '선택한 부대';
       openActionToast({
         action: 'join_unit',
-        title: '부대 가입',
+        title: '부대 이동',
         message: `${pendingUnitTargetName}(으)로 소속 부대를 이동하시겠습니까?\n이동 후 현재 부대의 수정 권한은 사라집니다.`,
-        confirmText: '부대 가입'
+        confirmText: '부대 이동'
       });
     }
 
@@ -4159,7 +4455,7 @@
         }
 
         if (activeAction === 'join_unit') {
-          if (!pendingUnitTargetId) throw new Error('가입할 부대 정보를 찾을 수 없습니다.');
+          if (!pendingUnitTargetId) throw new Error('이동할 부대 정보를 찾을 수 없습니다.');
           actionToastConfirmBtn.textContent = '이동 중...';
 
           const { data, error } = await sb.rpc('join_unit_as_admin', {
@@ -4203,7 +4499,7 @@
         const labels = {
           delete_account: '회원탈퇴',
           logout: '로그아웃',
-          join_unit: '부대 가입',
+          join_unit: '부대 이동',
           request_unit_delete: '삭제 신청',
           approve_unit_user: '승인',
           reject_unit_user: '반려'
@@ -4453,7 +4749,6 @@
             await loadUnitData({ quiet: true });
             await loadUnitManagementState({ quiet: true });
             await searchUnitsForManagement({ quiet: true });
-            if (readonlyUnitId) await openUnitViewer(readonlyUnitId);
           } catch (error) {
             console.error('부대 정보 실시간 갱신 실패:', error);
           }
@@ -4658,6 +4953,139 @@
       replaceSelectOptions(recordsCompanyFilter, companies, '전체 중대');
       replaceSelectOptions(personnelZoneFilter, zoneOptions, '전체 구역');
       replaceSelectOptions(recordsZoneFilter, zoneOptions, '전체 구역');
+      syncZoneFilterButtonLabels();
+    }
+
+    function getZoneFilterElements(target) {
+      if (target === 'records') {
+        return {
+          select: recordsZoneFilter,
+          button: recordsZoneFilterButton,
+          render: renderRecords,
+          title: '기록 구역 필터'
+        };
+      }
+
+      return {
+        select: personnelZoneFilter,
+        button: personnelZoneFilterButton,
+        render: renderPersonnel,
+        title: '병력 구역 필터'
+      };
+    }
+
+    function syncZoneFilterButtonLabel(target) {
+      const { select, button } = getZoneFilterElements(target);
+      const selectedOption = select.options[select.selectedIndex];
+      const label = button.querySelector('.search-filter-trigger-label');
+      label.textContent = selectedOption?.textContent || '전체 구역';
+    }
+
+    function syncZoneFilterButtonLabels() {
+      syncZoneFilterButtonLabel('personnel');
+      syncZoneFilterButtonLabel('records');
+    }
+
+    function renderZoneFilterOptions() {
+      const keyword = normalizeSearchText(zoneFilterSearchInput.value);
+      const { select } = getZoneFilterElements(activeZoneFilterTarget);
+      const selectedValue = select.value;
+      const options = [
+        { value: '', label: '전체 구역' },
+        ...zones
+          .map(zone => ({ value: zone.id, label: zone.name }))
+          .filter(option => !keyword || normalizeSearchText(option.label).includes(keyword))
+          .sort((a, b) => a.label.localeCompare(b.label, 'ko-KR', { numeric: true, sensitivity: 'base' }))
+      ];
+
+      zoneFilterOptionList.innerHTML = '';
+      if (options.length === 1 && keyword) {
+        const empty = document.createElement('div');
+        empty.className = 'filter-picker-empty';
+        empty.textContent = '검색된 구역이 없습니다.';
+        zoneFilterOptionList.appendChild(empty);
+        return;
+      }
+
+      options.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'filter-picker-option';
+        button.classList.toggle('selected', option.value === selectedValue);
+        button.type = 'button';
+
+        const label = document.createElement('span');
+        label.textContent = option.label;
+        button.appendChild(label);
+
+        if (option.value === selectedValue) {
+          const mark = document.createElement('span');
+          mark.className = 'filter-picker-option-mark';
+          mark.textContent = '선택됨';
+          button.appendChild(mark);
+        }
+
+        button.addEventListener('click', () => {
+          const target = getZoneFilterElements(activeZoneFilterTarget);
+          target.select.value = option.value;
+          syncZoneFilterButtonLabel(activeZoneFilterTarget);
+          target.render();
+          closeZoneFilterModal();
+        });
+
+        zoneFilterOptionList.appendChild(button);
+      });
+    }
+
+    function openZoneFilterModal(target) {
+      activeZoneFilterTarget = target === 'records' ? 'records' : 'personnel';
+      const elements = getZoneFilterElements(activeZoneFilterTarget);
+      zoneFilterTitle.textContent = elements.title;
+      zoneFilterSearchInput.value = '';
+      renderZoneFilterOptions();
+      animateOpen(zoneFilterModal, zoneFilterDialog);
+      setTimeout(() => zoneFilterSearchInput.focus({ preventScroll: true }), 80);
+    }
+
+    function closeZoneFilterModal() {
+      animateClose(zoneFilterModal, zoneFilterDialog);
+    }
+
+    function getKstDateString(value = new Date()) {
+      const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Seoul',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      }).formatToParts(new Date(value));
+      const partMap = Object.fromEntries(parts.map(part => [part.type, part.value]));
+      return `${partMap.year}-${partMap.month}-${partMap.day}`;
+    }
+
+    function addDaysToDateValue(dateValue, days) {
+      const [year, month, day] = String(dateValue || '').split('-').map(Number);
+      if (!year || !month || !day) return '';
+      const date = new Date(Date.UTC(year, month - 1, day + Number(days || 0)));
+      return date.toISOString().slice(0, 10);
+    }
+
+    function updateRecordsPeriodButtonLabel() {
+      const label = recordsPeriodFilterButton.querySelector('.search-filter-trigger-label');
+      if (!appliedRecordsStartDate || !appliedRecordsEndDate) {
+        label.textContent = '기간 설정';
+        return;
+      }
+      label.textContent = `${appliedRecordsStartDate.slice(5).replace('-', '.')}~${appliedRecordsEndDate.slice(5).replace('-', '.')}`;
+    }
+
+    function openRecordsPeriodModal() {
+      const today = getKstDateString();
+      recordsPeriodStartInput.value = appliedRecordsStartDate || today;
+      recordsPeriodEndInput.value = appliedRecordsEndDate || recordsPeriodStartInput.value;
+      animateOpen(recordsPeriodModal, recordsPeriodDialog);
+    }
+
+    function closeRecordsPeriodModal() {
+      animateClose(recordsPeriodModal, recordsPeriodDialog);
     }
 
     function renderPersonnel() {
@@ -4667,6 +5095,11 @@
       const zoneFilter = personnelZoneFilter.value;
       const hasFilter = Boolean(keyword || companyFilter || unreturnedOnly || zoneFilter);
       personnelSearchClearBtn.classList.toggle('visible', keyword.length > 0);
+      personnelState.hidden = true;
+      personnelState.style.display = 'none';
+      personnelState.style.padding = '0';
+      personnelList.hidden = false;
+      personnelList.style.display = 'grid';
       personnelList.innerHTML = '';
 
       const matches = people
@@ -4681,13 +5114,13 @@
 
       if (matches.length === 0) {
         personnelState.hidden = false;
+        personnelState.style.display = 'flex';
+        personnelState.style.padding = '16px 12px';
         personnelState.textContent = hasFilter ? '검색 조건에 맞는 인원이 없습니다.' : '등록된 인원이 없습니다.';
         personnelList.hidden = true;
+        personnelList.style.display = 'none';
         return;
       }
-
-      personnelState.hidden = true;
-      personnelList.hidden = false;
 
       matches.forEach(person => {
         const zone = getZone(person.zoneId);
@@ -4700,25 +5133,27 @@
               <h3 class="personnel-card-name"></h3>
               <span class="personnel-card-phone"></span>
             </div>
-            <span class="personnel-zone-badge"></span>
           </div>
           <dl class="personnel-card-info">
             <dt>중대</dt>
             <dd class="personnel-company"></dd>
             <dt>생활관</dt>
-            <dd class="personnel-home-zone"></dd>
+            <dd class="personnel-home-zone personnel-location-badge"></dd>
             <dt>현위치</dt>
-            <dd class="personnel-current-zone"></dd>
+            <dd class="personnel-current-zone personnel-location-badge"></dd>
           </dl>
         `;
 
-        card.style.setProperty('--zone-color', zone?.color || '#2563eb');
+        const homeZone = getZone(person.homeZoneId);
         card.querySelector('.personnel-card-name').textContent = person.name || '-';
         card.querySelector('.personnel-card-phone').textContent = formatPersonnelPhone(person.phone);
-        card.querySelector('.personnel-zone-badge').textContent = zone?.name || '위치 미지정';
         card.querySelector('.personnel-company').textContent = person.company || '미입력';
-        card.querySelector('.personnel-home-zone').textContent = person.homeZoneName || '미지정';
-        card.querySelector('.personnel-current-zone').textContent = zone?.name || '-';
+        const homeZoneBadge = card.querySelector('.personnel-home-zone');
+        homeZoneBadge.textContent = person.homeZoneName || '미지정';
+        homeZoneBadge.style.setProperty('--badge-color', homeZone?.color || '#64748b');
+        const currentZoneBadge = card.querySelector('.personnel-current-zone');
+        currentZoneBadge.textContent = zone?.name || '위치 미지정';
+        currentZoneBadge.style.setProperty('--badge-color', zone?.color || '#64748b');
 
         if (!atHome) {
           const info = card.querySelector('.personnel-card-info');
@@ -4765,14 +5200,23 @@
       const companyFilter = recordsCompanyFilter.value;
       const unreturnedOnly = recordsReturnFilter.value === 'unreturned';
       const zoneFilter = recordsZoneFilter.value;
-      const hasFilter = Boolean(keyword || companyFilter || unreturnedOnly || zoneFilter);
+      const hasPeriodFilter = Boolean(appliedRecordsStartDate && appliedRecordsEndDate);
+      const hasFilter = Boolean(keyword || companyFilter || unreturnedOnly || zoneFilter || hasPeriodFilter);
       recordsSearchClearBtn.classList.toggle('visible', keyword.length > 0);
+      recordsState.hidden = true;
+      recordsState.style.display = 'none';
+      recordsState.style.padding = '0';
+      recordsList.hidden = false;
+      recordsList.style.display = 'grid';
       recordsList.innerHTML = '';
 
       if (recordsSetupRequired) {
         recordsState.hidden = false;
+        recordsState.style.display = 'flex';
+        recordsState.style.padding = '16px 12px';
         recordsState.textContent = '기록·생활관 기능용 Supabase SQL을 먼저 실행해주세요.';
         recordsList.hidden = true;
+        recordsList.style.display = 'none';
         return;
       }
 
@@ -4781,19 +5225,24 @@
         .filter(log => !companyFilter || log.company === companyFilter)
         .filter(log => !unreturnedOnly || !log.arrivalTime)
         .filter(log => !zoneFilter || log.zoneId === zoneFilter)
+        .filter(log => {
+          if (!hasPeriodFilter) return true;
+          const departureDate = getKstDateString(log.departureTime);
+          return departureDate >= appliedRecordsStartDate && departureDate <= appliedRecordsEndDate;
+        })
         .sort((a, b) => new Date(b.departureTime).getTime() - new Date(a.departureTime).getTime());
 
       if (matches.length === 0) {
         recordsState.hidden = false;
+        recordsState.style.display = 'flex';
+        recordsState.style.padding = '16px 12px';
         recordsState.textContent = hasFilter
           ? '검색 조건에 맞는 기록이 없습니다.'
           : '최근 일주일 동안 저장된 이동 기록이 없습니다.';
         recordsList.hidden = true;
+        recordsList.style.display = 'none';
         return;
       }
-
-      recordsState.hidden = true;
-      recordsList.hidden = false;
 
       matches.forEach(log => {
         const returned = Boolean(log.arrivalTime);
@@ -5705,9 +6154,7 @@
       const unitId = card.dataset.unitId;
       const unitName = card.querySelector('.unit-search-result-info strong')?.textContent || '선택한 부대';
 
-      if (button.dataset.unitAction === 'view') {
-        openUnitViewer(unitId);
-      } else if (button.dataset.unitAction === 'join') {
+      if (button.dataset.unitAction === 'join') {
         requestJoinUnit(unitId, unitName);
       }
     });
@@ -5727,16 +6174,6 @@
     });
 
     unitDeleteRequestBtn.addEventListener('click', requestUnitDelete);
-
-    document.getElementById('unitViewerCloseBtn').addEventListener('click', closeUnitViewer);
-    document.getElementById('unitViewerBottomCloseBtn').addEventListener('click', closeUnitViewer);
-    unitViewerModal.addEventListener('click', event => {
-      if (event.target === unitViewerModal) closeUnitViewer();
-    });
-
-    document.querySelectorAll('[data-unit-viewer-tab]').forEach(button => {
-      button.addEventListener('click', () => setUnitViewerTab(button.dataset.unitViewerTab));
-    });
 
 
     document.getElementById('settingsBtn').addEventListener('click', openSettingsModal);
@@ -5786,8 +6223,10 @@
       if (event.key !== 'Escape') return;
       if (actionToastBackdrop.classList.contains('open')) {
         closeActionToast();
-      } else if (unitViewerModal.classList.contains('open')) {
-        closeUnitViewer();
+      } else if (recordsPeriodModal.classList.contains('open')) {
+        closeRecordsPeriodModal();
+      } else if (zoneFilterModal.classList.contains('open')) {
+        closeZoneFilterModal();
       } else if (settingsModal.classList.contains('open')) {
         closeSettingsModal();
       }
@@ -5809,10 +6248,56 @@
       recordsSearchInput.focus();
     });
 
-    [personnelCompanyFilter, personnelReturnFilter, personnelZoneFilter]
+    [personnelCompanyFilter, personnelReturnFilter]
       .forEach(select => select.addEventListener('change', renderPersonnel));
-    [recordsCompanyFilter, recordsReturnFilter, recordsZoneFilter]
+    [recordsCompanyFilter, recordsReturnFilter]
       .forEach(select => select.addEventListener('change', renderRecords));
+
+    personnelZoneFilterButton.addEventListener('click', () => openZoneFilterModal('personnel'));
+    recordsZoneFilterButton.addEventListener('click', () => openZoneFilterModal('records'));
+    zoneFilterSearchInput.addEventListener('input', renderZoneFilterOptions);
+    zoneFilterSearchInput.addEventListener('search', renderZoneFilterOptions);
+    zoneFilterCloseButton.addEventListener('click', closeZoneFilterModal);
+    zoneFilterModal.addEventListener('click', event => {
+      if (event.target === zoneFilterModal) closeZoneFilterModal();
+    });
+
+    recordsPeriodFilterButton.addEventListener('click', openRecordsPeriodModal);
+    recordsPeriodCloseButton.addEventListener('click', closeRecordsPeriodModal);
+    recordsPeriodCancelButton.addEventListener('click', closeRecordsPeriodModal);
+    recordsPeriodModal.addEventListener('click', event => {
+      if (event.target === recordsPeriodModal) closeRecordsPeriodModal();
+    });
+    recordsPeriodStartInput.addEventListener('change', () => {
+      if (!recordsPeriodStartInput.value) recordsPeriodStartInput.value = getKstDateString();
+      if (!recordsPeriodEndInput.value || recordsPeriodEndInput.value < recordsPeriodStartInput.value) {
+        recordsPeriodEndInput.value = recordsPeriodStartInput.value;
+      }
+    });
+    document.querySelectorAll('[data-period-add-days]').forEach(button => {
+      button.addEventListener('click', () => {
+        const startDate = recordsPeriodStartInput.value || getKstDateString();
+        recordsPeriodStartInput.value = startDate;
+        recordsPeriodEndInput.value = addDaysToDateValue(startDate, Number(button.dataset.periodAddDays));
+      });
+    });
+    recordsPeriodApplyButton.addEventListener('click', () => {
+      const startDate = recordsPeriodStartInput.value || getKstDateString();
+      const endDate = recordsPeriodEndInput.value || startDate;
+      recordsPeriodStartInput.value = startDate;
+      recordsPeriodEndInput.value = endDate;
+
+      if (endDate < startDate) {
+        showMessage('종료일은 시작일보다 빠를 수 없습니다.', '기간 확인');
+        return;
+      }
+
+      appliedRecordsStartDate = startDate;
+      appliedRecordsEndDate = endDate;
+      updateRecordsPeriodButtonLabel();
+      renderRecords();
+      closeRecordsPeriodModal();
+    });
 
     document.getElementById('addLocationBtn').addEventListener('click', () => openZoneModal());
     document.getElementById('dashboardAddLocationBtn').addEventListener('click', () => openZoneModal());
