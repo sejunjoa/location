@@ -3214,6 +3214,171 @@
       min-width: 82px;
     }
 
+
+
+    /* 2026-08-06 요청 반영: 제목은 흐름대로 사라지고 현황표만 상단 고정 */
+    #view-detail > .sticky-dashboard,
+    #view-dashboard > .sticky-dashboard,
+    #view-personnel > .sticky-dashboard,
+    #view-records > .sticky-dashboard,
+    body.detail-tab-active #view-detail > .sticky-dashboard.tab-dashboard-fixed,
+    body.dashboard-tab-active #view-dashboard > .sticky-dashboard.tab-dashboard-fixed,
+    body.personnel-tab-active #view-personnel > .sticky-dashboard.tab-dashboard-fixed,
+    body.records-tab-active #view-records > .sticky-dashboard.tab-dashboard-fixed {
+      position: sticky !important;
+      top: 0 !important;
+      left: auto !important;
+      right: auto !important;
+      width: calc(100% + 28px) !important;
+      margin: 0 -14px !important;
+      transform: none !important;
+      z-index: 85 !important;
+      box-shadow: 0 8px 20px rgba(15,23,42,.06) !important;
+    }
+
+    .tab-dashboard-pin-spacer {
+      display: none !important;
+      height: 0 !important;
+    }
+
+    /* 현황판 이름 카드는 한 행에 5명 */
+    .dashboard-person-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+      gap: 6px !important;
+    }
+
+    .dashboard-person-card {
+      padding-left: 3px !important;
+      padding-right: 3px !important;
+      font-size: 9px !important;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 초기 생활관 색을 병력 카드의 테마색으로 사용 */
+    .personnel-card,
+    .sheet-person {
+      border-color: color-mix(in srgb, var(--home-zone-color, #64748b) 28%, var(--line)) !important;
+      background: color-mix(in srgb, var(--home-zone-color, #64748b) 6%, white) !important;
+    }
+
+    .personnel-card-name,
+    .sheet-person .person-card-name {
+      color: var(--home-zone-color, var(--text)) !important;
+    }
+
+    .sheet-person .person-card-name {
+      background: color-mix(in srgb, var(--home-zone-color, #64748b) 12%, white) !important;
+    }
+
+    /* 기록 카드는 한 행에 2개 */
+    .records-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+      gap: 9px !important;
+    }
+
+    .record-card {
+      padding: 12px !important;
+      border-radius: 17px !important;
+    }
+
+    .record-card-head {
+      display: grid !important;
+      grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr) !important;
+      align-items: start !important;
+      gap: 8px !important;
+      padding-bottom: 10px !important;
+    }
+
+    .record-card-name {
+      font-size: 15px !important;
+      line-height: 1.35 !important;
+      white-space: normal !important;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+
+    .record-card-meta {
+      min-width: 0;
+      display: grid;
+      gap: 4px;
+      color: #475569;
+      font-size: 8px;
+      font-weight: 800;
+      line-height: 1.35;
+      text-align: right;
+    }
+
+    .record-card-meta-line {
+      min-width: 0;
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+
+    .record-card-meta-line em {
+      flex: 0 0 auto;
+      color: #94a3b8;
+      font-style: normal;
+      font-weight: 800;
+    }
+
+    .record-card-meta-line b {
+      min-width: 0;
+      color: #334155;
+      font-weight: 900;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .record-card-route {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      align-items: center;
+      gap: 3px;
+      margin-top: 1px;
+    }
+
+    .record-card-route span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .record-card-route i {
+      color: #2563eb;
+      font-style: normal;
+      font-weight: 950;
+    }
+
+    .record-card-info {
+      grid-template-columns: minmax(54px, auto) 1fr !important;
+      gap: 7px 7px !important;
+      margin-top: 10px !important;
+    }
+
+    .record-card-info dt {
+      font-size: 9px !important;
+    }
+
+    .record-card-info dd {
+      font-size: 9px !important;
+    }
+
+    .settings-account-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .settings-account-actions .settings-action-btn {
+      margin: 0 !important;
+    }
+
   </style>
 </head>
 <body class="detail-tab-active">
@@ -3380,6 +3545,10 @@
               />
               <button class="personnel-search-clear" id="recordsSearchClearBtn" type="button" aria-label="검색어 지우기">✕</button>
             </div>
+            <button class="user-record-period-button search-filter-select search-filter-trigger" id="recordsPeriodFilterButton" type="button" aria-label="이동 기록 기간 설정">
+              <span class="search-filter-trigger-label period-button-label">기간 설정</span>
+              <span class="search-filter-trigger-arrow" aria-hidden="true">⌄</span>
+            </button>
             <div class="search-filter-row records-filter-row" aria-label="기록 검색 필터">
               <select class="search-filter-select" id="recordsCompanyFilter" aria-label="중대 필터">
                 <option value="">전체 중대</option>
@@ -3397,10 +3566,6 @@
                   <option value="">전체 구역</option>
                 </select>
               </div>
-              <button class="search-filter-select search-filter-trigger" id="recordsPeriodFilterButton" type="button" aria-label="기록 기간 설정">
-                <span class="search-filter-trigger-label">기간 설정</span>
-                <span class="search-filter-trigger-arrow" aria-hidden="true">⌄</span>
-              </button>
             </div>
           </section>
         </div>
@@ -3544,8 +3709,9 @@
           <button class="period-quick-btn" type="button" data-period-add-days="5">+5일</button>
           <button class="period-quick-btn" type="button" data-period-add-days="7">+7일</button>
         </div>
-        <div class="dialog-actions">
+        <div class="dialog-actions period-filter-actions">
           <button class="cancel-btn" id="recordsPeriodCancelButton" type="button">취소</button>
+          <button class="period-clear-btn" id="recordsPeriodClearButton" type="button">해제</button>
           <button class="confirm-btn" id="recordsPeriodApplyButton" type="button">적용</button>
         </div>
       </div>
@@ -3677,7 +3843,6 @@
       <div class="dialog-head settings-dialog-head">
         <div>
           <h3 id="settingsDialogTitle">설정</h3>
-          <p>개인정보와 계정 상태를 관리합니다.</p>
         </div>
         <button class="dialog-close-btn" id="settingsModalCloseBtn" type="button" aria-label="설정 닫기">✕</button>
       </div>
@@ -3685,7 +3850,6 @@
       <div class="settings-dialog-body">
         <section class="settings-section" aria-labelledby="profileSettingsTitle">
           <h4 class="settings-section-title" id="profileSettingsTitle">개인정보 수정</h4>
-          <p class="settings-section-description">이름, 휴대폰 번호, 직책을 변경할 수 있습니다.</p>
 
           <form id="settingsProfileForm" novalidate>
             <div class="settings-field">
@@ -3706,24 +3870,16 @@
             <div class="settings-field">
               <label class="field-label" for="settingsCurrentPasswordInput">현재 비밀번호</label>
               <input class="text-input" id="settingsCurrentPasswordInput" type="password" maxlength="128" autocomplete="current-password" placeholder="수정을 위해 현재 비밀번호 입력" />
-              <p class="settings-password-note">현재 비밀번호가 확인된 경우에만 개인정보가 저장됩니다.</p>
             </div>
 
             <button class="confirm-btn settings-save-btn" id="saveProfileSettingsBtn" type="submit">개인정보 저장</button>
           </form>
         </section>
 
-        <section class="settings-section" aria-labelledby="logoutSettingsTitle">
-          <h4 class="settings-section-title" id="logoutSettingsTitle">로그아웃</h4>
-          <p class="settings-section-description">현재 로그인 세션을 종료하고 로그인 페이지로 이동합니다.</p>
+        <div class="settings-account-actions">
           <button class="settings-action-btn logout" id="logoutSettingsBtn" type="button">로그아웃</button>
-        </section>
-
-        <section class="settings-section" aria-labelledby="withdrawSettingsTitle">
-          <h4 class="settings-section-title" id="withdrawSettingsTitle">회원탈퇴</h4>
-          <p class="settings-section-description">계정과 연결된 위치 정보를 삭제합니다. 탈퇴 후에는 복구할 수 없습니다.</p>
           <button class="settings-action-btn withdraw" id="deleteAccountSettingsBtn" type="button">회원탈퇴</button>
-        </section>
+        </div>
 
       </div>
       <div class="settings-dialog-footer">
@@ -3792,6 +3948,7 @@
     const recordsPeriodStartInput = document.getElementById('recordsPeriodStartInput');
     const recordsPeriodEndInput = document.getElementById('recordsPeriodEndInput');
     const recordsPeriodCancelButton = document.getElementById('recordsPeriodCancelButton');
+    const recordsPeriodClearButton = document.getElementById('recordsPeriodClearButton');
     const recordsPeriodApplyButton = document.getElementById('recordsPeriodApplyButton');
 
     const unitCurrentName = document.getElementById('unitCurrentName');
@@ -3954,7 +4111,6 @@
 
       fillSettingsProfileForm();
       animateOpen(settingsModal, settingsDialog);
-      setTimeout(() => settingsNameInput.focus(), 80);
     }
 
     function closeSettingsModal() {
@@ -4562,45 +4718,100 @@
       updateManagementControls();
     }
 
+
     async function loadLocationMembers(unitId) {
       const personnelResult = await sb.rpc('get_location_personnel', {
         p_unit_id: unitId
       });
 
-      if (!personnelResult.error) return personnelResult;
-
-      // 중대 컬럼용 신규 RPC가 아직 설치되지 않은 환경에서도 기존 기능은 유지합니다.
-      const legacyResult = await sb.rpc('get_location_members', {
-        p_unit_id: unitId
-      });
-
-      if (legacyResult.error) return personnelResult;
-      return legacyResult;
-    }
-
-    async function loadMovementLogs(unitId) {
-      const result = await sb.rpc('get_location_movement_logs', {
-        p_unit_id: unitId
-      });
-
-      if (!result.error) {
-        recordsSetupRequired = false;
-        return result;
+      let baseResult = personnelResult;
+      if (personnelResult.error) {
+        const legacyResult = await sb.rpc('get_location_members', {
+          p_unit_id: unitId
+        });
+        if (!legacyResult.error) baseResult = legacyResult;
       }
 
-      const functionMissing = ['PGRST202', '42883'].includes(result.error.code)
-        || String(result.error.message || '').includes('get_location_movement_logs');
+      if (baseResult.error) return baseResult;
 
-      if (functionMissing) {
-        recordsSetupRequired = true;
-        console.warn('기록 탭용 Supabase 함수가 아직 설치되지 않았습니다.');
-        return { data: [], error: null };
+      // 신규 SQL을 실행하지 않은 환경에서도 관리자 권한으로 날짜 정보를 보강합니다.
+      const dateResult = await sb
+        .from('profiles')
+        .select('id, enlist_date, discharge_date')
+        .eq('unit_id', unitId)
+        .eq('role', 'user');
+
+      if (dateResult.error) {
+        console.warn('입대일/전역일 보강 조회 실패:', dateResult.error);
+        return baseResult;
       }
 
-      return result;
+      const dateMap = new Map((dateResult.data || []).map(row => [row.id, row]));
+      return {
+        data: (baseResult.data || []).map(member => {
+          const dateRow = dateMap.get(member.user_id) || {};
+          return {
+            ...member,
+            enlist_date: member.enlist_date || dateRow.enlist_date || null,
+            discharge_date: member.discharge_date || dateRow.discharge_date || null
+          };
+        }),
+        error: null
+      };
     }
 
-    async function loadUnitData({ quiet = false } = {}) {
+
+async function loadMovementLogs(unitId) {
+  const [rpcResult, directResult] = await Promise.all([
+    sb.rpc('get_location_movement_logs', { p_unit_id: unitId }),
+    sb
+      .from('location_movement_logs')
+      .select('*')
+      .eq('unit_id', unitId)
+      .order('departure_time', { ascending: false })
+      .limit(500)
+  ]);
+
+  if (!rpcResult.error) {
+    recordsSetupRequired = false;
+    if (directResult.error) return rpcResult;
+
+    const directRows = directResult.data || [];
+    const rpcRows = rpcResult.data || [];
+    const rpcById = new Map(
+      rpcRows.map(row => [String(row.log_id ?? row.id ?? ''), row])
+    );
+    const directIds = new Set();
+    const mergedRows = directRows.map(row => {
+      const id = String(row.log_id ?? row.id ?? '');
+      directIds.add(id);
+      return { ...(rpcById.get(id) || {}), ...row };
+    });
+    rpcRows.forEach(row => {
+      const id = String(row.log_id ?? row.id ?? '');
+      if (!directIds.has(id)) mergedRows.push(row);
+    });
+    return { data: mergedRows, error: null };
+  }
+
+  if (!directResult.error) {
+    recordsSetupRequired = false;
+    return directResult;
+  }
+
+  const functionMissing = ['PGRST202', '42883'].includes(rpcResult.error?.code)
+    || String(rpcResult.error?.message || '').includes('get_location_movement_logs');
+
+  if (functionMissing) {
+    recordsSetupRequired = true;
+    console.warn('기록 탭용 Supabase 함수가 아직 설치되지 않았습니다.');
+    return { data: [], error: null };
+  }
+
+  return rpcResult;
+}
+
+async function loadUnitData({ quiet = false } = {}) {
       if (!selectedUnitId) {
         replaceArray(zones, []);
         replaceArray(people, []);
@@ -4658,6 +4869,8 @@
             role: member.member_role,
             company: member.company || member.company_name || null,
             phone: member.phone || null,
+            enlistDate: member.enlist_date || member.enlistment_date || null,
+            dischargeDate: member.discharge_date || null,
             homeZoneId: member.home_zone_id || null,
             homeZoneName: member.home_zone_name || null,
             zoneId: location.zone_id,
@@ -4667,17 +4880,63 @@
         })
         .filter(Boolean));
 
-      replaceArray(movementLogs, (recordResult.data || []).map(log => ({
-        id: log.log_id ?? log.id,
-        userId: log.user_id,
-        name: log.display_name || '이름 미입력',
-        company: memberMap.get(log.user_id)?.company || memberMap.get(log.user_id)?.company_name || null,
-        zoneId: log.zone_id || null,
-        zoneName: log.zone_name || null,
-        departureTime: log.departure_time,
-        expectedReturnTime: log.expected_return_time || log.return_time || null,
-        arrivalTime: log.arrival_time
-      })));
+
+const normalizedMovementLogs = (recordResult.data || []).map(log => {
+  const member = memberMap.get(log.user_id);
+  return {
+    id: log.log_id ?? log.id,
+    userId: log.user_id,
+    name: log.display_name || log.name || member?.display_name || member?.name || '이름 미입력',
+    company: member?.company || member?.company_name || log.company || log.company_name || null,
+    homeZoneId: member?.home_zone_id || log.home_zone_id || null,
+    homeZoneName: member?.home_zone_name || log.home_zone_name || null,
+    zoneId: log.to_zone_id || log.destination_zone_id || log.arrival_zone_id || log.zone_id || log.current_zone_id || null,
+    zoneName: log.to_zone_name || log.destination_zone_name || log.arrival_zone_name || log.zone_name || log.current_zone_name || null,
+    originZoneId:
+      log.from_zone_id || log.origin_zone_id || log.departure_zone_id || log.previous_zone_id ||
+      log.source_zone_id || log.from_location_id || log.previous_location_id || log.before_zone_id || null,
+    destinationZoneId:
+      log.to_zone_id || log.destination_zone_id || log.arrival_zone_id || log.zone_id ||
+      log.target_zone_id || log.to_location_id || log.current_zone_id || null,
+    originZoneName:
+      log.from_zone_name || log.origin_zone_name || log.departure_zone_name || log.previous_zone_name ||
+      log.source_zone_name || log.from_location_name || log.previous_location_name || log.before_zone_name || null,
+    destinationZoneName:
+      log.to_zone_name || log.destination_zone_name || log.arrival_zone_name || log.zone_name ||
+      log.target_zone_name || log.to_location_name || log.current_zone_name || null,
+    departureTime: log.departure_time || log.moved_at || log.created_at,
+    expectedReturnTime: log.expected_return_time || log.return_time || null,
+    arrivalTime: log.arrival_time || log.returned_at || null
+  };
+});
+
+const logsByUser = new Map();
+normalizedMovementLogs.forEach(log => {
+  if (!logsByUser.has(log.userId)) logsByUser.set(log.userId, []);
+  logsByUser.get(log.userId).push(log);
+});
+
+logsByUser.forEach((userLogs, userId) => {
+  const member = memberMap.get(userId);
+  let previousZoneId = member?.home_zone_id || null;
+  let previousZoneName = member?.home_zone_name || getZone(previousZoneId)?.name || null;
+
+  userLogs
+    .sort((a, b) => new Date(a.departureTime || 0).getTime() - new Date(b.departureTime || 0).getTime())
+    .forEach(log => {
+      if (!log.originZoneId && previousZoneId) log.originZoneId = previousZoneId;
+      if (!log.originZoneName) {
+        log.originZoneName = getZone(log.originZoneId)?.name || previousZoneName || null;
+      }
+      if (!log.destinationZoneName) {
+        log.destinationZoneName = getZone(log.destinationZoneId)?.name || log.zoneName || null;
+      }
+      if (log.destinationZoneId) previousZoneId = log.destinationZoneId;
+      if (log.destinationZoneName) previousZoneName = log.destinationZoneName;
+    });
+});
+
+replaceArray(movementLogs, normalizedMovementLogs);
 
       if (selectedZoneId && !getZone(selectedZoneId)) {
         selectedZoneId = null;
@@ -4961,7 +5220,7 @@
         return {
           select: recordsZoneFilter,
           button: recordsZoneFilterButton,
-          render: renderRecords,
+          render: () => renderMovementLogs(),
           title: '기록 구역 필터'
         };
       }
@@ -5074,7 +5333,7 @@
         label.textContent = '기간 설정';
         return;
       }
-      label.textContent = `${appliedRecordsStartDate.slice(5).replace('-', '.')}~${appliedRecordsEndDate.slice(5).replace('-', '.')}`;
+      label.textContent = `${appliedRecordsStartDate} ~ ${appliedRecordsEndDate}`;
     }
 
     function openRecordsPeriodModal() {
@@ -5088,93 +5347,101 @@
       animateClose(recordsPeriodModal, recordsPeriodDialog);
     }
 
-    function renderPersonnel() {
-      const keyword = normalizeSearchText(personnelSearchInput.value);
-      const companyFilter = personnelCompanyFilter.value;
-      const unreturnedOnly = personnelReturnFilter.value === 'unreturned';
-      const zoneFilter = personnelZoneFilter.value;
-      const hasFilter = Boolean(keyword || companyFilter || unreturnedOnly || zoneFilter);
-      personnelSearchClearBtn.classList.toggle('visible', keyword.length > 0);
-      personnelState.hidden = true;
-      personnelState.style.display = 'none';
-      personnelState.style.padding = '0';
-      personnelList.hidden = false;
-      personnelList.style.display = 'grid';
-      personnelList.innerHTML = '';
 
-      const matches = people
-        .filter(person => !keyword || normalizeSearchText(person.name).includes(keyword))
-        .filter(person => !companyFilter || person.company === companyFilter)
-        .filter(person => !unreturnedOnly || !isPersonAtHome(person))
-        .filter(person => !zoneFilter || person.zoneId === zoneFilter)
-        .sort((a, b) => String(b.name || '').localeCompare(String(a.name || ''), 'ko-KR', {
-          numeric: true,
-          sensitivity: 'base'
-        }));
+function renderPersonnel() {
+  const keyword = normalizeSearchText(personnelSearchInput.value);
+  const companyFilter = personnelCompanyFilter.value;
+  const unreturnedOnly = personnelReturnFilter.value === 'unreturned';
+  const zoneFilter = personnelZoneFilter.value;
+  const hasFilter = Boolean(keyword || companyFilter || unreturnedOnly || zoneFilter);
+  personnelSearchClearBtn.classList.toggle('visible', keyword.length > 0);
+  personnelState.hidden = true;
+  personnelState.style.display = 'none';
+  personnelState.style.padding = '0';
+  personnelList.hidden = false;
+  personnelList.style.display = 'grid';
+  personnelList.innerHTML = '';
 
-      if (matches.length === 0) {
-        personnelState.hidden = false;
-        personnelState.style.display = 'flex';
-        personnelState.style.padding = '16px 12px';
-        personnelState.textContent = hasFilter ? '검색 조건에 맞는 인원이 없습니다.' : '등록된 인원이 없습니다.';
-        personnelList.hidden = true;
-        personnelList.style.display = 'none';
-        return;
-      }
+  const dateValue = value => {
+    if (!value) return Number.POSITIVE_INFINITY;
+    const parsed = new Date(`${String(value).slice(0, 10)}T00:00:00Z`).getTime();
+    return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
+  };
 
-      matches.forEach(person => {
-        const zone = getZone(person.zoneId);
-        const atHome = isPersonAtHome(person);
-        const card = document.createElement('article');
-        card.className = 'personnel-card';
-        card.innerHTML = `
-          <div class="personnel-card-head">
-            <div class="personnel-card-title-line">
-              <h3 class="personnel-card-name"></h3>
-              <span class="personnel-card-phone"></span>
-            </div>
-          </div>
-          <dl class="personnel-card-info">
-            <dt>중대</dt>
-            <dd class="personnel-company"></dd>
-            <dt>생활관</dt>
-            <dd class="personnel-home-zone personnel-location-badge"></dd>
-            <dt>현위치</dt>
-            <dd class="personnel-current-zone personnel-location-badge"></dd>
-          </dl>
-        `;
-
-        const homeZone = getZone(person.homeZoneId);
-        card.querySelector('.personnel-card-name').textContent = person.name || '-';
-        card.querySelector('.personnel-card-phone').textContent = formatPersonnelPhone(person.phone);
-        card.querySelector('.personnel-company').textContent = person.company || '미입력';
-        const homeZoneBadge = card.querySelector('.personnel-home-zone');
-        homeZoneBadge.textContent = person.homeZoneName || '미지정';
-        homeZoneBadge.style.setProperty('--badge-color', homeZone?.color || '#64748b');
-        const currentZoneBadge = card.querySelector('.personnel-current-zone');
-        currentZoneBadge.textContent = zone?.name || '위치 미지정';
-        currentZoneBadge.style.setProperty('--badge-color', zone?.color || '#64748b');
-
-        if (!atHome) {
-          const info = card.querySelector('.personnel-card-info');
-          const departureLabel = document.createElement('dt');
-          departureLabel.textContent = '출발 시간';
-          const departureValue = document.createElement('dd');
-          departureValue.className = 'personnel-time-value';
-          departureValue.textContent = formatTime(person.departureTime);
-          const returnLabel = document.createElement('dt');
-          returnLabel.textContent = '도착 예정 시간';
-          const returnValue = document.createElement('dd');
-          returnValue.className = 'personnel-time-value';
-          returnValue.textContent = formatTime(person.returnTime);
-          info.append(departureLabel, departureValue, returnLabel, returnValue);
-        }
-
-        personnelList.appendChild(card);
+  // 입대일이 빠른 인원(선임)부터 표시하고, 날짜가 없으면 마지막에 둡니다.
+  const matches = people
+    .filter(person => !keyword || normalizeSearchText(person.name).includes(keyword))
+    .filter(person => !companyFilter || person.company === companyFilter)
+    .filter(person => !unreturnedOnly || !isPersonAtHome(person))
+    .filter(person => !zoneFilter || person.zoneId === zoneFilter)
+    .sort((a, b) => {
+      const dateOrder = dateValue(a.enlistDate) - dateValue(b.enlistDate);
+      if (dateOrder) return dateOrder;
+      return String(a.name || '').localeCompare(String(b.name || ''), 'ko-KR', {
+        numeric: true,
+        sensitivity: 'base'
       });
-    }
+    });
 
-    function formatRecordDateTime(value) {
+  if (matches.length === 0) {
+    personnelState.hidden = false;
+    personnelState.style.display = 'flex';
+    personnelState.style.padding = '16px 12px';
+    personnelState.textContent = hasFilter ? '검색 조건에 맞는 인원이 없습니다.' : '등록된 인원이 없습니다.';
+    personnelList.hidden = true;
+    personnelList.style.display = 'none';
+    return;
+  }
+
+  const formatDate = value => {
+    const raw = String(value || '').slice(0, 10);
+    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return match ? `${match[1]}. ${match[2]}. ${match[3]}.` : '미입력';
+  };
+
+  matches.forEach(person => {
+    const zone = getZone(person.zoneId);
+    const card = document.createElement('article');
+    card.className = 'personnel-card';
+    card.innerHTML = `
+      <div class="personnel-card-head">
+        <div class="personnel-card-title-line">
+          <h3 class="personnel-card-name"></h3>
+          <span class="personnel-card-phone"></span>
+        </div>
+      </div>
+      <dl class="personnel-card-info">
+        <dt>중대</dt>
+        <dd class="personnel-company"></dd>
+        <dt>입대일</dt>
+        <dd class="personnel-enlist-date personnel-date-value"></dd>
+        <dt>전역일</dt>
+        <dd class="personnel-discharge-date personnel-date-value"></dd>
+        <dt>생활관</dt>
+        <dd class="personnel-home-zone personnel-location-badge"></dd>
+        <dt>현위치</dt>
+        <dd class="personnel-current-zone personnel-location-badge"></dd>
+      </dl>
+    `;
+
+    const homeZone = getZone(person.homeZoneId);
+    card.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
+    card.querySelector('.personnel-card-name').textContent = person.name || '-';
+    card.querySelector('.personnel-card-phone').textContent = formatPersonnelPhone(person.phone);
+    card.querySelector('.personnel-company').textContent = person.company || '미입력';
+    card.querySelector('.personnel-enlist-date').textContent = formatDate(person.enlistDate);
+    card.querySelector('.personnel-discharge-date').textContent = formatDate(person.dischargeDate);
+    const homeZoneBadge = card.querySelector('.personnel-home-zone');
+    homeZoneBadge.textContent = person.homeZoneName || '미지정';
+    homeZoneBadge.style.setProperty('--badge-color', homeZone?.color || '#64748b');
+    const currentZoneBadge = card.querySelector('.personnel-current-zone');
+    currentZoneBadge.textContent = zone?.name || '위치 미지정';
+    currentZoneBadge.style.setProperty('--badge-color', zone?.color || '#64748b');
+    personnelList.appendChild(card);
+  });
+}
+
+function formatRecordDateTime(value) {
       if (!value) return '-';
 
       return new Intl.DateTimeFormat('ko-KR', {
@@ -5252,15 +5519,18 @@
         card.innerHTML = `
           <div class="record-card-head">
             <h3 class="record-card-name"></h3>
+            <div class="record-card-meta">
+              <span class="record-card-meta-line"><em>중대</em><b class="record-meta-company"></b></span>
+              <span class="record-card-meta-line"><em>생활관</em><b class="record-meta-home"></b></span>
+              <span class="record-card-route"><span class="record-meta-origin"></span><i>→</i><span class="record-meta-destination"></span></span>
+            </div>
           </div>
           <dl class="record-card-info">
-            <dt>현위치</dt>
-            <dd class="record-current-zone"></dd>
-            <dt>출발 시간</dt>
+            <dt>출발</dt>
             <dd class="record-departure-time"></dd>
-            <dt>도착 예정 시간</dt>
+            <dt>도착 예정</dt>
             <dd class="record-expected-time"></dd>
-            <dt>도착 시간</dt>
+            <dt>도착</dt>
             <dd class="record-arrival-time"></dd>
             <dt>지난 시간</dt>
             <dd class="record-elapsed-time"></dd>
@@ -5268,7 +5538,10 @@
         `;
 
         card.querySelector('.record-card-name').textContent = log.name || '이름 미입력';
-        card.querySelector('.record-current-zone').textContent = log.zoneName || '위치 정보 없음';
+        card.querySelector('.record-meta-company').textContent = log.company || '미입력';
+        card.querySelector('.record-meta-home').textContent = log.homeZoneName || '미지정';
+        card.querySelector('.record-meta-origin').textContent = log.originZoneName || getZone(log.originZoneId)?.name || '출발지 미기록';
+        card.querySelector('.record-meta-destination').textContent = log.destinationZoneName || getZone(log.destinationZoneId)?.name || log.zoneName || '도착지 미기록';
         card.querySelector('.record-departure-time').textContent = formatRecordDateTime(log.departureTime);
         card.querySelector('.record-expected-time').textContent = formatRecordDateTime(log.expectedReturnTime);
         const arrival = card.querySelector('.record-arrival-time');
@@ -5773,7 +6046,7 @@
       renderDashboardZones();
       updateSearchFilterOptions();
       renderPersonnel();
-      renderRecords();
+      renderMovementLogs();
       updateZoneState();
       updateMetrics();
     }
@@ -5876,6 +6149,8 @@
       zonePeople.forEach(person => {
         const row = document.createElement('article');
         row.className = 'sheet-person';
+        const homeZone = getZone(person.homeZoneId);
+        row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
         const companyText = person.company || '미입력';
         const atHome = isPersonAtHome(person);
 
@@ -5890,9 +6165,9 @@
             <span class="person-card-company"></span>
           </div>
           <div class="person-card-grid">
-            <span class="person-card-label">출발 시간</span>
+            <span class="person-card-label">출발</span>
             <span class="person-card-value">${formatTime(person.departureTime)}</span>
-            <span class="person-card-label">도착 예정 시간</span>
+            <span class="person-card-label">도착 예정</span>
             <span class="person-card-value">${formatTime(person.returnTime)}</span>
             <span class="person-card-label">지난 시간</span>
             <span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
@@ -6240,18 +6515,18 @@
       personnelSearchInput.focus();
     });
 
-    recordsSearchInput.addEventListener('input', renderRecords);
-    recordsSearchInput.addEventListener('search', renderRecords);
+    recordsSearchInput.addEventListener('input', () => renderMovementLogs());
+    recordsSearchInput.addEventListener('search', () => renderMovementLogs());
     recordsSearchClearBtn.addEventListener('click', () => {
       recordsSearchInput.value = '';
-      renderRecords();
+      renderMovementLogs();
       recordsSearchInput.focus();
     });
 
     [personnelCompanyFilter, personnelReturnFilter]
       .forEach(select => select.addEventListener('change', renderPersonnel));
     [recordsCompanyFilter, recordsReturnFilter]
-      .forEach(select => select.addEventListener('change', renderRecords));
+      .forEach(select => select.addEventListener('change', () => renderMovementLogs()));
 
     personnelZoneFilterButton.addEventListener('click', () => openZoneFilterModal('personnel'));
     recordsZoneFilterButton.addEventListener('click', () => openZoneFilterModal('records'));
@@ -6265,6 +6540,15 @@
     recordsPeriodFilterButton.addEventListener('click', openRecordsPeriodModal);
     recordsPeriodCloseButton.addEventListener('click', closeRecordsPeriodModal);
     recordsPeriodCancelButton.addEventListener('click', closeRecordsPeriodModal);
+    recordsPeriodClearButton.addEventListener('click', () => {
+      appliedRecordsStartDate = '';
+      appliedRecordsEndDate = '';
+      recordsPeriodStartInput.value = '';
+      recordsPeriodEndInput.value = '';
+      updateRecordsPeriodButtonLabel();
+      renderMovementLogs();
+      closeRecordsPeriodModal();
+    });
     recordsPeriodModal.addEventListener('click', event => {
       if (event.target === recordsPeriodModal) closeRecordsPeriodModal();
     });
@@ -6295,7 +6579,7 @@
       appliedRecordsStartDate = startDate;
       appliedRecordsEndDate = endDate;
       updateRecordsPeriodButtonLabel();
-      renderRecords();
+      renderMovementLogs();
       closeRecordsPeriodModal();
     });
 
@@ -7045,5 +7329,2080 @@
 
     initializeAdminPage();
   </script>
+<script>
+(function(){
+  const style = document.createElement('style');
+  style.textContent = `
+    .settings-action-btn.withdraw{border:0!important;background:#fff1f2!important}
+    .sticky-dashboard.admin-js-fixed{position:fixed!important;top:0!important;left:50%!important;transform:translateX(-50%)!important;width:var(--sticky-fixed-width,min(100%,480px))!important;margin:0!important;z-index:96!important;box-shadow:0 10px 24px rgba(15,23,42,.1)!important}
+    .sticky-dashboard-spacer.active{display:block!important}
+    #view-records .records-list{grid-template-columns:1fr!important;gap:12px!important}
+    #view-records .record-card{padding:14px!important;border-radius:18px!important}
+    #view-records .record-card-head{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:8px!important;min-width:0!important;padding-bottom:11px!important;overflow:hidden!important;white-space:nowrap!important}
+    #view-records .record-card-name{font-size:18px!important;line-height:1.2!important;white-space:nowrap!important;flex:0 1 auto!important;max-width:34%!important;overflow:hidden!important;text-overflow:ellipsis!important}
+    .record-header-company{flex:0 0 auto!important;color:var(--text)!important;font-size:15px!important;font-weight:900!important;line-height:1.2!important;white-space:nowrap!important}
+    #view-records .record-card-head > .record-zone-badge{flex:0 1 auto!important;max-width:108px!important}
+    .record-card-body{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(92px,108px)!important;gap:14px!important;align-items:stretch!important;margin-top:13px!important}
+    #view-records .record-card-body .record-card-info{margin:0!important;align-content:center!important;grid-template-columns:minmax(78px,auto) minmax(0,1fr)!important;gap:10px 12px!important}
+    #view-records .record-card-body .record-card-info dt{font-size:13px!important;font-weight:900!important;line-height:1.3!important}
+    #view-records .record-card-body .record-card-info dd{font-size:14px!important;font-weight:900!important;line-height:1.3!important}
+    .record-route-vertical{min-width:0!important;padding-left:13px!important;border-left:1px solid #e8edf5!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:5px!important;text-align:center!important}
+    .record-route-caption{color:var(--muted)!important;font-size:10px!important;font-weight:850!important;line-height:1!important}
+    .record-route-down{color:#2563eb!important;font-size:18px!important;font-weight:950!important;line-height:.8!important}
+    .record-route-vertical .record-zone-badge{width:100%!important;max-width:100%!important;justify-content:center!important}
+    .record-zone-badge{display:inline-flex!important;align-items:center!important;gap:4px!important;min-width:0!important;max-width:100%!important;padding:5px 8px!important;border-radius:999px!important;border:1px solid color-mix(in srgb, var(--badge-color,#64748b) 28%, var(--line))!important;background:color-mix(in srgb, var(--badge-color,#64748b) 10%, white)!important;color:var(--badge-color,#64748b)!important;font-size:11px!important;font-weight:900!important;line-height:1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;box-shadow:none!important}
+    .record-zone-badge svg,.sheet-home-badge svg{width:11px!important;height:11px!important;fill:currentColor;flex:0 0 auto!important}
+    .record-zone-badge em{display:none!important}
+    .record-zone-badge b{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;font-size:11px!important;line-height:1!important;font-weight:900!important;white-space:nowrap!important}
+    @media (max-width:390px){
+      #view-records .record-card{padding:12px!important}
+      #view-records .record-card-head{gap:6px!important}
+      #view-records .record-card-name{font-size:17px!important;max-width:31%!important}
+      .record-header-company{font-size:14px!important}
+      #view-records .record-card-head > .record-zone-badge{max-width:94px!important}
+      .record-card-body{grid-template-columns:minmax(0,1fr) 88px!important;gap:10px!important}
+      #view-records .record-card-body .record-card-info{grid-template-columns:minmax(72px,auto) minmax(0,1fr)!important;gap:9px 9px!important}
+      #view-records .record-card-body .record-card-info dt{font-size:12px!important}
+      #view-records .record-card-body .record-card-info dd{font-size:13px!important}
+      .record-route-vertical{padding-left:10px!important}
+      .record-zone-badge{padding:4px 6px!important;font-size:10px!important}
+      .record-zone-badge svg{width:10px!important;height:10px!important}
+      .record-zone-badge b{font-size:10px!important}
+    }
+    .sheet-home-badge{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb, var(--badge-color,#64748b) 26%, var(--line));background:color-mix(in srgb, var(--badge-color,#64748b) 9%, white);color:var(--badge-color,#64748b);font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .sheet-person .person-card-company{font-size:13px!important;font-weight:850!important}
+    .search-filter-select.js-filter-button{display:inline-flex!important;align-items:center;justify-content:space-between;gap:8px}
+    #personnelCompanyFilter,#personnelReturnFilter,#recordsCompanyFilter,#recordsReturnFilter{display:none!important}
+  `;
+  document.head.appendChild(style);
+
+  function svgHome(){ return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg>'; }
+  function escapeHtml(v){ return String(v ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+  function zoneBadge(role, label, color){ return `<span class="record-zone-badge" style="--badge-color:${color || '#64748b'}" title="${escapeHtml(role)}">${svgHome()}<b>${escapeHtml(label || '미지정')}</b></span>`; }
+  function makeSheetBadge(label, color){ const span=document.createElement('span'); span.className='sheet-home-badge'; span.style.setProperty('--badge-color', color || '#64748b'); span.innerHTML = svgHome() + `<span>${escapeHtml(label || '미지정')}</span>`; return span; }
+
+  function adminV13HomeBadge(label,color){
+    const span=document.createElement('span');
+    span.className='sheet-home-badge';
+    span.style.setProperty('--badge-color',color||'#64748b');
+    span.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    span.querySelector('span').textContent=label||'미지정';
+    return span;
+  }
+
+  const app = document.querySelector('.app');
+  const header = document.querySelector('.header');
+  let stickyFrame=0;
+  function syncAdminSticky(){
+    stickyFrame = 0;
+    const activeView = document.querySelector('[data-admin-tab-view]:not([hidden])');
+
+    document.querySelectorAll('.admin-tab-view > .sticky-dashboard').forEach(dashboard => {
+      const view = dashboard.parentElement;
+      let spacer = view.querySelector(':scope > .sticky-dashboard-spacer');
+      if (!spacer) {
+        spacer = document.createElement('div');
+        spacer.className = 'sticky-dashboard-spacer';
+        view.insertBefore(spacer, dashboard);
+      }
+
+      if (view !== activeView) {
+        dashboard.classList.remove('admin-js-fixed');
+        spacer.classList.remove('active');
+        spacer.style.display = 'none';
+        spacer.style.height = '0px';
+      }
+    });
+
+    if (!activeView) return;
+    const dashboard = activeView.querySelector(':scope > .sticky-dashboard');
+    const spacer = activeView.querySelector(':scope > .sticky-dashboard-spacer');
+    if (!dashboard || !spacer) return;
+
+    const shouldFix = header.getBoundingClientRect().bottom <= 0;
+    if (shouldFix) {
+      const width = Math.max(1, Math.round(app.getBoundingClientRect().width));
+      spacer.classList.add('active');
+      spacer.style.display = 'block';
+      spacer.style.height = `${Math.max(dashboard.offsetHeight, 1)}px`;
+      dashboard.style.setProperty('--sticky-fixed-width', `${width}px`);
+      dashboard.classList.add('admin-js-fixed');
+    } else {
+      dashboard.classList.remove('admin-js-fixed');
+      spacer.classList.remove('active');
+      spacer.style.display = 'none';
+      spacer.style.height = '0px';
+    }
+  }
+  function scheduleSticky(){ if(!stickyFrame) stickyFrame=requestAnimationFrame(syncAdminSticky); }
+  window.addEventListener('scroll', scheduleSticky, {passive:true});
+  window.addEventListener('resize', scheduleSticky, {passive:true});
+  const originalUpdateAdminTabButtons = updateAdminTabButtons;
+  updateAdminTabButtons = function(type){ originalUpdateAdminTabButtons(type); scheduleSticky(); };
+
+  renderZonePeople = function(zoneId) {
+    const preserveOpenedState = sheetBackdrop.classList.contains('open');
+    const zone = getZone(zoneId); const zonePeople = getZonePeople(zoneId); if (!zone) return; sheetTitle.textContent = zone.name; sheetSubtitle.textContent = `등록된 인원 ${zonePeople.length}명`; zonePeopleContent.innerHTML = ''; if (!zonePeople.length) { zonePeopleContent.innerHTML = '<div class="sheet-empty-state">등록된 인원이 없습니다.</div>'; return; }
+    zonePeople.forEach(person => { const row = document.createElement('article'); row.className = 'sheet-person'; const homeZone = getZone(person.homeZoneId); row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b'); const atHome = isPersonAtHome(person); row.innerHTML = atHome ? `<div class="person-card-head"><strong class="person-card-name"></strong><span class="person-card-company"></span></div>` : `<div class="person-card-head"><strong class="person-card-name"></strong><span class="person-card-company"></span></div><div class="person-card-grid"><span class="person-card-label">출발</span><span class="person-card-value">${formatTime(person.departureTime)}</span><span class="person-card-label">도착 예정</span><span class="person-card-value">${formatTime(person.returnTime)}</span><span class="person-card-label">지난 시간</span><span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span></div>`; row.querySelector('.person-card-name').textContent = person.name || '이름 없음'; row.querySelector('.person-card-company').textContent = person.company || '미입력'; if (homeZone) row.querySelector('.person-card-head').appendChild(makeSheetBadge(homeZone.name, homeZone.color)); zonePeopleContent.appendChild(row); });
+    if (preserveOpenedState) { bottomSheet.classList.add('sheet-opened'); bottomSheet.classList.remove('sheet-following', 'sheet-returning', 'closing'); bottomSheet.style.removeProperty('transform'); }
+  };
+
+
+renderMovementLogs = function() {
+  const searchKeyword = normalizeSearchText(recordsSearchInput.value);
+  recordsSearchClearBtn.classList.toggle('visible', searchKeyword.length > 0);
+  recordsList.hidden = false;
+  recordsList.style.display = '';
+  recordsState.hidden = true;
+  recordsState.style.display = 'none';
+
+  const keyword = normalizeSearchText(recordsSearchInput.value);
+  const companyFilter = recordsCompanyFilter.value;
+  const unreturnedOnly = recordsReturnFilter.value === 'unreturned';
+  const zoneFilter = recordsZoneFilter.value;
+  const hasPeriodFilter = Boolean(appliedRecordsStartDate && appliedRecordsEndDate);
+  const hasFilter = Boolean(keyword || companyFilter || unreturnedOnly || zoneFilter || hasPeriodFilter);
+
+  recordsList.innerHTML = '';
+  const matches = movementLogs
+    .filter(log => !keyword || normalizeSearchText([
+      log.name, log.company, log.homeZoneName, log.originZoneName, log.destinationZoneName
+    ].filter(Boolean).join(' ')).includes(keyword))
+    .filter(log => !companyFilter || log.company === companyFilter)
+    .filter(log => !unreturnedOnly || !log.arrivalTime)
+    .filter(log => !zoneFilter || log.destinationZoneId === zoneFilter || log.zoneId === zoneFilter)
+    .filter(log => {
+      if (!hasPeriodFilter) return true;
+      const departureDate = getKstDateString(log.departureTime);
+      return departureDate >= appliedRecordsStartDate && departureDate <= appliedRecordsEndDate;
+    })
+    .sort((a, b) => new Date(b.departureTime || 0).getTime() - new Date(a.departureTime || 0).getTime());
+
+  if (matches.length === 0) {
+    recordsState.hidden = false;
+    recordsState.style.display = 'flex';
+    recordsState.style.padding = '16px 12px';
+    recordsState.textContent = hasFilter
+      ? '검색 조건에 맞는 기록이 없습니다.'
+      : '최근 일주일 동안 저장된 이동 기록이 없습니다.';
+    recordsList.hidden = true;
+    recordsList.style.display = 'none';
+    return;
+  }
+
+  matches.forEach(log => {
+    const returned = Boolean(log.arrivalTime);
+    const elapsedText = getRecordOverdueMinutes(log.expectedReturnTime, log.arrivalTime);
+    const homeName = log.homeZoneName || getZone(log.homeZoneId)?.name || '미지정';
+    const originName = log.originZoneName || getZone(log.originZoneId)?.name || homeName;
+    const destinationName = log.destinationZoneName || getZone(log.destinationZoneId || log.zoneId)?.name || log.zoneName || '도착지 미기록';
+    const homeColor = getZone(log.homeZoneId)?.color || '#64748b';
+    const originColor = getZone(log.originZoneId)?.color || homeColor;
+    const destinationColor = getZone(log.destinationZoneId || log.zoneId)?.color || '#2563eb';
+
+    const card = document.createElement('article');
+    card.className = 'record-card';
+    card.innerHTML = `
+      <div class="record-card-head">
+        <h3 class="record-card-name"></h3>
+        <span class="record-header-company"></span>
+        ${zoneBadge('생활관', homeName, homeColor)}
+      </div>
+      <div class="record-card-body">
+        <dl class="record-card-info">
+          <dt>출발</dt><dd class="record-departure-time"></dd>
+          <dt>도착 예정</dt><dd class="record-expected-time"></dd>
+          <dt>도착</dt><dd class="record-arrival-time"></dd>
+          <dt>지난 시간</dt><dd class="record-elapsed-time"></dd>
+        </dl>
+        <aside class="record-route-vertical" aria-label="이동 구역">
+          ${zoneBadge('출발지', originName, originColor)}
+          <span class="record-route-down" aria-hidden="true">↓</span>
+          ${zoneBadge('도착지', destinationName, destinationColor)}
+        </aside>
+      </div>`;
+
+    card.querySelector('.record-card-name').textContent = log.name || '이름 미입력';
+    card.querySelector('.record-header-company').textContent = log.company || '미입력';
+    card.querySelector('.record-departure-time').textContent = formatRecordDateTime(log.departureTime);
+    card.querySelector('.record-expected-time').textContent = formatRecordDateTime(log.expectedReturnTime);
+    const arrival = card.querySelector('.record-arrival-time');
+    arrival.textContent = returned ? formatRecordDateTime(log.arrivalTime) : '미복귀';
+    arrival.classList.toggle('missing', !returned);
+    const elapsed = card.querySelector('.record-elapsed-time');
+    elapsed.textContent = elapsedText;
+    elapsed.style.color = elapsedText !== '-' && elapsedText !== '0분' ? '#dc2626' : '';
+    recordsList.appendChild(card);
+  });
+};
+
+function makeFilterButton(id, label, targetKey){ let button = document.getElementById(id); if (button) return button; button = document.createElement('button'); button.id = id; button.type = 'button'; button.className = 'search-filter-select search-filter-trigger js-filter-button'; button.innerHTML = `<span class="search-filter-trigger-label">${label}</span><span class="search-filter-trigger-arrow" aria-hidden="true">⌄</span>`; button.addEventListener('click', () => openZoneFilterModal(targetKey)); return button; }
+  function installExtraFilterButtons(){
+    const personnelRow = document.querySelector('#view-personnel .search-filter-row');
+    const recordsRow = document.querySelector('#view-records .records-filter-row');
+    if (personnelRow && !document.getElementById('personnelCompanyFilterButton')) {
+      const zoneWrap = personnelRow.querySelector(':scope > .filter-picker-wrap');
+      const anchor = zoneWrap || null;
+      const companyButton = makeFilterButton('personnelCompanyFilterButton', '전체 중대', 'personnel_company');
+      const statusButton = makeFilterButton('personnelReturnFilterButton', '전체 상태', 'personnel_status');
+      if (anchor) {
+        personnelRow.insertBefore(companyButton, anchor);
+        personnelRow.insertBefore(statusButton, anchor);
+      } else {
+        personnelRow.append(companyButton, statusButton);
+      }
+    }
+    if (recordsRow && !document.getElementById('recordsCompanyFilterButton')) {
+      const periodButton = document.getElementById('recordsPeriodFilterButton');
+      const companyButton = makeFilterButton('recordsCompanyFilterButton', '전체 중대', 'records_company');
+      const statusButton = makeFilterButton('recordsReturnFilterButton', '전체 상태', 'records_status');
+      if (periodButton?.parentElement === recordsRow) {
+        recordsRow.insertBefore(companyButton, periodButton);
+        recordsRow.insertBefore(statusButton, periodButton);
+      } else {
+        recordsRow.append(companyButton, statusButton);
+      }
+    }
+  }
+
+  let activePickerConfig = null;
+  function getPickerConfig(target){ return { personnel:{ title:'구역 필터', select: personnelZoneFilter, button: document.getElementById('personnelZoneFilterButton'), options: () => [{value:'',label:'전체 구역'}, ...zones.map(z => ({value:z.id,label:z.name}))], render: renderPersonnel, placeholder:'구역 검색' }, records:{ title:'구역 필터', select: recordsZoneFilter, button: document.getElementById('recordsZoneFilterButton'), options: () => [{value:'',label:'전체 구역'}, ...zones.map(z => ({value:z.id,label:z.name}))], render: renderMovementLogs, placeholder:'구역 검색' }, personnel_company:{ title:'중대 필터', select: personnelCompanyFilter, button: document.getElementById('personnelCompanyFilterButton'), options: () => [...personnelCompanyFilter.options].map(o => ({value:o.value,label:o.textContent.trim()})), render: renderPersonnel, placeholder:'중대 검색' }, personnel_status:{ title:'상태 필터', select: personnelReturnFilter, button: document.getElementById('personnelReturnFilterButton'), options: () => [...personnelReturnFilter.options].map(o => ({value:o.value,label:o.textContent.trim()})), render: renderPersonnel, placeholder:'상태 검색' }, records_company:{ title:'중대 필터', select: recordsCompanyFilter, button: document.getElementById('recordsCompanyFilterButton'), options: () => [...recordsCompanyFilter.options].map(o => ({value:o.value,label:o.textContent.trim()})), render: renderMovementLogs, placeholder:'중대 검색' }, records_status:{ title:'상태 필터', select: recordsReturnFilter, button: document.getElementById('recordsReturnFilterButton'), options: () => [...recordsReturnFilter.options].map(o => ({value:o.value,label:o.textContent.trim()})), render: renderMovementLogs, placeholder:'상태 검색' } }[target]; }
+  function syncButtonLabel(config){ if (!config?.button || !config?.select) return; const labelNode = config.button.querySelector('.search-filter-trigger-label'); const selected = config.select.options[config.select.selectedIndex]; if (labelNode) labelNode.textContent = selected?.textContent || config.title; }
+  renderZoneFilterOptions = function(){ const config = activePickerConfig; if (!config) return; const keyword = normalizeSearchText(zoneFilterSearchInput.value); const selectedValue = config.select.value; const options = config.options().filter(option => !keyword || normalizeSearchText(option.label).includes(keyword)); zoneFilterOptionList.innerHTML = ''; if (!options.length) { const empty = document.createElement('div'); empty.className='filter-picker-empty'; empty.textContent='검색 결과가 없습니다.'; zoneFilterOptionList.appendChild(empty); return; } options.forEach(option => { const button = document.createElement('button'); button.className = 'filter-picker-option'; button.type = 'button'; button.classList.toggle('selected', option.value === selectedValue); const label = document.createElement('span'); label.textContent = option.label; button.appendChild(label); if (option.value === selectedValue) { const mark = document.createElement('span'); mark.className='filter-picker-option-mark'; mark.textContent='선택됨'; button.appendChild(mark); } button.addEventListener('click', () => { config.select.value = option.value; syncButtonLabel(config); config.render(); closeZoneFilterModal(); }); zoneFilterOptionList.appendChild(button); }); };
+  openZoneFilterModal = function(target){ installExtraFilterButtons(); activePickerConfig = getPickerConfig(target); if (!activePickerConfig) return; zoneFilterTitle.textContent = activePickerConfig.title; zoneFilterSearchInput.placeholder = activePickerConfig.placeholder || '검색'; zoneFilterSearchInput.value = ''; renderZoneFilterOptions(); animateOpen(zoneFilterModal, zoneFilterDialog); setTimeout(() => zoneFilterSearchInput.focus({preventScroll:true}), 80); };
+  closeZoneFilterModal = function(){ animateClose(zoneFilterModal, zoneFilterDialog); activePickerConfig = null; };
+
+  installExtraFilterButtons();
+  ['personnel','records','personnel_company','personnel_status','records_company','records_status'].forEach(key => { const c = getPickerConfig(key); if (c) syncButtonLabel(c); });
+  setTimeout(() => { try { renderZones(); renderPersonnel(); renderMovementLogs(); scheduleSticky(); ['personnel','records','personnel_company','personnel_status','records_company','records_status'].forEach(key => { const c = getPickerConfig(key); if (c) syncButtonLabel(c); }); } catch(_){} }, 220);
+})();
+</script>
+
+
+<script>
+(function locationAdminV13Fix(){
+  const css = document.createElement('style');
+  css.textContent = `
+    /* v13: 제목은 흐름대로 사라지고, 탭 상단 섹션만 고정 */
+    .header{position:relative!important;top:auto!important}
+    .admin-tab-view > .sticky-dashboard:not(.admin-v13-fixed){
+      position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+      transform:none!important;margin-left:-14px!important;margin-right:-14px!important;
+    }
+    .admin-tab-view > .sticky-dashboard.admin-v13-fixed{
+      position:fixed!important;top:0!important;left:50%!important;right:auto!important;
+      transform:translateX(-50%)!important;width:var(--admin-v13-width,min(100%,480px))!important;
+      margin:0!important;z-index:120!important;box-shadow:0 10px 24px rgba(15,23,42,.10)!important;
+    }
+    .admin-v13-sticky-spacer{display:none;width:100%;height:0}
+    .admin-v13-sticky-spacer.active{display:block}
+
+    /* 상세현황 팝업: 관리자 카드 2열 및 한 줄 이름 */
+    #zonePeopleContent{
+      display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-flow:row!important;align-content:start!important;align-items:stretch!important;
+      gap:10px!important;
+    }
+    #zonePeopleContent > .sheet-person{width:100%!important;min-width:0!important;margin:0!important;padding:11px!important}
+    #zonePeopleContent > .sheet-empty-state{grid-column:1/-1!important}
+    #zonePeopleContent .person-card-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:6px!important;align-items:center!important}
+    #zonePeopleContent .person-card-name{
+      display:block!important;min-width:0!important;max-width:100%!important;padding:6px 7px!important;
+      font-size:13px!important;line-height:1.2!important;white-space:nowrap!important;
+      overflow:hidden!important;text-overflow:ellipsis!important;
+    }
+    #zonePeopleContent .person-card-company{font-size:12px!important;white-space:nowrap!important}
+    #zonePeopleContent .sheet-home-badge{
+      grid-column:1/-1!important;justify-self:stretch!important;justify-content:center!important;
+      text-align:center!important;min-width:0!important;max-width:100%!important;
+    }
+    #zonePeopleContent .sheet-home-badge span{display:block!important;min-width:0!important;text-align:center!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+
+    /* 병력 탭 필터 글자 한 단계 확대 */
+    #view-personnel .search-filter-select,
+    #view-personnel .search-filter-trigger,
+    #view-personnel .filter-picker-option{font-size:12px!important}
+    #view-personnel .search-filter-trigger-label{font-size:12px!important;font-weight:900!important}
+
+    /* 기간 빠른 선택 */
+    .period-preset-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0 0 12px}
+    .period-preset-btn{min-height:38px;border:0;border-radius:12px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:900}
+    .period-preset-btn:active{background:#dbeafe;transform:scale(.985)}
+
+    @media (max-width:380px){
+      #zonePeopleContent{gap:8px!important}
+      #zonePeopleContent > .sheet-person{padding:9px!important}
+      #zonePeopleContent .person-card-name{font-size:12px!important}
+      #zonePeopleContent .person-card-company{font-size:11px!important}
+    }
+  `;
+  document.head.appendChild(css);
+
+  const app = document.querySelector('.app');
+  const header = document.querySelector('.header');
+  let stickyRaf = 0;
+
+  function getScrollTop(){
+    return Math.max(
+      window.scrollY || 0,
+      document.documentElement?.scrollTop || 0,
+      document.body?.scrollTop || 0,
+      app?.scrollTop || 0
+    );
+  }
+
+  function ensureStickySpacer(view, dashboard){
+    let spacer = view.querySelector(':scope > .admin-v13-sticky-spacer');
+    if (!spacer){
+      spacer = document.createElement('div');
+      spacer.className = 'admin-v13-sticky-spacer';
+      view.insertBefore(spacer, dashboard);
+    }
+    return spacer;
+  }
+
+  function syncAdminV13Sticky(){
+    stickyRaf = 0;
+    const activeView = document.querySelector('[data-admin-tab-view]:not([hidden])');
+    document.querySelectorAll('.admin-tab-view > .sticky-dashboard').forEach(dashboard => {
+      const view = dashboard.parentElement;
+      const spacer = ensureStickySpacer(view, dashboard);
+      if (view !== activeView){
+        dashboard.classList.remove('admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed');
+        spacer.classList.remove('active');
+        spacer.style.height = '0px';
+      }
+    });
+    if (!activeView || !header || !app) return;
+    const dashboard = activeView.querySelector(':scope > .sticky-dashboard');
+    if (!dashboard) return;
+    const spacer = ensureStickySpacer(activeView, dashboard);
+    const threshold = Math.max(1, header.offsetTop + header.offsetHeight);
+    const shouldFix = getScrollTop() >= threshold || header.getBoundingClientRect().bottom <= 0;
+    if (shouldFix){
+      const width = Math.max(1, Math.round(app.getBoundingClientRect().width));
+      spacer.style.height = `${Math.max(1,dashboard.offsetHeight)}px`;
+      spacer.classList.add('active');
+      dashboard.style.setProperty('--admin-v13-width', `${width}px`);
+      dashboard.classList.remove('admin-js-fixed','tab-dashboard-fixed');
+      dashboard.classList.add('admin-v13-fixed');
+    } else {
+      dashboard.classList.remove('admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed');
+      spacer.classList.remove('active');
+      spacer.style.height = '0px';
+    }
+  }
+
+  function scheduleAdminV13Sticky(){
+    if (!stickyRaf) stickyRaf = requestAnimationFrame(syncAdminV13Sticky);
+  }
+  window.addEventListener('scroll', scheduleAdminV13Sticky, {passive:true});
+  document.addEventListener('scroll', scheduleAdminV13Sticky, {passive:true,capture:true});
+  app?.addEventListener('scroll', scheduleAdminV13Sticky, {passive:true});
+  window.addEventListener('resize', scheduleAdminV13Sticky, {passive:true});
+  document.querySelectorAll('[data-admin-tab]').forEach(button => button.addEventListener('click', () => setTimeout(scheduleAdminV13Sticky, 0)));
+
+  // 팝업 인원 카드 렌더러를 최종 디자인으로 통일
+  renderZonePeople = function(zoneId){
+    const preserveOpenedState = sheetBackdrop.classList.contains('open');
+    const zone = getZone(zoneId);
+    if (!zone) return;
+    const zonePeople = getZonePeople(zoneId);
+    sheetTitle.textContent = zone.name;
+    sheetSubtitle.textContent = `등록된 인원 ${zonePeople.length}명`;
+    zonePeopleContent.innerHTML = '';
+    if (!zonePeople.length){
+      zonePeopleContent.innerHTML = '<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';
+      return;
+    }
+    zonePeople.forEach(person => {
+      const row = document.createElement('article');
+      row.className = 'sheet-person';
+      const homeZone = getZone(person.homeZoneId);
+      row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
+      const atHome = isPersonAtHome(person);
+      row.innerHTML = atHome ? `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>` : `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>
+        <div class="person-card-grid">
+          <span class="person-card-label">출발</span>
+          <span class="person-card-value">${formatTime(person.departureTime)}</span>
+          <span class="person-card-label">도착 예정</span>
+          <span class="person-card-value">${formatTime(person.returnTime)}</span>
+          <span class="person-card-label">지난 시간</span>
+          <span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+        </div>`;
+      row.querySelector('.person-card-name').textContent = person.name || '이름 없음';
+      row.querySelector('.person-card-company').textContent = person.company || '미입력';
+      if (homeZone){
+        const badge = adminV13HomeBadge(homeZone.name, homeZone.color);
+        row.querySelector('.person-card-head').appendChild(badge);
+      }
+      zonePeopleContent.appendChild(row);
+    });
+    if (preserveOpenedState){
+      bottomSheet.classList.add('sheet-opened');
+      bottomSheet.classList.remove('sheet-following','sheet-returning','closing');
+      bottomSheet.style.removeProperty('transform');
+    }
+  };
+
+  function installPeriodPresets(){
+    const fields = recordsPeriodDialog?.querySelector('.period-filter-fields');
+    if (!fields || document.getElementById('recordsPeriodPresetButtons')) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'period-preset-buttons';
+    wrap.id = 'recordsPeriodPresetButtons';
+    wrap.innerHTML = `
+      <button class="period-preset-btn" type="button" data-period-preset="today">오늘</button>
+      <button class="period-preset-btn" type="button" data-period-preset="yesterday">어제</button>
+      <button class="period-preset-btn" type="button" data-period-preset="last-week">지난주</button>`;
+    fields.insertAdjacentElement('beforebegin', wrap);
+    wrap.addEventListener('click', event => {
+      const button = event.target.closest('[data-period-preset]');
+      if (!button) return;
+      const today = getKstDateString();
+      if (button.dataset.periodPreset === 'today'){
+        recordsPeriodStartInput.value = today;
+        recordsPeriodEndInput.value = today;
+      } else if (button.dataset.periodPreset === 'yesterday'){
+        const yesterday = addDaysToDateValue(today, -1);
+        recordsPeriodStartInput.value = yesterday;
+        recordsPeriodEndInput.value = yesterday;
+      } else {
+        // 지난 월요일~일요일
+        const [y,m,d] = today.split('-').map(Number);
+        const utc = new Date(Date.UTC(y,m-1,d));
+        const day = utc.getUTCDay() || 7;
+        const thisMonday = addDaysToDateValue(today, 1-day);
+        recordsPeriodStartInput.value = addDaysToDateValue(thisMonday, -7);
+        recordsPeriodEndInput.value = addDaysToDateValue(thisMonday, -1);
+      }
+    });
+  }
+
+  installPeriodPresets();
+  scheduleAdminV13Sticky();
+  setTimeout(() => { installPeriodPresets(); scheduleAdminV13Sticky(); }, 250);
+})();
+</script>
+
+
+<script>
+(function(){
+  function createV14HomeBadge(label, color){
+    const badge = document.createElement('span');
+    badge.className = 'sheet-home-badge';
+    badge.style.setProperty('--badge-color', color || '#64748b');
+    badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    badge.querySelector('span').textContent = label || '미지정';
+    return badge;
+  }
+
+  // 마지막 렌더러가 다른 IIFE 내부 함수(adminV13HomeBadge)를 참조하던 오류 제거
+  renderZonePeople = function(zoneId){
+    const preserveOpenedState = sheetBackdrop.classList.contains('open');
+    const zone = getZone(zoneId);
+    if (!zone) return;
+    const zonePeople = getZonePeople(zoneId);
+    const visibleTitle = document.querySelector('#bottomSheet #sheetTitle');
+    const visibleSubtitle = document.querySelector('#bottomSheet #sheetSubtitle');
+    const visibleContent = document.getElementById('zonePeopleContent');
+    if (visibleTitle) visibleTitle.textContent = zone.name;
+    if (visibleSubtitle) visibleSubtitle.textContent = `등록된 인원 ${zonePeople.length}명`;
+    if (!visibleContent) return;
+    visibleContent.innerHTML = '';
+
+    if (!zonePeople.length){
+      visibleContent.innerHTML = '<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';
+      return;
+    }
+
+    zonePeople.forEach(person => {
+      const row = document.createElement('article');
+      row.className = 'sheet-person';
+      const homeZone = getZone(person.homeZoneId);
+      row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
+      const atHome = isPersonAtHome(person);
+      row.innerHTML = atHome ? `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>` : `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>
+        <div class="person-card-grid">
+          <span class="person-card-label">출발</span>
+          <span class="person-card-value">${formatTime(person.departureTime)}</span>
+          <span class="person-card-label">도착 예정</span>
+          <span class="person-card-value">${formatTime(person.returnTime)}</span>
+          <span class="person-card-label">지난 시간</span>
+          <span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+        </div>`;
+      row.querySelector('.person-card-name').textContent = person.name || '이름 없음';
+      row.querySelector('.person-card-company').textContent = person.company || '미입력';
+      if (homeZone) row.querySelector('.person-card-head').appendChild(createV14HomeBadge(homeZone.name, homeZone.color));
+      visibleContent.appendChild(row);
+    });
+
+    if (preserveOpenedState){
+      bottomSheet.classList.add('sheet-opened');
+      bottomSheet.classList.remove('sheet-following','sheet-returning','closing');
+      bottomSheet.style.removeProperty('transform');
+    }
+  };
+})();
+</script>
+
+
+<script>
+(function locationAdminV15Final(){
+  const css = document.createElement('style');
+  css.textContent = `
+    #view-personnel .personnel-date-value{
+      color:#334155!important;
+      font-size:11px!important;
+      font-weight:850!important;
+      text-align:right!important;
+      white-space:nowrap!important;
+    }
+
+    /* 과거 팝업 카드 디자인: 이름 / 중대 / 생활관을 같은 행에 표시 */
+    #zonePeopleContent{
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-flow:row!important;
+      align-content:start!important;
+      align-items:stretch!important;
+      gap:10px!important;
+      padding:14px 14px calc(24px + env(safe-area-inset-bottom))!important;
+    }
+    #zonePeopleContent > .sheet-person{
+      display:block!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:none!important;
+      margin:0!important;
+      padding:10px!important;
+      border:1px solid color-mix(in srgb,var(--home-zone-color,#64748b) 28%,var(--line))!important;
+      border-radius:16px!important;
+      background:color-mix(in srgb,var(--home-zone-color,#64748b) 6%,white)!important;
+      box-shadow:0 6px 16px rgba(15,23,42,.05)!important;
+    }
+    #zonePeopleContent > .sheet-empty-state{grid-column:1/-1!important}
+    #zonePeopleContent .person-card-head{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) auto auto!important;
+      align-items:center!important;
+      gap:7px!important;
+      min-width:0!important;
+    }
+    #zonePeopleContent .person-card-name{
+      display:block!important;
+      min-width:0!important;
+      max-width:100%!important;
+      padding:7px 9px!important;
+      border-radius:10px!important;
+      background:color-mix(in srgb,var(--home-zone-color,#2563eb) 12%,white)!important;
+      color:var(--home-zone-color,#1d4ed8)!important;
+      font-size:14px!important;
+      font-weight:900!important;
+      line-height:1.15!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      text-align:left!important;
+    }
+    #zonePeopleContent .person-card-company{
+      color:#64748b!important;
+      font-size:12px!important;
+      font-weight:900!important;
+      line-height:1.2!important;
+      white-space:nowrap!important;
+      text-align:center!important;
+    }
+    #zonePeopleContent .sheet-home-badge{
+      grid-column:auto!important;
+      justify-self:end!important;
+      display:inline-flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      gap:4px!important;
+      width:auto!important;
+      max-width:72px!important;
+      min-height:25px!important;
+      padding:4px 8px!important;
+      border:1px solid color-mix(in srgb,var(--badge-color,#64748b) 28%,var(--line))!important;
+      border-radius:999px!important;
+      background:color-mix(in srgb,var(--badge-color,#64748b) 9%,white)!important;
+      color:var(--badge-color,#64748b)!important;
+      font-size:10px!important;
+      font-weight:900!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+    #zonePeopleContent .sheet-home-badge svg{width:13px!important;height:13px!important;fill:currentColor!important;flex:none!important}
+    #zonePeopleContent .sheet-home-badge span{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:center!important}
+    #zonePeopleContent .person-card-grid{
+      display:grid!important;
+      grid-template-columns:minmax(55px,auto) minmax(0,1fr)!important;
+      gap:7px 8px!important;
+      margin-top:10px!important;
+      align-items:center!important;
+    }
+    #zonePeopleContent .person-card-label{font-size:10px!important;font-weight:800!important;color:#64748b!important}
+    #zonePeopleContent .person-card-value{font-size:11px!important;font-weight:850!important;text-align:right!important;min-width:0!important}
+    @media(max-width:380px){
+      #zonePeopleContent{gap:8px!important;padding-left:10px!important;padding-right:10px!important}
+      #zonePeopleContent > .sheet-person{padding:8px!important}
+      #zonePeopleContent .person-card-head{gap:5px!important}
+      #zonePeopleContent .person-card-name{font-size:13px!important;padding:6px 7px!important}
+      #zonePeopleContent .person-card-company{font-size:11px!important}
+      #zonePeopleContent .sheet-home-badge{max-width:62px!important;padding:4px 6px!important;font-size:9px!important}
+    }
+  `;
+  document.head.appendChild(css);
+
+  function makeHomeBadge(label,color){
+    const badge=document.createElement('span');
+    badge.className='sheet-home-badge';
+    badge.style.setProperty('--badge-color',color||'#64748b');
+    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    badge.querySelector('span').textContent=label||'미지정';
+    return badge;
+  }
+
+  renderZonePeople=function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+    const zonePeople=getZonePeople(zoneId);
+    const title=bottomSheet?.querySelector('#sheetTitle')||sheetTitle;
+    const subtitle=bottomSheet?.querySelector('#sheetSubtitle')||sheetSubtitle;
+    const content=document.getElementById('zonePeopleContent');
+    if(title)title.textContent=zone.name;
+    if(subtitle)subtitle.textContent=`등록된 인원 ${zonePeople.length}명`;
+    if(!content)return;
+    content.innerHTML='';
+    if(!zonePeople.length){content.innerHTML='<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';return;}
+    zonePeople.forEach(person=>{
+      const row=document.createElement('article');
+      row.className='sheet-person';
+      const homeZone=getZone(person.homeZoneId);
+      row.style.setProperty('--home-zone-color',homeZone?.color||'#64748b');
+      const atHome=isPersonAtHome(person);
+      row.innerHTML=atHome?`
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>`:`
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>
+        <div class="person-card-grid">
+          <span class="person-card-label">출발</span><span class="person-card-value">${formatTime(person.departureTime)}</span>
+          <span class="person-card-label">도착 예정</span><span class="person-card-value">${formatTime(person.returnTime)}</span>
+          <span class="person-card-label">지난 시간</span><span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+        </div>`;
+      row.querySelector('.person-card-name').textContent=person.name||'이름 없음';
+      row.querySelector('.person-card-company').textContent=person.company||'미입력';
+      row.querySelector('.person-card-head').appendChild(makeHomeBadge(homeZone?.name||person.homeZoneName||'미지정',homeZone?.color||'#64748b'));
+      content.appendChild(row);
+    });
+  };
+})();
+</script>
+
+<script>
+(function locationAdminV16Final(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* 과거 고정 로직의 스페이서와 fixed 클래스를 완전히 무력화 */
+    .tab-dashboard-pin-spacer,.sticky-dashboard-spacer,.admin-v13-sticky-spacer{display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important}
+    .admin-tab-view>.sticky-dashboard:not(.admin-v16-fixed){
+      position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+      width:calc(100% + 28px)!important;margin-left:-14px!important;margin-right:-14px!important;
+      transform:none!important;z-index:85!important;
+    }
+    .admin-tab-view>.sticky-dashboard.admin-v16-fixed{
+      position:fixed!important;top:0!important;left:50%!important;right:auto!important;
+      width:var(--admin-v16-width,min(100%,480px))!important;margin:0!important;
+      transform:translateX(-50%)!important;z-index:130!important;
+      box-shadow:0 10px 24px rgba(15,23,42,.10)!important;
+    }
+    .admin-v16-sticky-spacer{display:none;width:100%;height:0}
+    .admin-v16-sticky-spacer.active{display:block}
+
+    /* 기간 필터: 첫 행 3칸 + 둘째 행 전체 폭 */
+    #view-records .records-filter-row{
+      display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      gap:7px!important;align-items:stretch!important;
+    }
+    #view-records .records-filter-row>#recordsPeriodFilterButton{
+      grid-column:1/-1!important;width:100%!important;min-width:0!important;min-height:42px!important;
+      justify-content:center!important;padding-left:14px!important;padding-right:14px!important;
+    }
+    #recordsPeriodFilterButton .search-filter-trigger-label{
+      display:block!important;max-width:none!important;overflow:visible!important;text-overflow:clip!important;
+      white-space:nowrap!important;font-size:12px!important;text-align:center!important;
+    }
+
+    /* 팝업 카드 이름 중앙 정렬 */
+    #zonePeopleContent .person-card-name{text-align:center!important}
+
+    /* 기록 카드의 조건부 행 */
+    #view-records .record-card-info.record-v16-short{align-content:center!important}
+
+    #adminTabMain{position:relative;overflow-x:hidden!important}
+    body.admin-v16-tab-moving{overflow-x:hidden!important}
+    body.admin-v16-tab-moving .admin-tab-view{backface-visibility:hidden;transform-style:preserve-3d}
+  `;
+  document.head.appendChild(style);
+
+  /* user 페이지와 동일한 방식: 제목이 사라진 시점부터 현황 섹션만 고정 */
+  const app=document.querySelector('.app'),header=document.querySelector('.header');
+  let stickyFrame=0;
+  function spacerFor(view,dashboard){
+    let spacer=view.querySelector(':scope>.admin-v16-sticky-spacer');
+    if(!spacer){spacer=document.createElement('div');spacer.className='admin-v16-sticky-spacer';view.insertBefore(spacer,dashboard)}
+    return spacer;
+  }
+  function syncSticky(){
+    stickyFrame=0;
+    const activeView=document.querySelector('[data-admin-tab-view]:not([hidden])');
+    document.querySelectorAll('.admin-tab-view>.sticky-dashboard').forEach(dashboard=>{
+      const view=dashboard.parentElement,spacer=spacerFor(view,dashboard);
+      dashboard.classList.remove('admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed');
+      if(view!==activeView||document.body.classList.contains('admin-v16-tab-moving')||document.body.classList.contains('admin-tab-switching')){
+        dashboard.classList.remove('admin-v16-fixed');spacer.classList.remove('active');spacer.style.height='0px';
+      }
+    });
+    if(!activeView||!header||!app)return;
+    const dashboard=activeView.querySelector(':scope>.sticky-dashboard');
+    if(!dashboard)return;
+    const spacer=spacerFor(activeView,dashboard);
+    const shouldFix=header.getBoundingClientRect().bottom<=0;
+    if(shouldFix){
+      spacer.style.height=`${Math.max(dashboard.offsetHeight,1)}px`;spacer.classList.add('active');
+      dashboard.style.setProperty('--admin-v16-width',`${Math.round(app.getBoundingClientRect().width)}px`);
+      dashboard.classList.add('admin-v16-fixed');
+    }else{
+      dashboard.classList.remove('admin-v16-fixed');spacer.classList.remove('active');spacer.style.height='0px';
+    }
+  }
+  function scheduleSticky(){if(!stickyFrame)stickyFrame=requestAnimationFrame(syncSticky)}
+  window.addEventListener('scroll',scheduleSticky,{passive:true});
+  document.addEventListener('scroll',scheduleSticky,{passive:true,capture:true});
+  app?.addEventListener('scroll',scheduleSticky,{passive:true});
+  window.addEventListener('resize',scheduleSticky,{passive:true});
+
+  function logElapsed(expected,arrival){
+    if(!expected)return '-';
+    const a=new Date(expected).getTime(),b=arrival?new Date(arrival).getTime():Date.now();
+    if(!Number.isFinite(a)||!Number.isFinite(b))return '-';
+    const minutes=Math.max(0,Math.floor((b-a)/60000));
+    if(minutes<60)return `${minutes}분`;
+    const h=Math.floor(minutes/60),m=minutes%60;
+    return m?`${h}시간 ${m}분`:`${h}시간`;
+  }
+  function isReturnHome(log){
+    const person=people.find(row=>row.id===log.userId);
+    const homeId=log.homeZoneId||person?.homeZoneId||null;
+    return Boolean(homeId&&(log.destinationZoneId||log.zoneId)===homeId);
+  }
+  function prepareTiming(logs){
+    const states=new Map();
+    return logs.slice().sort((a,b)=>new Date(a.departureTime||0)-new Date(b.departureTime||0)).map(log=>{
+      const copy={...log};
+      const person=people.find(row=>row.id===copy.userId);
+      const homeId=copy.homeZoneId||person?.homeZoneId||null;
+      const state=states.get(copy.userId)||{expected:null};
+      const destination=copy.destinationZoneId||copy.zoneId;
+      if(homeId&&destination===homeId){
+        if(!copy.expectedReturnTime&&state.expected)copy.expectedReturnTime=state.expected;
+        state.expected=null;
+      }else if(copy.expectedReturnTime){state.expected=copy.expectedReturnTime}
+      states.set(copy.userId,state);
+      return copy;
+    });
+  }
+  function zoneBadgeV16(label,color){
+    const span=document.createElement('span');
+    span.className='record-zone-badge';span.style.setProperty('--badge-color',color||'#64748b');
+    span.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><b></b>';
+    span.querySelector('b').textContent=label||'미지정';
+    return span.outerHTML;
+  }
+
+  renderMovementLogs=function(){
+    const keyword=normalizeSearchText(recordsSearchInput.value);
+    recordsSearchClearBtn.classList.toggle('visible',keyword.length>0);
+    const companyFilter=recordsCompanyFilter.value,unreturnedOnly=recordsReturnFilter.value==='unreturned',zoneFilter=recordsZoneFilter.value;
+    const hasPeriod=Boolean(appliedRecordsStartDate&&appliedRecordsEndDate);
+    const hasFilter=Boolean(keyword||companyFilter||unreturnedOnly||zoneFilter||hasPeriod);
+    recordsList.innerHTML='';recordsList.hidden=false;recordsList.style.display='';recordsState.hidden=true;recordsState.style.display='none';
+    const matches=prepareTiming(movementLogs)
+      .filter(log=>!keyword||normalizeSearchText([log.name,log.company,log.homeZoneName,log.originZoneName,log.destinationZoneName].filter(Boolean).join(' ')).includes(keyword))
+      .filter(log=>!companyFilter||log.company===companyFilter)
+      .filter(log=>!unreturnedOnly||!log.arrivalTime)
+      .filter(log=>!zoneFilter||log.destinationZoneId===zoneFilter||log.zoneId===zoneFilter)
+      .filter(log=>!hasPeriod||(getKstDateString(log.departureTime)>=appliedRecordsStartDate&&getKstDateString(log.departureTime)<=appliedRecordsEndDate))
+      .sort((a,b)=>new Date(b.departureTime||0)-new Date(a.departureTime||0));
+    if(!matches.length){
+      recordsState.hidden=false;recordsState.style.display='flex';recordsState.style.padding='16px 12px';
+      recordsState.textContent=hasFilter?'검색 조건에 맞는 기록이 없습니다.':'최근 일주일 동안 저장된 이동 기록이 없습니다.';
+      recordsList.hidden=true;recordsList.style.display='none';return;
+    }
+    matches.forEach(log=>{
+      const person=people.find(row=>row.id===log.userId);
+      const name=log.name||person?.name||'이름 미입력';
+      const company=log.company||person?.company||'미입력';
+      const homeId=log.homeZoneId||person?.homeZoneId||null;
+      const homeName=log.homeZoneName||person?.homeZoneName||getZone(homeId)?.name||'미지정';
+      const originName=log.originZoneName||getZone(log.originZoneId)?.name||homeName;
+      const destinationId=log.destinationZoneId||log.zoneId;
+      const destinationName=log.destinationZoneName||getZone(destinationId)?.name||log.zoneName||'도착지 미기록';
+      const homeColor=getZone(homeId)?.color||'#64748b',originColor=getZone(log.originZoneId)?.color||homeColor,destinationColor=getZone(destinationId)?.color||'#2563eb';
+      const returnHome=isReturnHome({...log,homeZoneId:homeId});
+      const card=document.createElement('article');card.className='record-card';
+      card.innerHTML=`
+        <div class="record-card-head"><h3 class="record-card-name"></h3><span class="record-header-company"></span>${zoneBadgeV16(homeName,homeColor)}</div>
+        <div class="record-card-body">
+          <dl class="record-card-info ${returnHome?'':'record-v16-short'}">
+            <dt>출발</dt><dd class="record-departure-time">${formatRecordDateTime(log.departureTime)}</dd>
+            ${returnHome?`<dt>도착 예정</dt><dd class="record-expected-time">${formatRecordDateTime(log.expectedReturnTime)}</dd>`:''}
+            <dt>도착</dt><dd class="record-arrival-time ${log.arrivalTime?'':'missing'}">${log.arrivalTime?formatRecordDateTime(log.arrivalTime):'미복귀'}</dd>
+            ${returnHome?`<dt>지난 시간</dt><dd class="record-elapsed-time">${logElapsed(log.expectedReturnTime,log.arrivalTime)}</dd>`:''}
+          </dl>
+          <aside class="record-route-vertical" aria-label="이동 구역">${zoneBadgeV16(originName,originColor)}<span class="record-route-down" aria-hidden="true">↓</span>${zoneBadgeV16(destinationName,destinationColor)}</aside>
+        </div>`;
+      card.querySelector('.record-card-name').textContent=name;
+      card.querySelector('.record-header-company').textContent=company;
+      const elapsed=card.querySelector('.record-elapsed-time');
+      if(elapsed&&elapsed.textContent!=='-'&&elapsed.textContent!=='0분')elapsed.style.color='#dc2626';
+      recordsList.appendChild(card);
+    });
+  };
+
+  /* 클릭·스와이프 모두 동일한 페이지 단위 애니메이션 */
+  const order=['detail','dashboard','personnel','records','unit'];
+  const main=document.getElementById('adminTabMain');
+  let tabBusy=false;
+  function activeType(){return document.querySelector('[data-admin-tab-view]:not([hidden])')?.dataset.adminTabView||'detail'}
+  function updateButtons(type){
+    document.body.classList.toggle('detail-tab-active',type==='detail');
+    document.body.classList.toggle('dashboard-tab-active',type==='dashboard');
+    document.body.classList.toggle('personnel-tab-active',type==='personnel');
+    document.body.classList.toggle('records-tab-active',type==='records');
+    document.body.classList.toggle('unit-tab-active',type==='unit');
+    document.querySelectorAll('[data-admin-tab]').forEach(button=>{
+      const active=button.dataset.adminTab===type;button.classList.toggle('active',active);
+      active?button.setAttribute('aria-current','page'):button.removeAttribute('aria-current');
+    });
+  }
+  function releaseSticky(){
+    document.querySelectorAll('.admin-tab-view>.sticky-dashboard').forEach(d=>d.classList.remove('admin-v16-fixed','admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed'));
+    document.querySelectorAll('.admin-v16-sticky-spacer').forEach(s=>{s.classList.remove('active');s.style.height='0px'});
+  }
+  function transitionTo(type,direction){
+    const from=activeType();
+    if(tabBusy||from===type||!order.includes(type)||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open')||document.body.classList.contains('zone-card-dragging'))return;
+    const current=document.getElementById(`view-${from}`),target=document.getElementById(`view-${type}`);if(!current||!target)return;
+    if(type==='unit'){
+      loadUnitManagementState({quiet:true}).catch(()=>{});searchUnitsForManagement({quiet:true}).catch(()=>{});loadPendingUnitApplications({quiet:true}).catch(()=>{});
+    }
+    tabBusy=true;releaseSticky();
+    const wrap=current.parentElement,cr=current.getBoundingClientRect(),wr=wrap.getBoundingClientRect(),width=Math.max(cr.width,1);
+    const cs=current.getAttribute('style'),ts=target.getAttribute('style'),ws=wrap.getAttribute('style');target.hidden=false;
+    const targetHeight=Math.max(target.scrollHeight,target.getBoundingClientRect().height,1);
+    if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';wrap.style.overflow='hidden';wrap.style.minHeight=`${Math.max(cr.height,targetHeight)}px`;
+    Object.assign(current.style,{position:'relative',zIndex:'2',width:'100%',transition:'none',transform:'translate3d(0,0,0)',willChange:'transform',pointerEvents:'none'});
+    Object.assign(target.style,{position:'absolute',left:`${cr.left-wr.left}px`,top:`${cr.top-wr.top}px`,zIndex:'3',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,margin:'0',transition:'none',transform:`translate3d(${direction*width}px,0,0)`,willChange:'transform',pointerEvents:'none'});
+    document.body.classList.add('admin-v16-tab-moving');
+    const duration=270,easing='cubic-bezier(.22,.61,.36,1)';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{current.style.transition=`transform ${duration}ms ${easing}`;target.style.transition=`transform ${duration}ms ${easing}`;current.style.transform=`translate3d(${-direction*width}px,0,0)`;target.style.transform='translate3d(0,0,0)'}));
+    let done=false;const finish=()=>{if(done)return;done=true;cs===null?current.removeAttribute('style'):current.setAttribute('style',cs);ts===null?target.removeAttribute('style'):target.setAttribute('style',ts);ws===null?wrap.removeAttribute('style'):wrap.setAttribute('style',ws);current.hidden=true;target.hidden=false;updateButtons(type);document.body.classList.remove('admin-v16-tab-moving');tabBusy=false;void target.offsetHeight;scheduleSticky()};
+    target.addEventListener('transitionend',finish,{once:true});setTimeout(finish,duration+100);
+  }
+  switchAdminTabFromButton=function(type){
+    const from=activeType(),a=order.indexOf(from),b=order.indexOf(type);if(a<0||b<0||a===b)return;transitionTo(type,b>a?1:-1);
+  };
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('[data-admin-tab]');if(!button)return;
+    event.preventDefault();event.stopImmediatePropagation();switchAdminTabFromButton(button.dataset.adminTab);
+  },true);
+  let gesture=null;
+  document.addEventListener('touchstart',event=>{
+    if(!main?.contains(event.target)||event.touches.length!==1||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open')||document.body.classList.contains('zone-card-dragging'))return;
+    if(event.target.closest('input,textarea,select,button,a,[contenteditable="true"]'))return;
+    const t=event.touches[0];gesture={x:t.clientX,y:t.clientY,axis:null};
+  },{capture:true,passive:true});
+  document.addEventListener('touchmove',event=>{
+    if(!gesture||event.touches.length!==1)return;const t=event.touches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y;
+    if(!gesture.axis){if(Math.abs(dx)<7&&Math.abs(dy)<7)return;gesture.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';if(gesture.axis==='y'){gesture=null;return}}
+    if(gesture.axis==='x'){event.preventDefault();event.stopImmediatePropagation()}
+  },{capture:true,passive:false});
+  document.addEventListener('touchend',event=>{
+    if(!gesture)return;if(gesture.axis==='x')event.stopImmediatePropagation();const t=event.changedTouches[0],dx=t.clientX-gesture.x;
+    if(gesture.axis==='x'&&Math.abs(dx)>=54){const index=order.indexOf(activeType()),next=index+(dx<0?1:-1);if(next>=0&&next<order.length)transitionTo(order[next],dx<0?1:-1)}gesture=null;
+  },{capture:true,passive:true});
+  document.addEventListener('touchcancel',()=>{gesture=null},{capture:true,passive:true});
+
+  scheduleSticky();setTimeout(()=>{scheduleSticky();try{renderMovementLogs();renderZonePeople(selectedZoneId)}catch(_){}},180);
+})();
+</script>
+
+
+  <!-- 일반 사용자 페이지와 동일한 로그아웃 확인 팝업 -->
+  <div class="modal-backdrop" id="adminLogoutConfirmModal" aria-hidden="true">
+    <section class="dialog admin-user-confirm-dialog" id="adminLogoutConfirmDialog" role="alertdialog" aria-modal="true" aria-labelledby="adminLogoutConfirmTitle">
+      <div class="dialog-body">
+        <div class="admin-user-confirm-icon" aria-hidden="true">!</div>
+        <h3 class="admin-user-confirm-title" id="adminLogoutConfirmTitle">로그아웃</h3>
+        <p class="admin-user-confirm-text">정말 로그아웃하시겠습니까?</p>
+        <div class="dialog-actions">
+          <button class="admin-user-confirm-cancel" id="adminLogoutConfirmCancel" type="button">취소</button>
+          <button class="admin-user-confirm-ok" id="adminLogoutConfirmOk" type="button">로그아웃</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+
+<script>
+(function locationAdminV17FinalFix(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* user 페이지처럼 헤더는 흐름대로 사라지고 요약 섹션만 화면 상단에 고정한다. */
+    .header{position:relative!important;top:auto!important;left:auto!important;right:auto!important;transform:none!important}
+    #adminTabMain{position:relative!important;overflow-x:clip!important;overflow-y:visible!important}
+    .app,main{overflow:visible!important}
+    .tab-dashboard-pin-spacer,.sticky-dashboard-spacer,.admin-v13-sticky-spacer,.admin-v16-sticky-spacer{display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important}
+    .admin-final-sticky-anchor{display:block!important;width:100%!important;height:0;margin:0;padding:0;border:0;pointer-events:none}
+    .admin-tab-view>.sticky-dashboard:not(.admin-final-fixed){
+      position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+      width:calc(100% + 28px)!important;margin-left:-14px!important;margin-right:-14px!important;
+      transform:none!important;z-index:85!important
+    }
+    .admin-tab-view>.sticky-dashboard.admin-final-fixed{
+      position:fixed!important;top:0!important;left:50%!important;right:auto!important;
+      width:var(--admin-final-width,min(100%,480px))!important;margin:0!important;
+      transform:translateX(-50%)!important;z-index:140!important;
+      box-shadow:0 10px 24px rgba(15,23,42,.10)!important
+    }
+    body.admin-final-tab-moving{overflow-x:hidden!important}
+    body.admin-final-tab-moving #adminTabMain{overflow:hidden!important}
+    body.admin-final-tab-moving .admin-tab-view{backface-visibility:hidden;transform-style:preserve-3d}
+
+    /* user 페이지 로그아웃 확인창과 동일한 구성 */
+    .admin-user-confirm-dialog{width:min(calc(100% - 28px),440px)!important}
+    .admin-user-confirm-dialog .dialog-body{padding:18px!important;text-align:center!important}
+    .admin-user-confirm-icon{width:46px;height:46px;margin:0 auto 13px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--primary-soft,#dbeafe);color:#1d4ed8;font-size:22px;font-weight:900}
+    .admin-user-confirm-title{margin:0;font-size:18px;font-weight:900}
+    .admin-user-confirm-text{margin:9px 0 0;color:var(--muted);font-size:12px;font-weight:700;line-height:1.65;white-space:pre-line}
+    .admin-user-confirm-cancel,.admin-user-confirm-ok{min-height:48px;border:0;border-radius:15px;font-size:14px;font-weight:900}
+    .admin-user-confirm-cancel{background:#e2e8f0;color:#334155}
+    .admin-user-confirm-ok{background:var(--primary);color:#fff}
+    .admin-user-confirm-cancel:active,.admin-user-confirm-ok:active{transform:scale(.985)}
+  `;
+  document.head.appendChild(style);
+
+  const app=document.querySelector('.app');
+  const header=document.querySelector('.header');
+  let stickyFrame=0;
+
+  function finalAnchor(view,dashboard){
+    let anchor=view.querySelector(':scope>.admin-final-sticky-anchor');
+    if(!anchor){
+      anchor=document.createElement('div');
+      anchor.className='admin-final-sticky-anchor';
+      view.insertBefore(anchor,dashboard);
+    }
+    return anchor;
+  }
+  function releaseAdminSticky(){
+    document.querySelectorAll('.admin-tab-view>.sticky-dashboard').forEach(dashboard=>{
+      dashboard.classList.remove('admin-final-fixed','admin-v16-fixed','admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed');
+    });
+    document.querySelectorAll('.admin-final-sticky-anchor').forEach(anchor=>{anchor.style.height='0px'});
+  }
+  function syncFinalAdminSticky(){
+    stickyFrame=0;
+    const moving=document.body.classList.contains('admin-final-tab-moving')||document.body.classList.contains('admin-v16-tab-moving')||document.body.classList.contains('admin-tab-switching');
+    const activeView=document.querySelector('[data-admin-tab-view]:not([hidden])');
+    document.querySelectorAll('.admin-tab-view>.sticky-dashboard').forEach(dashboard=>{
+      const view=dashboard.parentElement;
+      const anchor=finalAnchor(view,dashboard);
+      dashboard.classList.remove('admin-v16-fixed','admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed');
+      if(view!==activeView||moving){
+        dashboard.classList.remove('admin-final-fixed');
+        anchor.style.height='0px';
+      }
+    });
+    if(!activeView||!app||!header||moving)return;
+    const dashboard=activeView.querySelector(':scope>.sticky-dashboard');
+    if(!dashboard)return;
+    const anchor=finalAnchor(activeView,dashboard);
+    const shouldFix=anchor.getBoundingClientRect().top<=0&&header.getBoundingClientRect().bottom<=0;
+    if(shouldFix){
+      const height=Math.max(dashboard.offsetHeight,1);
+      anchor.style.height=`${height}px`;
+      dashboard.style.setProperty('--admin-final-width',`${Math.max(1,Math.round(app.getBoundingClientRect().width))}px`);
+      dashboard.classList.add('admin-final-fixed');
+    }else{
+      dashboard.classList.remove('admin-final-fixed');
+      anchor.style.height='0px';
+    }
+  }
+  function scheduleFinalAdminSticky(){
+    if(!stickyFrame)stickyFrame=requestAnimationFrame(syncFinalAdminSticky);
+  }
+  window.addEventListener('scroll',scheduleFinalAdminSticky,{passive:true});
+  document.addEventListener('scroll',scheduleFinalAdminSticky,{passive:true,capture:true});
+  app?.addEventListener('scroll',scheduleFinalAdminSticky,{passive:true});
+  window.addEventListener('resize',scheduleFinalAdminSticky,{passive:true});
+
+  function adminJourneyBadgeMarkup(label,color){
+    const safe=String(label||'미지정').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    return `<span class="record-zone-badge" style="--badge-color:${color||'#64748b'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><b>${safe}</b></span>`;
+  }
+
+  function adminJourneyLogs(logs){
+    const states=new Map();
+    return (logs||[])
+      .slice()
+      .sort((a,b)=>new Date(a.departureTime||0)-new Date(b.departureTime||0))
+      .map(log=>{
+        const copy={...log};
+        const person=people.find(row=>row.id===copy.userId);
+        const homeId=copy.homeZoneId||person?.homeZoneId||null;
+        const origin=copy.originZoneId||null;
+        const destination=copy.destinationZoneId||copy.zoneId||null;
+        const state=states.get(copy.userId)||{departure:null,expected:null,away:false};
+        const returnsHome=Boolean(homeId&&destination===homeId);
+        const leavesHome=Boolean(homeId&&origin===homeId&&destination!==homeId);
+        copy.isJourneyDeparture=leavesHome;
+
+        if(returnsHome){
+          copy.isReturnHomeJourney=true;
+          copy.journeyDepartureTime=state.departure||copy.departureTime||null;
+          copy.journeyExpectedReturnTime=state.expected||copy.expectedReturnTime||null;
+          copy.journeyArrivalTime=copy.arrivalTime||copy.departureTime||null;
+          states.set(copy.userId,{departure:null,expected:null,away:false});
+        }else{
+          if(leavesHome||!state.away){
+            state.departure=copy.departureTime||state.departure;
+            state.expected=copy.expectedReturnTime||null;
+            state.away=true;
+          }else if(!state.expected&&copy.expectedReturnTime){
+            state.expected=copy.expectedReturnTime;
+          }
+          copy.isReturnHomeJourney=false;
+          copy.journeyDepartureTime=copy.departureTime||null;
+          states.set(copy.userId,state);
+        }
+        return copy;
+      });
+  }
+  function adminJourneyElapsed(expected,arrival){
+    if(!expected)return '-';
+    const expectedMs=new Date(expected).getTime();
+    const arrivalMs=arrival?new Date(arrival).getTime():Date.now();
+    if(!Number.isFinite(expectedMs)||!Number.isFinite(arrivalMs))return '-';
+    const minutes=Math.max(0,Math.floor((arrivalMs-expectedMs)/60000));
+    if(minutes<60)return `${minutes}분`;
+    const hours=Math.floor(minutes/60),rest=minutes%60;
+    return rest?`${hours}시간 ${rest}분`:`${hours}시간`;
+  }
+
+  renderMovementLogs=function(){
+    const keyword=normalizeSearchText(recordsSearchInput.value);
+    recordsSearchClearBtn.classList.toggle('visible',keyword.length>0);
+    const companyFilter=recordsCompanyFilter.value;
+    const unreturnedOnly=recordsReturnFilter.value==='unreturned';
+    const zoneFilter=recordsZoneFilter.value;
+    const hasPeriod=Boolean(appliedRecordsStartDate&&appliedRecordsEndDate);
+    const hasFilter=Boolean(keyword||companyFilter||unreturnedOnly||zoneFilter||hasPeriod);
+    recordsList.innerHTML='';
+    recordsList.hidden=false;
+    recordsList.style.display='';
+    recordsState.hidden=true;
+    recordsState.style.display='none';
+
+    const forcedUnreadKeys=Array.isArray(window.__adminUnreadRecordKeys)?window.__adminUnreadRecordKeys:[];
+    const showUnreadRegardlessOfFilters=window.__adminReviewingUnreadRecords===true;
+    const matches=adminJourneyLogs(movementLogs)
+      .filter(log=>{
+        const key=String(log?.id??log?.log_id??`${log?.userId||log?.user_id||''}|${log?.departureTime||log?.departure_time||''}|${log?.destinationZoneId||log?.to_zone_id||log?.destination_zone_id||log?.zone_id||''}`);
+        if(showUnreadRegardlessOfFilters&&forcedUnreadKeys.includes(key))return true;
+        if(keyword&&!normalizeSearchText([log.name,log.company,log.homeZoneName,log.originZoneName,log.destinationZoneName].filter(Boolean).join(' ')).includes(keyword))return false;
+        if(companyFilter&&log.company!==companyFilter)return false;
+        if(unreturnedOnly&&(log.isReturnHomeJourney||log.arrivalTime))return false;
+        if(zoneFilter&&log.destinationZoneId!==zoneFilter&&log.zoneId!==zoneFilter)return false;
+        if(hasPeriod){
+          const date=getKstDateString(log.departureTime);
+          if(date<appliedRecordsStartDate||date>appliedRecordsEndDate)return false;
+        }
+        return true;
+      })
+      .sort((a,b)=>new Date(b.departureTime||0)-new Date(a.departureTime||0));
+
+    if(!matches.length){
+      recordsState.hidden=false;
+      recordsState.style.display='flex';
+      recordsState.style.padding='16px 12px';
+      recordsState.textContent=hasFilter?'검색 조건에 맞는 기록이 없습니다.':'최근 일주일 동안 저장된 이동 기록이 없습니다.';
+      recordsList.hidden=true;
+      recordsList.style.display='none';
+      return;
+    }
+
+    matches.forEach(log=>{
+      const person=people.find(row=>row.id===log.userId);
+      const name=log.name||person?.name||'이름 미입력';
+      const company=log.company||person?.company||'미입력';
+      const homeId=log.homeZoneId||person?.homeZoneId||null;
+      const homeName=log.homeZoneName||person?.homeZoneName||getZone(homeId)?.name||'미지정';
+      const originName=log.originZoneName||getZone(log.originZoneId)?.name||homeName;
+      const destinationId=log.destinationZoneId||log.zoneId;
+      const destinationName=log.destinationZoneName||getZone(destinationId)?.name||log.zoneName||'도착지 미기록';
+      const homeColor=getZone(homeId)?.color||'#64748b';
+      const originColor=getZone(log.originZoneId)?.color||homeColor;
+      const destinationColor=getZone(destinationId)?.color||'#2563eb';
+      const returnHome=log.isReturnHomeJourney===true;
+      const outsideMovement=getZone(destinationId)?.attribute==='outside';
+      const journeyDeparture=log.isJourneyDeparture===true;
+      const showFullTiming=returnHome||outsideMovement;
+      const showExpected=showFullTiming||journeyDeparture;
+      const departure=returnHome?log.journeyDepartureTime:log.departureTime;
+      const expected=returnHome?log.journeyExpectedReturnTime:log.expectedReturnTime;
+      const arrival=returnHome?log.journeyArrivalTime:log.arrivalTime;
+      const card=document.createElement('article');
+      card.className='record-card';
+      card.dataset.logKey=String(log.id??`${log.userId||''}|${log.departureTime||''}|${destinationId||''}`);
+      card.innerHTML=`
+        <div class="record-card-head"><h3 class="record-card-name"></h3><span class="record-header-company"></span>${adminJourneyBadgeMarkup(homeName,homeColor)}</div>
+        <div class="record-card-body">
+          <dl class="record-card-info ${showFullTiming?'':showExpected?'record-journey-departure-info':'record-v16-short'}">
+            <dt>출발</dt><dd class="record-departure-time">${formatRecordDateTime(departure)}</dd>
+            ${showExpected?`<dt>도착 예정</dt><dd class="record-expected-time">${formatRecordDateTime(expected)}</dd>`:''}
+            ${showFullTiming?`
+              <dt>도착</dt><dd class="record-arrival-time ${arrival?'':'missing'}">${arrival?formatRecordDateTime(arrival):'미복귀'}</dd>
+              <dt>지난 시간</dt><dd class="record-v17-elapsed">${adminJourneyElapsed(expected,arrival)}</dd>
+            `:''}
+          </dl>
+          <aside class="record-route-vertical" aria-label="이동 구역">${adminJourneyBadgeMarkup(originName,originColor)}<span class="record-route-down" aria-hidden="true">↓</span>${adminJourneyBadgeMarkup(destinationName,destinationColor)}</aside>
+        </div>`;
+      card.querySelector('.record-card-name').textContent=name;
+      card.querySelector('.record-header-company').textContent=company;
+      const elapsed=card.querySelector('.record-v17-elapsed');
+      if(elapsed&&elapsed.textContent!=='-'&&elapsed.textContent!=='0분')elapsed.style.color='#dc2626';
+      recordsList.appendChild(card);
+    });
+  };
+
+  const tabOrder=['detail','dashboard','personnel','records','unit'];
+  const tabMain=document.getElementById('adminTabMain');
+  let tabState=null;
+
+  function activeAdminTab(){
+    return document.querySelector('[data-admin-tab-view]:not([hidden])')?.dataset.adminTabView||'detail';
+  }
+  function updateAdminTabButtons(type){
+    document.body.classList.toggle('detail-tab-active',type==='detail');
+    document.body.classList.toggle('dashboard-tab-active',type==='dashboard');
+    document.body.classList.toggle('personnel-tab-active',type==='personnel');
+    document.body.classList.toggle('records-tab-active',type==='records');
+    document.body.classList.toggle('unit-tab-active',type==='unit');
+    document.querySelectorAll('[data-admin-tab]').forEach(button=>{
+      const active=button.dataset.adminTab===type;
+      button.classList.toggle('active',active);
+      active?button.setAttribute('aria-current','page'):button.removeAttribute('aria-current');
+    });
+  }
+  function restoreInline(element,value){
+    value===null?element.removeAttribute('style'):element.setAttribute('style',value);
+  }
+  function setupAdminTransition(type,direction){
+    const from=activeAdminTab();
+    if(tabState||from===type||!tabOrder.includes(type)||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open,.action-toast-backdrop.open')||document.body.classList.contains('zone-card-dragging'))return null;
+    const current=document.getElementById(`view-${from}`);
+    const target=document.getElementById(`view-${type}`);
+    if(!current||!target)return null;
+    if(type==='unit'){
+      try{loadUnitManagementState({quiet:true}).catch(()=>{});searchUnitsForManagement({quiet:true}).catch(()=>{});loadPendingUnitApplications({quiet:true}).catch(()=>{})}catch(_){}
+    }
+
+    releaseAdminSticky();
+    const wrap=current.parentElement;
+    const currentRect=current.getBoundingClientRect();
+    const wrapRect=wrap.getBoundingClientRect();
+    const width=Math.max(currentRect.width,1);
+    const saved={current:current.getAttribute('style'),target:target.getAttribute('style'),wrap:wrap.getAttribute('style'),targetHidden:target.hidden};
+    target.hidden=false;
+    const targetHeight=Math.max(target.scrollHeight,target.getBoundingClientRect().height,1);
+    if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';
+    wrap.style.overflow='hidden';
+    wrap.style.minHeight=`${Math.max(currentRect.height,targetHeight)}px`;
+    Object.assign(current.style,{position:'relative',zIndex:'2',width:'100%',transition:'none',transform:'translate3d(0,0,0)',willChange:'transform',pointerEvents:'none'});
+    Object.assign(target.style,{position:'absolute',left:`${currentRect.left-wrapRect.left}px`,top:`${currentRect.top-wrapRect.top}px`,zIndex:'3',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,margin:'0',boxSizing:'border-box',transition:'none',transform:`translate3d(${direction*width}px,0,0)`,willChange:'transform',pointerEvents:'none'});
+    document.body.classList.add('admin-final-tab-moving');
+    tabState={from,type,direction,current,target,wrap,width,saved,done:false};
+    return tabState;
+  }
+  function setAdminTransitionOffset(state,offset){
+    const limited=state.direction>0
+      ?Math.max(-state.width,Math.min(0,offset))
+      :Math.min(state.width,Math.max(0,offset));
+    state.offset=limited;
+    state.current.style.transform=`translate3d(${limited}px,0,0)`;
+    state.target.style.transform=`translate3d(${state.direction*state.width+limited}px,0,0)`;
+  }
+  function finishAdminTransition(state,complete){
+    if(!state||state.done)return;
+    state.done=true;
+    restoreInline(state.current,state.saved.current);
+    restoreInline(state.target,state.saved.target);
+    restoreInline(state.wrap,state.saved.wrap);
+    if(complete){
+      state.current.hidden=true;
+      state.target.hidden=false;
+      updateAdminTabButtons(state.type);
+    }else{
+      state.current.hidden=false;
+      state.target.hidden=state.saved.targetHidden;
+      updateAdminTabButtons(state.from);
+    }
+    document.body.classList.remove('admin-final-tab-moving');
+    tabState=null;
+    window.dispatchEvent(new CustomEvent('admin-final-tab-change',{
+      detail:{from:state.from,to:complete?state.type:state.from,completed:complete}
+    }));
+    requestAnimationFrame(()=>requestAnimationFrame(scheduleFinalAdminSticky));
+  }
+  function animateAdminTransition(state,complete){
+    if(!state)return;
+    const duration=complete?255:190;
+    const easing='cubic-bezier(.22,.61,.36,1)';
+    state.current.style.transition=`transform ${duration}ms ${easing}`;
+    state.target.style.transition=`transform ${duration}ms ${easing}`;
+    requestAnimationFrame(()=>{
+      state.current.style.transform=complete?`translate3d(${-state.direction*state.width}px,0,0)`:'translate3d(0,0,0)';
+      state.target.style.transform=complete?'translate3d(0,0,0)':`translate3d(${state.direction*state.width}px,0,0)`;
+    });
+    let ended=false;
+    const done=()=>{if(ended)return;ended=true;finishAdminTransition(state,complete)};
+    state.target.addEventListener('transitionend',done,{once:true});
+    setTimeout(done,duration+90);
+  }
+  function goAdminTab(type,directionOverride=null){
+    const from=activeAdminTab();
+    const fromIndex=tabOrder.indexOf(from),toIndex=tabOrder.indexOf(type);
+    if(fromIndex<0||toIndex<0||fromIndex===toIndex){updateAdminTabButtons(from);scheduleFinalAdminSticky();return}
+    const direction=directionOverride??(toIndex>fromIndex?1:-1);
+    const state=setupAdminTransition(type,direction);
+    if(!state)return;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>animateAdminTransition(state,true)));
+  }
+  switchAdminTabFromButton=function(type){goAdminTab(type)};
+
+  window.addEventListener('click',event=>{
+    const target=event.target instanceof Element?event.target:null;
+    const button=target?.closest('[data-admin-tab]');
+    if(!button)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    goAdminTab(button.dataset.adminTab);
+  },true);
+
+  let gesture=null;
+  window.addEventListener('touchstart',event=>{
+    const target=event.target instanceof Element?event.target:null;
+    if(!target||!tabMain?.contains(target)||event.touches.length!==1||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open,.action-toast-backdrop.open')||document.body.classList.contains('zone-card-dragging'))return;
+    if(target.closest('input,textarea,select,button,a,[contenteditable="true"]'))return;
+    const touch=event.touches[0];
+    gesture={x:touch.clientX,y:touch.clientY,time:performance.now(),axis:null,state:null,lastX:touch.clientX};
+    event.stopImmediatePropagation();
+  },{capture:true,passive:false});
+  window.addEventListener('touchmove',event=>{
+    if(!gesture||event.touches.length!==1)return;
+    event.stopImmediatePropagation();
+    const touch=event.touches[0];
+    const dx=touch.clientX-gesture.x,dy=touch.clientY-gesture.y;
+    gesture.lastX=touch.clientX;
+    if(!gesture.axis){
+      if(Math.abs(dx)<7&&Math.abs(dy)<7)return;
+      gesture.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';
+      if(gesture.axis==='y')return;
+      const currentIndex=tabOrder.indexOf(activeAdminTab());
+      const direction=dx<0?1:-1;
+      const nextIndex=(currentIndex+direction+tabOrder.length)%tabOrder.length;
+      gesture.state=setupAdminTransition(tabOrder[nextIndex],direction);
+    }
+    if(gesture.axis==='x'){
+      event.preventDefault();
+      if(gesture.state)setAdminTransitionOffset(gesture.state,dx);
+    }
+  },{capture:true,passive:false});
+  window.addEventListener('touchend',event=>{
+    if(!gesture)return;
+    event.stopImmediatePropagation();
+    const state=gesture.state;
+    if(gesture.axis==='x'&&state){
+      const changed=event.changedTouches[0];
+      const dx=(changed?.clientX??gesture.lastX)-gesture.x;
+      const elapsed=Math.max(performance.now()-gesture.time,1);
+      const velocity=Math.abs(dx)/elapsed;
+      const complete=Math.abs(dx)>=Math.max(54,state.width*.18)||velocity>.55;
+      animateAdminTransition(state,complete);
+    }
+    gesture=null;
+  },{capture:true,passive:false});
+  window.addEventListener('touchcancel',event=>{
+    if(!gesture)return;
+    event.stopImmediatePropagation();
+    if(gesture.state)animateAdminTransition(gesture.state,false);
+    gesture=null;
+  },{capture:true,passive:false});
+
+  const logoutModal=document.getElementById('adminLogoutConfirmModal');
+  const logoutDialog=document.getElementById('adminLogoutConfirmDialog');
+  const logoutCancel=document.getElementById('adminLogoutConfirmCancel');
+  const logoutOk=document.getElementById('adminLogoutConfirmOk');
+  function openAdminLogoutConfirm(){
+    try{closeSettingsModal()}catch(_){}
+    logoutModal.classList.remove('closing');
+    logoutDialog.classList.remove('closing');
+    logoutModal.classList.add('open');
+    logoutModal.setAttribute('aria-hidden','false');
+    document.body.classList.add('sheet-open-lock');
+  }
+  function closeAdminLogoutConfirm(){
+    if(!logoutModal.classList.contains('open'))return;
+    logoutModal.classList.add('closing');
+    logoutDialog.classList.add('closing');
+    setTimeout(()=>{
+      logoutModal.classList.remove('open','closing');
+      logoutDialog.classList.remove('closing');
+      logoutModal.setAttribute('aria-hidden','true');
+      if(!document.querySelector('.modal-backdrop.open,.sheet-backdrop.open,.action-toast-backdrop.open'))document.body.classList.remove('sheet-open-lock');
+      logoutOk.disabled=false;
+      logoutOk.textContent='로그아웃';
+    },220);
+  }
+  window.addEventListener('click',event=>{
+    const target=event.target instanceof Element?event.target:null;
+    if(!target?.closest('#logoutSettingsBtn'))return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    openAdminLogoutConfirm();
+  },true);
+  logoutCancel?.addEventListener('click',closeAdminLogoutConfirm);
+  logoutModal?.addEventListener('click',event=>{if(event.target===logoutModal)closeAdminLogoutConfirm()});
+  logoutOk?.addEventListener('click',async()=>{
+    logoutOk.disabled=true;
+    logoutOk.textContent='로그아웃 중...';
+    try{
+      const {error}=await sb.auth.signOut();
+      if(error)throw error;
+      location.replace('index.html');
+    }catch(error){
+      logoutOk.disabled=false;
+      logoutOk.textContent='로그아웃';
+      closeAdminLogoutConfirm();
+      try{showMessage(error?.message||'로그아웃하지 못했습니다.','로그아웃 실패')}catch(_){}
+    }
+  });
+  window.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&logoutModal?.classList.contains('open')){
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeAdminLogoutConfirm();
+    }
+  },true);
+
+  scheduleFinalAdminSticky();
+  setTimeout(()=>{
+    scheduleFinalAdminSticky();
+    try{renderMovementLogs()}catch(_){}
+  },180);
+})();
+</script>
+
+
+<script>
+(function locationAdminV18Fix(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* user 페이지와 같은 문서 스크롤 구조 */
+    html{overflow-x:clip!important;overflow-y:visible!important}
+    body:not(.sheet-open-lock){overflow-x:clip!important;overflow-y:visible!important}
+    .app,#adminTabMain,main,.admin-tab-view{overflow:visible!important}
+    .header{position:relative!important;top:auto!important;contain:none!important}
+    .admin-final-sticky-anchor,.admin-v16-sticky-spacer,.admin-v13-sticky-spacer,.tab-dashboard-pin-spacer{
+      display:none!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important
+    }
+    .admin-tab-view>.sticky-dashboard:not(.js-sticky-fixed){
+      position:relative!important;top:auto!important;left:auto!important;right:auto!important;
+      width:calc(100% + 28px)!important;margin:0 -14px!important;transform:none!important;z-index:85!important
+    }
+    .admin-tab-view>.sticky-dashboard.js-sticky-fixed{
+      position:fixed!important;top:0!important;left:50%!important;right:auto!important;
+      width:var(--sticky-fixed-width,min(100%,480px))!important;margin:0!important;
+      transform:translateX(-50%)!important;z-index:145!important;
+      box-shadow:0 10px 24px rgba(15,23,42,.10)!important
+    }
+    .sticky-dashboard-spacer{display:none!important;width:100%!important;height:0;margin:0;padding:0;border:0}
+    .sticky-dashboard-spacer.active{display:block!important}
+
+    /* 이름 검색 → 기간 설정 → 구역·중대·상태 순서 */
+    #view-records>.sticky-dashboard{
+      height:257px!important;min-height:257px!important;max-height:257px!important;
+      grid-template-rows:69px 156px!important
+    }
+    #view-records .sticky-actions.tab-search-actions{
+      height:156px!important;min-height:156px!important;max-height:156px!important;
+      display:grid!important;grid-template-columns:1fr!important;grid-template-rows:48px 48px 44px!important;
+      gap:8px!important
+    }
+    #view-records .records-filter-row{
+      width:100%!important;height:44px!important;min-height:44px!important;max-height:44px!important;
+      display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+      grid-template-rows:44px!important;grid-auto-flow:row!important;gap:7px!important;align-items:stretch!important
+    }
+    #view-records #recordsPeriodFilterButton{
+      width:100%!important;height:48px!important;min-height:48px!important;max-height:48px!important;
+      min-width:0!important;box-sizing:border-box!important;justify-content:space-between!important;
+      padding:0 14px!important;margin:0!important;border:1px solid var(--line)!important;
+      border-radius:16px!important;background:var(--surface)!important;color:#334155!important;
+      box-shadow:var(--shadow)!important;font-size:11px!important;font-weight:850!important;text-align:left!important
+    }
+    #view-records #recordsPeriodFilterButton .search-filter-trigger-label{
+      display:block!important;min-width:0!important;max-width:none!important;overflow:hidden!important;
+      text-overflow:ellipsis!important;white-space:nowrap!important;text-align:left!important;
+      color:#334155!important;font-size:11px!important;flex:1!important
+    }
+    .period-filter-actions{grid-template-columns:1fr 1fr 1fr!important}
+    .period-clear-btn{
+      min-height:48px;border:0;border-radius:15px;background:#fee2e2;color:#b91c1c;
+      font-size:14px;font-weight:900
+    }
+
+    /* 미확인 이동 기록: 카드 머리말에 [신규] 아이콘만 표시 */
+    .movement-record-count-badge,
+    #view-records .record-card.record-new-highlight::after{display:none!important}
+    #view-records .record-new-badge{
+      flex:0 0 auto!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+      min-height:22px!important;padding:3px 8px!important;border:1px solid #fecaca!important;border-radius:999px!important;
+      background:#fff1f2!important;color:#dc2626!important;font-size:10px!important;font-weight:950!important;line-height:1!important;
+      letter-spacing:-.1px!important;white-space:nowrap!important;box-shadow:0 3px 8px rgba(220,38,38,.10)!important
+    }
+  `;
+  document.head.appendChild(style);
+
+  /* 기간 버튼 표시와 DOM 순서를 최종 고정 */
+  updateRecordsPeriodButtonLabel=function(){
+    const label=recordsPeriodFilterButton?.querySelector('.search-filter-trigger-label');
+    if(!label)return;
+    label.textContent=appliedRecordsStartDate&&appliedRecordsEndDate
+      ?`${appliedRecordsStartDate} ~ ${appliedRecordsEndDate}`
+      :'기간 설정';
+  };
+  function arrangeRecordsFilters(){
+    const actions=document.querySelector('#view-records .sticky-actions.tab-search-actions');
+    const row=document.querySelector('#view-records .records-filter-row');
+    const search=actions?.querySelector(':scope>.personnel-search-wrap');
+    const zone=row?.querySelector(':scope>.filter-picker-wrap');
+    const company=document.getElementById('recordsCompanyFilterButton');
+    const status=document.getElementById('recordsReturnFilterButton');
+    const period=document.getElementById('recordsPeriodFilterButton');
+    if(!actions||!row||!search||!zone||!company||!status||!period)return;
+    actions.insertBefore(period,row);
+    row.append(zone,company,status);
+    updateRecordsPeriodButtonLabel();
+  }
+  arrangeRecordsFilters();
+  setTimeout(arrangeRecordsFilters,120);
+  setTimeout(arrangeRecordsFilters,420);
+
+  /* user 페이지의 고정 방식과 동일한 spacer + fixed 처리 */
+  const stickyApp=document.querySelector('.app');
+  const stickyHeader=document.querySelector('.header');
+  let stickyFrame=0;
+  function syncUserStyleAdminSticky(){
+    stickyFrame=0;
+    const activeView=document.querySelector('[data-admin-tab-view]:not([hidden])');
+    document.querySelectorAll('.admin-tab-view>.sticky-dashboard').forEach(dashboard=>{
+      const view=dashboard.parentElement;
+      let spacer=view.querySelector(':scope>.sticky-dashboard-spacer');
+      if(!spacer){
+        spacer=document.createElement('div');
+        spacer.className='sticky-dashboard-spacer';
+        view.insertBefore(spacer,dashboard);
+      }
+      dashboard.classList.remove('admin-final-fixed','admin-v16-fixed','admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed');
+      if(view!==activeView||document.body.classList.contains('admin-final-tab-moving')){
+        dashboard.classList.remove('js-sticky-fixed');
+        spacer.classList.remove('active');
+        spacer.style.height='0px';
+      }
+    });
+    if(!activeView||!stickyApp||!stickyHeader||document.body.classList.contains('admin-final-tab-moving'))return;
+    const dashboard=activeView.querySelector(':scope>.sticky-dashboard');
+    const spacer=activeView.querySelector(':scope>.sticky-dashboard-spacer');
+    if(!dashboard||!spacer)return;
+    const shouldFix=spacer.getBoundingClientRect().top<=0&&stickyHeader.getBoundingClientRect().bottom<=0;
+    if(shouldFix){
+      spacer.classList.add('active');
+      spacer.style.height=`${Math.max(dashboard.offsetHeight,1)}px`;
+      dashboard.style.setProperty('--sticky-fixed-width',`${Math.round(stickyApp.getBoundingClientRect().width)}px`);
+      dashboard.classList.add('js-sticky-fixed');
+    }else{
+      dashboard.classList.remove('js-sticky-fixed');
+      spacer.classList.remove('active');
+      spacer.style.height='0px';
+    }
+  }
+  function scheduleUserStyleAdminSticky(){
+    if(!stickyFrame)stickyFrame=requestAnimationFrame(syncUserStyleAdminSticky);
+  }
+  window.addEventListener('scroll',scheduleUserStyleAdminSticky,{passive:true});
+  window.addEventListener('resize',scheduleUserStyleAdminSticky,{passive:true});
+  const tabMutationObserver=new MutationObserver(scheduleUserStyleAdminSticky);
+  document.querySelectorAll('[data-admin-tab-view]').forEach(view=>tabMutationObserver.observe(view,{attributes:true,attributeFilter:['hidden']}));
+  if('ResizeObserver'in window){
+    const resizeObserver=new ResizeObserver(scheduleUserStyleAdminSticky);
+    document.querySelectorAll('.admin-tab-view>.sticky-dashboard').forEach(dashboard=>resizeObserver.observe(dashboard));
+  }
+  scheduleUserStyleAdminSticky();
+  setTimeout(scheduleUserStyleAdminSticky,180);
+
+  /* 미확인 이동 기록: 탭을 나갈 때까지 [신규]와 개수 배지를 유지 */
+  const recordsTabButton=document.getElementById('adminTabRecords');
+  const recordsView=document.getElementById('view-records');
+  let movementNoticeChannel=null;
+  let noticeUnitId=selectedUnitId||'';
+  let unreadLogKeys=[];
+  let knownLogKeys=[];
+  let unreadStorageLoaded=false;
+
+  function movementLogKey(log){
+    return String(log?.id??log?.log_id??`${log?.userId||log?.user_id||''}|${log?.departureTime||log?.departure_time||''}|${log?.destinationZoneId||log?.to_zone_id||log?.destination_zone_id||log?.zone_id||''}`);
+  }
+  function noticeStorageKey(unitId=selectedUnitId||'none'){
+    return `location-admin-record-notice-v2:${adminAccess?.user?.id||'anonymous'}:${unitId}`;
+  }
+  function ensureMovementCountBadge(){
+    if(!recordsTabButton)return null;
+    let badge=recordsTabButton.querySelector('.movement-record-count-badge');
+    if(!badge){
+      badge=document.createElement('span');
+      badge.className='movement-record-count-badge';
+      badge.hidden=true;
+      badge.setAttribute('aria-hidden','true');
+      recordsTabButton.appendChild(badge);
+    }
+    return badge;
+  }
+  function updateMovementCountBadge(){
+    const badge=ensureMovementCountBadge();
+    if(!badge)return;
+    const count=unreadLogKeys.length;
+    badge.hidden=count<1;
+    badge.textContent=count>99?'99+':String(count);
+    badge.setAttribute('aria-hidden',count<1?'true':'false');
+    if(count>0)badge.setAttribute('aria-label',`확인되지 않은 이동 기록 ${count}건`);
+    else badge.removeAttribute('aria-label');
+  }
+  function persistNoticeState(){
+    try{
+      localStorage.setItem(noticeStorageKey(),JSON.stringify({
+        known:knownLogKeys.slice(-1000),
+        unread:unreadLogKeys.slice(-500)
+      }));
+    }catch(_){}
+    window.__adminUnreadRecordKeys=unreadLogKeys;
+    updateMovementCountBadge();
+  }
+  function loadNoticeState({initializeFromCurrent=false}={}){
+    let stored=null;
+    try{stored=JSON.parse(localStorage.getItem(noticeStorageKey())||'null')}catch(_){}
+    if(stored&&Array.isArray(stored.known)&&Array.isArray(stored.unread)){
+      knownLogKeys=[...new Set(stored.known.map(String))];
+      unreadLogKeys=[...new Set(stored.unread.map(String))];
+    }else{
+      const currentKeys=(Array.isArray(movementLogs)?movementLogs:[]).map(movementLogKey).filter(Boolean);
+      knownLogKeys=initializeFromCurrent?[...new Set(currentKeys)]:[];
+      unreadLogKeys=[];
+    }
+    unreadStorageLoaded=true;
+    persistNoticeState();
+  }
+  function syncUnreadWithLoadedLogs(){
+    if(!unreadStorageLoaded)loadNoticeState({initializeFromCurrent:true});
+    const currentKeys=(Array.isArray(movementLogs)?movementLogs:[]).map(movementLogKey).filter(Boolean);
+    if(!knownLogKeys.length&&currentKeys.length){
+      knownLogKeys=[...new Set(currentKeys)];
+      persistNoticeState();
+      return;
+    }
+    const known=new Set(knownLogKeys);
+    currentKeys.forEach(key=>{
+      if(!known.has(key)){
+        known.add(key);
+        unreadLogKeys.push(key);
+      }
+    });
+    knownLogKeys=[...known].slice(-1000);
+    unreadLogKeys=[...new Set(unreadLogKeys)].filter(key=>currentKeys.includes(key)).slice(-500);
+    persistNoticeState();
+  }
+  function enqueueUnreadMovementLog(log){
+    const key=movementLogKey(log);
+    if(!key)return;
+    if(!knownLogKeys.includes(key))knownLogKeys.push(key);
+    if(!unreadLogKeys.includes(key))unreadLogKeys.push(key);
+    persistNoticeState();
+    applyUnreadRecordBadges();
+  }
+  function clearUnreadAfterRecordsVisit(){
+    if(!unreadLogKeys.length){
+      updateMovementCountBadge();
+      return;
+    }
+    unreadLogKeys=[];
+    persistNoticeState();
+    applyUnreadRecordBadges();
+  }
+  function applyUnreadRecordBadges(){
+    updateMovementCountBadge();
+    if(!recordsList)return;
+    const unreadSet=new Set(unreadLogKeys);
+    recordsList.querySelectorAll('.record-card').forEach(card=>{
+      const key=String(card.dataset.logKey||'');
+      const isUnread=unreadSet.has(key);
+      card.classList.toggle('record-is-new',isUnread);
+      let badge=card.querySelector(':scope>.record-new-badge');
+      if(isUnread){
+        if(!badge){
+          badge=document.createElement('span');
+          badge.className='record-new-badge';
+          badge.textContent='신규';
+          badge.setAttribute('aria-label','미확인 신규 이동 기록');
+          card.appendChild(badge);
+        }
+      }else{
+        badge?.remove();
+      }
+    });
+  }
+
+  const renderMovementLogsBeforeNotice=renderMovementLogs;
+  renderMovementLogs=function(...args){
+    syncUnreadWithLoadedLogs();
+    const result=renderMovementLogsBeforeNotice.apply(this,args);
+    applyUnreadRecordBadges();
+    return result;
+  };
+
+  const loadUnitDataBeforeNotice=loadUnitData;
+  loadUnitData=async function(...args){
+    const previousUnit=selectedUnitId||'';
+    const result=await loadUnitDataBeforeNotice.apply(this,args);
+    const currentUnit=selectedUnitId||'';
+    if(currentUnit!==noticeUnitId||currentUnit!==previousUnit){
+      noticeUnitId=currentUnit;
+      unreadStorageLoaded=false;
+      loadNoticeState({initializeFromCurrent:true});
+    }
+    syncUnreadWithLoadedLogs();
+    applyUnreadRecordBadges();
+    return result;
+  };
+
+  function installMovementNoticeChannel(){
+    if(movementNoticeChannel||!adminAccess?.user?.id){
+      if(!movementNoticeChannel)setTimeout(installMovementNoticeChannel,180);
+      return;
+    }
+    movementNoticeChannel=sb
+      .channel(`location-admin-record-notice-${adminAccess.user.id}-${Date.now()}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'location_movement_logs'},payload=>{
+        const row=payload?.new||{};
+        if(!selectedUnitId||!row.unit_id||row.unit_id!==selectedUnitId)return;
+        enqueueUnreadMovementLog(row);
+      })
+      .subscribe();
+  }
+  loadNoticeState({initializeFromCurrent:true});
+  installMovementNoticeChannel();
+
+  /* 전환이 실제 완료되어 기록 탭을 벗어난 시점에만 확인 처리한다. */
+  window.addEventListener('admin-final-tab-change',event=>{
+    const detail=event.detail||{};
+    if(!detail.completed)return;
+    if(detail.from==='records'&&detail.to!=='records'){
+      clearUnreadAfterRecordsVisit();
+      return;
+    }
+    if(detail.to==='records'){
+      applyUnreadRecordBadges();
+      requestAnimationFrame(applyUnreadRecordBadges);
+    }
+  });
+
+  const recordsViewObserver=new MutationObserver(()=>{
+    if(!recordsView?.hidden){
+      applyUnreadRecordBadges();
+      requestAnimationFrame(applyUnreadRecordBadges);
+    }
+    scheduleUserStyleAdminSticky();
+  });
+  if(recordsView)recordsViewObserver.observe(recordsView,{attributes:true,attributeFilter:['hidden']});
+  recordsTabButton?.addEventListener('click',()=>setTimeout(applyUnreadRecordBadges,60));
+  window.addEventListener('beforeunload',()=>{
+    if(activeAdminTab()==='records')clearUnreadAfterRecordsVisit();
+    else persistNoticeState();
+    if(movementNoticeChannel)try{sb.removeChannel(movementNoticeChannel)}catch(_){}
+  });
+})();
+</script>
+
+
+
+<script>
+(function locationAdminV19Polish(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* 기간 버튼은 다른 필터와 같은 글자색/배경색을 사용한다. */
+    #view-records #recordsPeriodFilterButton{
+      background-color:var(--surface)!important;color:#334155!important;
+      border-color:var(--line)!important
+    }
+    #view-records #recordsPeriodFilterButton .search-filter-trigger-label{color:#334155!important}
+    #view-records .record-card-info.record-journey-departure-info{align-content:center!important}
+  `;
+  document.head.appendChild(style);
+
+  /* 현황판 구역 추가 버튼 문구를 상세현황 버튼과 항상 동일하게 유지 */
+  const detailAddButton=document.getElementById('addLocationBtn');
+  const dashboardAddButton=document.getElementById('dashboardAddLocationBtn');
+  function syncAddZoneButtonText(){
+    if(detailAddButton&&dashboardAddButton&&dashboardAddButton.innerHTML!==detailAddButton.innerHTML){
+      dashboardAddButton.innerHTML=detailAddButton.innerHTML;
+    }
+  }
+  syncAddZoneButtonText();
+  if(detailAddButton&&dashboardAddButton){
+    new MutationObserver(syncAddZoneButtonText).observe(detailAddButton,{subtree:true,childList:true,characterData:true});
+  }
+})();
+</script>
+
+
+<script>
+(function locationAdminV20LayoutPolish(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* 모든 기본 필터 버튼의 문구를 화살표와 무관하게 정확히 가운데 정렬 */
+    #view-personnel button.search-filter-select,
+    #view-records button.search-filter-select{
+      position:relative!important;
+      justify-content:center!important;
+      text-align:center!important;
+      padding-left:24px!important;
+      padding-right:24px!important;
+    }
+    #view-personnel button.search-filter-select .search-filter-trigger-label,
+    #view-records button.search-filter-select .search-filter-trigger-label{
+      display:block!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      flex:1 1 auto!important;
+      text-align:center!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+    }
+    #view-personnel button.search-filter-select .search-filter-trigger-arrow,
+    #view-records button.search-filter-select .search-filter-trigger-arrow{
+      position:absolute!important;
+      right:8px!important;
+      top:50%!important;
+      transform:translateY(-50%)!important;
+      margin:0!important;
+    }
+    #view-personnel select.search-filter-select,
+    #view-records select.search-filter-select{
+      text-align:center!important;
+      text-align-last:center!important;
+    }
+
+    /* 구역·중대·상태 필터 글자를 기존보다 한 단계 확대 */
+    #personnelZoneFilterButton,
+    #personnelCompanyFilterButton,
+    #personnelReturnFilterButton,
+    #recordsZoneFilterButton,
+    #recordsCompanyFilterButton,
+    #recordsReturnFilterButton,
+    #personnelZoneFilterButton .search-filter-trigger-label,
+    #personnelCompanyFilterButton .search-filter-trigger-label,
+    #personnelReturnFilterButton .search-filter-trigger-label,
+    #recordsZoneFilterButton .search-filter-trigger-label,
+    #recordsCompanyFilterButton .search-filter-trigger-label,
+    #recordsReturnFilterButton .search-filter-trigger-label{
+      font-size:12px!important;
+      font-weight:900!important;
+    }
+
+    /* 기록 카드: 이름 영역 → 이동 경로 → 시간 스탬프 순서 */
+    #view-records .record-card{
+      padding:15px 14px 16px!important;
+    }
+    #view-records .record-card-head{
+      padding-bottom:10px!important;
+    }
+    #view-records .record-card-body{
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:stretch!important;
+      gap:0!important;
+      margin-top:0!important;
+    }
+    #view-records .record-route-vertical{
+      order:-1!important;
+      width:100%!important;
+      min-width:0!important;
+      box-sizing:border-box!important;
+      padding:3px 0 12px!important;
+      border-left:0!important;
+      border-bottom:1px solid #e8edf5!important;
+      display:flex!important;
+      flex-direction:row!important;
+      align-items:center!important;
+      justify-content:flex-start!important;
+      gap:8px!important;
+      text-align:left!important;
+    }
+    #view-records .record-route-vertical .record-zone-badge{
+      width:auto!important;
+      max-width:calc(50% - 22px)!important;
+      flex:0 1 auto!important;
+      justify-content:center!important;
+      padding:6px 9px!important;
+    }
+    #view-records .record-route-down{
+      flex:0 0 auto!important;
+      width:18px!important;
+      color:#64748b!important;
+      font-size:0!important;
+      line-height:1!important;
+      text-align:center!important;
+    }
+    #view-records .record-route-down::before{
+      content:"→";
+      display:block;
+      font-size:16px;
+      font-weight:950;
+      line-height:1;
+    }
+    #view-records .record-card-body .record-card-info{
+      width:100%!important;
+      margin:12px 0 0!important;
+      grid-template-columns:minmax(82px,auto) minmax(0,1fr)!important;
+      gap:10px 12px!important;
+      align-content:start!important;
+    }
+    @media (max-width:390px){
+      #view-records .record-card{padding:13px 12px 14px!important}
+      #view-records .record-route-vertical{gap:6px!important;padding-bottom:11px!important}
+      #view-records .record-route-vertical .record-zone-badge{max-width:calc(50% - 19px)!important;padding:5px 7px!important}
+      #view-records .record-card-body .record-card-info{grid-template-columns:minmax(76px,auto) minmax(0,1fr)!important;gap:9px 9px!important}
+    }
+  `;
+  document.head.appendChild(style);
+})();
+</script>
+
+<script>
+(function locationAdminV21NewRecordAndPeriodPolish(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* user 페이지 기간 설정 버튼과 동일한 규격 */
+    #view-records #recordsPeriodFilterButton{
+      position:relative!important;width:100%!important;height:46px!important;min-height:46px!important;max-height:46px!important;
+      box-sizing:border-box!important;border:1px solid var(--line)!important;border-radius:13px!important;
+      padding:0 24px!important;background:var(--surface)!important;color:#334155!important;
+      box-shadow:0 5px 14px rgba(15,23,42,.05)!important;
+      display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;
+      font-size:11px!important;font-weight:850!important;line-height:1.2!important;text-align:center!important
+    }
+    #view-records #recordsPeriodFilterButton .search-filter-trigger-label{
+      display:block!important;width:100%!important;min-width:0!important;max-width:100%!important;
+      flex:1 1 auto!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;
+      text-align:center!important;color:#334155!important
+    }
+    #view-records #recordsPeriodFilterButton .search-filter-trigger-arrow{
+      position:absolute!important;right:9px!important;top:50%!important;transform:translateY(-50%)!important;
+      margin:0!important;flex:0 0 12px!important;width:12px!important;height:12px!important;color:transparent!important;
+      font-size:0!important;line-height:0!important;
+      background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%23334155' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat!important
+    }
+
+    /* 출발 → 도착 화살표를 한 단계 확대하고 경로 행의 수직 중앙에 고정 */
+    #view-records .record-route-vertical{align-items:center!important}
+    #view-records .record-route-down{
+      align-self:stretch!important;width:24px!important;min-width:24px!important;
+      display:inline-flex!important;align-items:center!important;justify-content:center!important;
+      color:#64748b!important;line-height:1!important
+    }
+    #view-records .record-route-down::before{
+      display:flex!important;align-items:center!important;justify-content:center!important;
+      width:100%!important;height:100%!important;font-size:20px!important;line-height:1!important
+    }
+  `;
+  document.head.appendChild(style);
+})();
+</script>
+
+
+<style id="location-admin-v20-record-notice-polish">
+  #adminTabRecords{
+    position:relative!important;
+    overflow:visible!important;
+  }
+  #adminTabRecords .movement-record-count-badge:not([hidden]){
+    position:absolute!important;
+    top:1px!important;
+    left:50%!important;
+    z-index:4!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:19px!important;
+    height:19px!important;
+    padding:0 5px!important;
+    border:2px solid #fff!important;
+    border-radius:999px!important;
+    background:#dc2626!important;
+    color:#fff!important;
+    box-sizing:border-box!important;
+    box-shadow:0 3px 8px rgba(185,28,28,.34)!important;
+    font-size:10px!important;
+    font-weight:950!important;
+    line-height:1!important;
+    letter-spacing:-.25px!important;
+    white-space:nowrap!important;
+    transform:translateX(5px)!important;
+    pointer-events:none!important;
+  }
+
+  #view-records .record-card{
+    position:relative!important;
+    display:flex!important;
+    flex-direction:column!important;
+    gap:12px!important;
+    padding:15px 14px 16px!important;
+  }
+  #view-records .record-card-head{
+    min-height:28px!important;
+    margin:0!important;
+    padding:0 62px 0 0!important;
+    border-bottom:0!important;
+  }
+  #view-records .record-card-body{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    gap:12px!important;
+    margin:0!important;
+  }
+  #view-records .record-route-vertical{
+    order:-1!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:32px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:8px!important;
+  }
+  #view-records .record-card-body .record-card-info{
+    width:100%!important;
+    margin:0!important;
+    grid-template-columns:minmax(82px,auto) minmax(0,1fr)!important;
+    row-gap:10px!important;
+    column-gap:12px!important;
+    align-content:start!important;
+  }
+  #view-records .record-new-badge{
+    position:absolute!important;
+    top:11px!important;
+    right:11px!important;
+    z-index:3!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:45px!important;
+    min-height:27px!important;
+    padding:5px 10px!important;
+    border:0!important;
+    border-radius:999px!important;
+    background:#dc2626!important;
+    color:#fff!important;
+    box-sizing:border-box!important;
+    box-shadow:0 4px 11px rgba(185,28,28,.28)!important;
+    font-size:12px!important;
+    font-weight:950!important;
+    line-height:1!important;
+    letter-spacing:-.15px!important;
+    white-space:nowrap!important;
+    pointer-events:none!important;
+  }
+  @media (max-width:390px){
+    #view-records .record-card{
+      gap:11px!important;
+      padding:13px 12px 14px!important;
+    }
+    #view-records .record-card-head{
+      padding-right:58px!important;
+    }
+    #view-records .record-card-body{
+      gap:11px!important;
+    }
+    #view-records .record-route-vertical{
+      gap:6px!important;
+      padding:0!important;
+    }
+    #view-records .record-card-body .record-card-info{
+      grid-template-columns:minmax(76px,auto) minmax(0,1fr)!important;
+      row-gap:9px!important;
+      column-gap:9px!important;
+    }
+    #view-records .record-new-badge{
+      top:9px!important;
+      right:9px!important;
+      min-width:43px!important;
+      min-height:26px!important;
+      padding:5px 9px!important;
+      font-size:11px!important;
+    }
+  }
+</style>
+
 </body>
 </html>

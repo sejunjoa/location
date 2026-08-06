@@ -1319,6 +1319,413 @@
         font-size: 13px;
       }
     }
+
+
+    /* 2026-08-06 사용자 페이지 탭/고정/슬라이드 상세 */
+    html, body {
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    main {
+      padding-bottom: calc(92px + env(safe-area-inset-bottom));
+      overflow: visible;
+    }
+
+    .header {
+      position: relative !important;
+      top: auto !important;
+    }
+
+    .user-tab-view {
+      width: 100%;
+      min-width: 0;
+      overflow: visible;
+    }
+
+    .user-tab-view > .sticky-dashboard {
+      position: sticky !important;
+      top: 0 !important;
+      z-index: 85 !important;
+    }
+
+    .sticky-actions {
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .return-home-btn {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid #bfdbfe;
+      border-radius: 15px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-size: 14px;
+      font-weight: 950;
+    }
+
+    .return-home-btn:active {
+      background: #dbeafe;
+      transform: scale(.99);
+    }
+
+    .return-home-btn:disabled {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
+      color: #94a3b8;
+    }
+
+    .current-badge {
+      top: 8px !important;
+      right: 8px !important;
+      width: 25px;
+      height: 25px;
+      padding: 0 !important;
+      transform: none !important;
+      border-radius: 50% !important;
+      background: #ef4444 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 13px rgba(239,68,68,.28);
+    }
+
+    .current-badge svg {
+      width: 15px;
+      height: 15px;
+      fill: #fff;
+    }
+
+    .location-title {
+      white-space: nowrap;
+      word-break: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .location-card.current .location-main {
+      cursor: default;
+    }
+
+    .dashboard-content {
+      padding-top: 16px;
+    }
+
+    .dashboard-zone-list {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 11px;
+    }
+
+    .dashboard-zone-card {
+      width: 100%;
+      min-height: 96px;
+    }
+
+    .dashboard-zone-main {
+      width: 100%;
+      min-height: 96px;
+      border: 0;
+      padding: 13px 14px 14px;
+      background: transparent;
+      color: inherit;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 11px;
+    }
+
+    .dashboard-zone-head {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .dashboard-zone-title {
+      min-width: 0;
+      color: var(--title-color, var(--primary));
+      font-size: 14px;
+      font-weight: 900;
+      line-height: 1.35;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .dashboard-zone-attribute {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .dashboard-person-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 6px;
+    }
+
+    .dashboard-person-card {
+      min-width: 0;
+      min-height: 30px;
+      padding: 6px 3px;
+      border: 1px solid color-mix(in srgb, var(--title-color, #2563eb) 22%, var(--line));
+      border-radius: 11px;
+      background: color-mix(in srgb, var(--title-color, #2563eb) 5%, white);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 850;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .records-content {
+      padding-top: 16px;
+    }
+
+    .records-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 11px;
+    }
+
+    .record-card {
+      border-color: color-mix(in srgb, var(--record-color, #2563eb) 24%, var(--line));
+      background: color-mix(in srgb, var(--record-color, #2563eb) 5%, white);
+    }
+
+    .record-route {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 7px;
+      align-items: center;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 13px;
+      background: rgba(255,255,255,.72);
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .record-route span {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .record-route i {
+      color: #2563eb;
+      font-style: normal;
+      font-weight: 950;
+    }
+
+    .sheet-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      background: rgba(15,23,42,.42);
+      backdrop-filter: blur(3px);
+    }
+
+    .sheet-backdrop.open {
+      display: block;
+      animation: fadeIn .18s ease;
+    }
+
+    .sheet-backdrop.closing {
+      animation: fadeOut .22s ease forwards;
+    }
+
+    .bottom-sheet {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      z-index: 10000;
+      width: min(100%, 480px);
+      height: 100vh;
+      height: 100dvh;
+      max-height: 100vh;
+      max-height: 100dvh;
+      transform: translateX(-50%);
+      background: var(--surface);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -20px 45px rgba(15,23,42,.20);
+      display: flex;
+      flex-direction: column;
+      animation: sheetUp .22s ease;
+    }
+
+    .bottom-sheet.closing {
+      animation: sheetDown .22s ease forwards;
+    }
+
+    .sheet-handle {
+      width: 42px;
+      height: 5px;
+      margin: 9px auto 2px;
+      border-radius: 999px;
+      background: #cbd5e1;
+    }
+
+    .sheet-head {
+      padding: 14px 18px 15px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sheet-head h3 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .sheet-head p {
+      margin: 7px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    .sheet-close {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 12px;
+      background: #f1f5f9;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .sheet-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 14px calc(24px + env(safe-area-inset-bottom));
+    }
+
+    .sheet-empty-state {
+      padding: 28px 8px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .sheet-person {
+      padding: 15px;
+      border: 1px solid color-mix(in srgb, var(--home-zone-color, #64748b) 28%, var(--line));
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--home-zone-color, #64748b) 6%, white);
+      box-shadow: 0 6px 16px rgba(15,23,42,.05);
+      margin-bottom: 10px;
+    }
+
+    .sheet-person:last-child { margin-bottom: 0; }
+
+    .person-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .person-card-name {
+      display: inline-block;
+      padding: 6px 9px;
+      border-radius: 10px;
+      background: color-mix(in srgb, var(--home-zone-color, #64748b) 12%, white);
+      color: var(--home-zone-color, #1d4ed8);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .person-card-company {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .person-card-grid {
+      display: grid;
+      grid-template-columns: minmax(72px, auto) 1fr;
+      gap: 7px 10px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .person-card-label {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .person-card-value {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 900;
+      text-align: right;
+    }
+
+    .person-card-value.overdue { color: #dc2626; }
+
+    body.sheet-open-lock {
+      overflow: hidden !important;
+      overscroll-behavior: none;
+    }
+
+    .settings-name-form {
+      margin-bottom: 18px;
+    }
+
+    @keyframes sheetUp {
+      from { transform: translate(-50%, 100%); }
+      to { transform: translate(-50%, 0); }
+    }
+
+    @keyframes sheetDown {
+      from { transform: translate(-50%, 0); }
+      to { transform: translate(-50%, 100%); }
+    }
+
+    .user-record-period-actions{padding-top:10px!important}
+    .user-record-period-button{
+      width:100%;min-height:46px;border:1px solid var(--line);border-radius:14px;
+      padding:0 16px;background:#f8fafc;color:var(--text);display:flex;align-items:center;
+      justify-content:center;gap:8px;font-size:12px;font-weight:900
+    }
+    .user-record-period-button .period-button-label{flex:1;text-align:center;white-space:nowrap}
+    .user-period-dialog{max-width:400px}
+    .user-period-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .user-period-field{min-width:0}
+    .user-period-presets,.user-period-quick-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .user-period-presets{margin-bottom:12px}
+    .user-period-quick-buttons{margin-top:12px}
+    .user-period-preset-btn,.user-period-quick-btn{
+      min-height:40px;border:1px solid #bfdbfe;border-radius:13px;background:#eff6ff;
+      color:#1d4ed8;font-size:12px;font-weight:900
+    }
+    .user-period-actions{grid-template-columns:1fr 1fr 1fr!important}
+    .user-period-clear-btn{
+      min-height:48px;border:0;border-radius:15px;background:#fee2e2;color:#b91c1c;
+      font-size:14px;font-weight:900
+    }
+
   </style>
 </head>
 <body>
@@ -1329,6 +1736,11 @@
       <div class="header-top">
         <div class="title-area">
           <h1 id="pageTitle">부대 위치현황</h1>
+          <div class="return-countdown-row" id="returnCountdownRow" aria-live="polite">
+            <span class="return-countdown-label">복귀까지</span>
+            <strong class="return-countdown-timer" id="returnCountdownTimer">--:--:--</strong>
+            <span class="return-countdown-overdue" id="returnCountdownOverdue" hidden><span class="return-countdown-overdue-icon" aria-hidden="true">!</span>초과됨</span>
+          </div>
         </div>
         <div class="header-actions">
           <button class="icon-btn" id="refreshBtn" type="button" aria-label="동기화">
@@ -1344,7 +1756,7 @@
     </header>
 
     <main id="userTabMain">
-      <section class="user-tab-view" id="view-dashboard" data-user-tab-view="dashboard">
+      <section class="user-tab-view" id="view-detail" data-user-tab-view="detail">
         <div class="sticky-dashboard">
           <section class="metrics" aria-label="병력 현황표">
             <article class="metric"><strong id="metricTotal">0</strong><span>총원</span></article>
@@ -1352,6 +1764,9 @@
             <article class="metric"><strong id="metricDuty">0</strong><span>근무</span></article>
             <article class="metric"><strong id="metricOutside">0</strong><span>열외</span></article>
             <article class="metric"><strong id="metricBarracksOutside">0</strong><span>막사외부</span></article>
+          </section>
+          <section class="sticky-actions">
+            <button class="return-home-btn" id="returnHomeBtn" type="button">복귀</button>
           </section>
         </div>
 
@@ -1364,7 +1779,69 @@
         </section>
       </section>
 
+      <section class="user-tab-view" id="view-dashboard" data-user-tab-view="dashboard" hidden>
+        <div class="sticky-dashboard">
+          <section class="metrics" aria-label="병력 현황표">
+            <article class="metric"><strong id="dashboardMetricTotal">0</strong><span>총원</span></article>
+            <article class="metric"><strong id="dashboardMetricInside">0</strong><span>현재원</span></article>
+            <article class="metric"><strong id="dashboardMetricDuty">0</strong><span>근무</span></article>
+            <article class="metric"><strong id="dashboardMetricOutside">0</strong><span>열외</span></article>
+            <article class="metric"><strong id="dashboardMetricBarracksOutside">0</strong><span>막사외부</span></article>
+          </section>
+        </div>
+        <section class="dashboard-content">
+          <div class="empty-location-state" id="dashboardEmptyState" hidden>
+            <strong>등록된 구역이 없습니다.</strong>
+          </div>
+          <div class="dashboard-zone-list" id="dashboardZoneList"></div>
+        </section>
+      </section>
+
+      <section class="user-tab-view" id="view-records" data-user-tab-view="records" hidden>
+        <div class="sticky-dashboard">
+          <section class="metrics" aria-label="병력 현황표">
+            <article class="metric"><strong id="recordsMetricTotal">0</strong><span>총원</span></article>
+            <article class="metric"><strong id="recordsMetricInside">0</strong><span>현재원</span></article>
+            <article class="metric"><strong id="recordsMetricDuty">0</strong><span>근무</span></article>
+            <article class="metric"><strong id="recordsMetricOutside">0</strong><span>열외</span></article>
+            <article class="metric"><strong id="recordsMetricBarracksOutside">0</strong><span>막사외부</span></article>
+          </section>
+          <section class="sticky-actions user-record-period-actions">
+            <button class="user-record-period-button search-filter-select search-filter-trigger" id="userRecordsPeriodFilterButton" type="button" aria-label="이동 기록 기간 설정">
+              <span class="search-filter-trigger-label period-button-label">기간 설정</span>
+              <span class="search-filter-trigger-arrow" aria-hidden="true">⌄</span>
+            </button>
+          </section>
+        </div>
+        <section class="records-content">
+          <div class="records-state" id="recordsState" hidden></div>
+          <div class="records-list" id="recordsList"></div>
+        </section>
+      </section>
     </main>
+
+    <nav class="bottom-nav" aria-label="일반 사용자 하단 메뉴">
+      <button class="nav-btn active" data-user-tab="detail" type="button" aria-current="page" aria-label="상세현황"><span class="nav-icon">▦</span>상세현황</button>
+      <button class="nav-btn" data-user-tab="dashboard" type="button" aria-label="현황판"><span class="nav-icon">⌂</span>현황판</button>
+      <button class="nav-btn" data-user-tab="records" type="button" aria-label="이동 기록"><span class="nav-icon">☷</span>이동 기록</button>
+    </nav>
+  </div>
+
+
+  <div class="sheet-backdrop" id="sheetBackdrop">
+    <section class="bottom-sheet" id="bottomSheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+      <div class="sheet-handle"></div>
+      <div class="sheet-head">
+        <div>
+          <h3 id="sheetTitle">구역</h3>
+          <p id="sheetSubtitle">등록된 인원 0명</p>
+        </div>
+        <button class="sheet-close" id="sheetClose" type="button" aria-label="구역 상세 닫기">✕</button>
+      </div>
+      <div class="sheet-content" id="zonePeopleContent">
+        <div class="sheet-empty-state">등록된 인원이 없습니다.</div>
+      </div>
+    </section>
   </div>
 
   <!-- 최초 중대 입력: 저장 전에는 닫을 수 없음 -->
@@ -1403,6 +1880,45 @@
   </div>
 
   <!-- 위치 이동 -->
+  <div class="modal-backdrop" id="userRecordsPeriodModal">
+    <section class="dialog user-period-dialog" id="userRecordsPeriodDialog" role="dialog" aria-modal="true" aria-labelledby="userRecordsPeriodTitle">
+      <div class="dialog-head">
+        <div>
+          <h3 id="userRecordsPeriodTitle">기간 설정</h3>
+          <p>선택한 날짜 사이에 출발한 기록만 표시합니다.</p>
+        </div>
+        <button class="dialog-close-btn" id="userRecordsPeriodCloseButton" type="button" aria-label="기간 설정 닫기">✕</button>
+      </div>
+      <div class="dialog-body">
+        <div class="user-period-presets" aria-label="기간 빠른 선택">
+          <button class="user-period-preset-btn" type="button" data-user-period-preset="today">오늘</button>
+          <button class="user-period-preset-btn" type="button" data-user-period-preset="yesterday">어제</button>
+          <button class="user-period-preset-btn" type="button" data-user-period-preset="last-week">지난주</button>
+        </div>
+        <div class="user-period-fields">
+          <div class="user-period-field">
+            <label class="field-label" for="userRecordsPeriodStartInput">시작일</label>
+            <input class="text-input" id="userRecordsPeriodStartInput" type="date" />
+          </div>
+          <div class="user-period-field">
+            <label class="field-label" for="userRecordsPeriodEndInput">종료일</label>
+            <input class="text-input" id="userRecordsPeriodEndInput" type="date" />
+          </div>
+        </div>
+        <div class="user-period-quick-buttons" aria-label="종료일 빠른 설정">
+          <button class="user-period-quick-btn" type="button" data-user-period-add-days="1">+1일</button>
+          <button class="user-period-quick-btn" type="button" data-user-period-add-days="5">+5일</button>
+          <button class="user-period-quick-btn" type="button" data-user-period-add-days="7">+7일</button>
+        </div>
+        <div class="dialog-actions user-period-actions">
+          <button class="secondary-btn" id="userRecordsPeriodCancelButton" type="button">취소</button>
+          <button class="user-period-clear-btn" id="userRecordsPeriodClearButton" type="button">해제</button>
+          <button class="primary-btn" id="userRecordsPeriodApplyButton" type="button">적용</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
   <div class="modal-backdrop" id="moveModal">
     <section class="dialog" id="moveDialog" role="dialog" aria-modal="true" aria-labelledby="moveDialogTitle">
       <div class="dialog-head">
@@ -1446,19 +1962,16 @@
       <div class="dialog-head">
         <div>
           <h3 id="settingsDialogTitle">설정</h3>
-          <p>내 정보와 로그인 상태를 관리합니다.</p>
         </div>
         <button class="dialog-close-btn" id="settingsCloseBtn" type="button" aria-label="설정 닫기">✕</button>
       </div>
       <div class="dialog-body settings-dialog-body">
         <section class="settings-section">
-          <h4 class="settings-title">내 정보</h4>
-          <dl class="profile-summary">
-            <dt>이름</dt><dd id="settingsNameText">-</dd>
-            <dt>소속 부대</dt><dd id="settingsUnitText">-</dd>
-            <dt>생활관</dt><dd id="settingsHomeZoneText">-</dd>
-            <dt>현위치</dt><dd id="settingsZoneText">-</dd>
-          </dl>
+          <form class="settings-name-form" id="settingsNameForm" novalidate>
+            <label class="field-label" for="settingsNameInput">이름</label>
+            <input class="text-input" id="settingsNameInput" type="text" maxlength="20" autocomplete="name" placeholder="이름 입력" />
+            <button class="primary-btn full-btn" id="settingsNameSaveBtn" type="submit" style="margin-top:12px;">이름 저장</button>
+          </form>
           <form class="settings-company-form" id="settingsCompanyForm" novalidate>
             <label class="field-label" for="settingsCompanyInput">중대</label>
             <input class="text-input" id="settingsCompanyInput" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대" />
@@ -1518,15 +2031,16 @@
     const loadingCover = document.getElementById('loadingCover');
     const locationList = document.getElementById('locationList');
     const emptyLocationState = document.getElementById('emptyLocationState');
+    const dashboardZoneList = document.getElementById('dashboardZoneList');
+    const dashboardEmptyState = document.getElementById('dashboardEmptyState');
+    const recordsList = document.getElementById('recordsList');
+    const recordsState = document.getElementById('recordsState');
+    const returnHomeBtn = document.getElementById('returnHomeBtn');
 
     const metricGroups = [
-      {
-        total: document.getElementById('metricTotal'),
-        inside: document.getElementById('metricInside'),
-        duty: document.getElementById('metricDuty'),
-        outside: document.getElementById('metricOutside'),
-        barracksOutside: document.getElementById('metricBarracksOutside')
-      }
+      { total: document.getElementById('metricTotal'), inside: document.getElementById('metricInside'), duty: document.getElementById('metricDuty'), outside: document.getElementById('metricOutside'), barracksOutside: document.getElementById('metricBarracksOutside') },
+      { total: document.getElementById('dashboardMetricTotal'), inside: document.getElementById('dashboardMetricInside'), duty: document.getElementById('dashboardMetricDuty'), outside: document.getElementById('dashboardMetricOutside'), barracksOutside: document.getElementById('dashboardMetricBarracksOutside') },
+      { total: document.getElementById('recordsMetricTotal'), inside: document.getElementById('recordsMetricInside'), duty: document.getElementById('recordsMetricDuty'), outside: document.getElementById('recordsMetricOutside'), barracksOutside: document.getElementById('recordsMetricBarracksOutside') }
     ];
 
 
@@ -1553,16 +2067,15 @@
 
     const settingsModal = document.getElementById('settingsModal');
     const settingsDialog = document.getElementById('settingsDialog');
+    const settingsNameForm = document.getElementById('settingsNameForm');
+    const settingsNameInput = document.getElementById('settingsNameInput');
+    const settingsNameSaveBtn = document.getElementById('settingsNameSaveBtn');
     const settingsCompanyForm = document.getElementById('settingsCompanyForm');
     const settingsCompanyInput = document.getElementById('settingsCompanyInput');
     const settingsCompanySaveBtn = document.getElementById('settingsCompanySaveBtn');
     const settingsHomeZoneForm = document.getElementById('settingsHomeZoneForm');
     const settingsHomeZoneSelect = document.getElementById('settingsHomeZoneSelect');
     const settingsHomeZoneSaveBtn = document.getElementById('settingsHomeZoneSaveBtn');
-    const settingsNameText = document.getElementById('settingsNameText');
-    const settingsUnitText = document.getElementById('settingsUnitText');
-    const settingsHomeZoneText = document.getElementById('settingsHomeZoneText');
-    const settingsZoneText = document.getElementById('settingsZoneText');
 
     const messageModal = document.getElementById('messageModal');
     const messageDialog = document.getElementById('messageDialog');
@@ -1571,17 +2084,28 @@
 
     const confirmModal = document.getElementById('confirmModal');
     const confirmDialog = document.getElementById('confirmDialog');
+    const confirmTitle = document.getElementById('confirmTitle');
+    const confirmText = document.getElementById('confirmText');
     const confirmOkBtn = document.getElementById('confirmOkBtn');
+
+    const sheetBackdrop = document.getElementById('sheetBackdrop');
+    const bottomSheet = document.getElementById('bottomSheet');
+    const sheetTitle = document.getElementById('sheetTitle');
+    const sheetSubtitle = document.getElementById('sheetSubtitle');
+    const zonePeopleContent = document.getElementById('zonePeopleContent');
 
     let userAccess = null;
     let currentUnit = null;
     let zones = [];
     let people = [];
+    let movementLogs = [];
     let ownLocation = null;
     let selectedMoveZone = null;
     let realtimeChannel = null;
     let reloadTimer = null;
     let loadSequence = 0;
+    let pendingConfirmAction = null;
+    let selectedSheetZoneId = null;
 
     function setSyncStatus(message, isError = false) {
       syncText.textContent = message;
@@ -1610,7 +2134,7 @@
     }
 
     function updateBodyOverlayLock() {
-      const hasOpenOverlay = Boolean(document.querySelector('.modal-backdrop.open'));
+      const hasOpenOverlay = Boolean(document.querySelector('.modal-backdrop.open, .sheet-backdrop.open'));
       document.body.classList.toggle('overlay-open', hasOpenOverlay);
     }
 
@@ -1710,7 +2234,79 @@
       });
     }
 
-    function renderZones() {
+    function getElapsedText(returnTime) {
+      if (!returnTime) return '-';
+      const target = new Date(returnTime).getTime();
+      if (!Number.isFinite(target)) return '-';
+      const diff = Math.floor((Date.now() - target) / 60000);
+      if (diff <= 0) return '0분';
+      if (diff < 60) return `${diff}분`;
+      const hours = Math.floor(diff / 60);
+      const minutes = diff % 60;
+      return minutes ? `${hours}시간 ${minutes}분` : `${hours}시간`;
+    }
+
+    function formatTime(value) {
+      if (!value) return '-';
+      return new Intl.DateTimeFormat('ko-KR', {
+        month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+      }).format(new Date(value));
+    }
+
+    function formatRecordDateTime(value) {
+      if (!value) return '-';
+      return new Intl.DateTimeFormat('ko-KR', {
+        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+      }).format(new Date(value));
+    }
+
+    function updateReturnButton() {
+      const homeZone = getHomeZone();
+      const alreadyHome = Boolean(homeZone && ownLocation?.zoneId === homeZone.id);
+      returnHomeBtn.disabled = !homeZone || alreadyHome;
+      returnHomeBtn.textContent = alreadyHome ? '복귀 완료' : '복귀';
+    }
+
+    function createCurrentMarker() {
+      const badge = document.createElement('span');
+      badge.className = 'current-badge';
+      badge.setAttribute('aria-label', '현재 위치');
+      badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.15 7 13 7 13s7-7.85 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>';
+      return badge;
+    }
+
+    function requestConfirmation({ title, message, confirmText: buttonText = '예', action }) {
+      pendingConfirmAction = action;
+      confirmTitle.textContent = title;
+      confirmText.textContent = message;
+      confirmOkBtn.textContent = buttonText;
+      openModal(confirmModal, confirmDialog);
+    }
+
+    async function returnToHomeZone() {
+      const homeZone = getHomeZone();
+      if (!homeZone || ownLocation?.zoneId === homeZone.id) return;
+      await moveOwnLocation(homeZone, null);
+      await loadPageData({ quiet: true });
+      triggerToast(`${homeZone.name}(으)로 복귀했습니다.`);
+    }
+
+    function handleDetailZoneClick(zone) {
+      if (!zone) return;
+      if (ownLocation?.zoneId === zone.id) return;
+      if (isOwnHomeZone(zone)) {
+        requestConfirmation({
+          title: '생활관 복귀',
+          message: '생활관으로 복귀하시겠습니까?',
+          confirmText: '예',
+          action: returnToHomeZone
+        });
+        return;
+      }
+      openMoveModal(zone.id);
+    }
+
+    function renderDetailZones() {
       locationList.innerHTML = '';
       emptyLocationState.hidden = zones.length > 0;
 
@@ -1728,7 +2324,7 @@
         const button = document.createElement('button');
         button.className = 'location-main';
         button.type = 'button';
-        button.setAttribute('aria-label', `${zone.name}으로 위치 이동`);
+        button.setAttribute('aria-label', isCurrent ? `${zone.name}, 현재 위치` : `${zone.name} 선택`);
 
         const top = document.createElement('span');
         const title = document.createElement('span');
@@ -1748,20 +2344,186 @@
         count.append(strong, unit);
 
         button.append(top, count);
-        button.addEventListener('click', () => openMoveModal(zone.id));
+        button.addEventListener('click', () => handleDetailZoneClick(zone));
         card.appendChild(button);
-
-        if (isCurrent) {
-          const badge = document.createElement('span');
-          badge.className = 'current-badge';
-          badge.textContent = '현재 위치';
-          card.appendChild(badge);
-        }
-
+        if (isCurrent) card.appendChild(createCurrentMarker());
         locationList.appendChild(card);
       });
+    }
 
+    function renderDashboardZones() {
+      dashboardZoneList.innerHTML = '';
+      dashboardEmptyState.hidden = zones.length > 0;
+
+      zones.forEach(zone => {
+        const zonePeople = getZonePeople(zone.id);
+        const card = document.createElement('article');
+        card.className = 'location-card dashboard-zone-card';
+        card.style.setProperty('--title-color', zone.color);
+        card.style.setProperty('--card-bg', hexToRgba(zone.color, .075));
+        card.style.setProperty('--card-border', hexToRgba(zone.color, .24));
+
+        const button = document.createElement('button');
+        button.className = 'dashboard-zone-main';
+        button.type = 'button';
+
+        const head = document.createElement('span');
+        head.className = 'dashboard-zone-head';
+        const title = document.createElement('span');
+        title.className = 'dashboard-zone-title';
+        title.textContent = zone.name;
+        const attribute = document.createElement('span');
+        attribute.className = 'dashboard-zone-attribute';
+        attribute.textContent = attributeLabel(zone.attribute);
+        head.append(title, attribute);
+        button.appendChild(head);
+
+        if (zonePeople.length) {
+          const grid = document.createElement('span');
+          grid.className = 'dashboard-person-grid';
+          zonePeople.forEach(person => {
+            const item = document.createElement('span');
+            item.className = 'dashboard-person-card';
+            item.textContent = person.name || '이름 없음';
+            grid.appendChild(item);
+          });
+          button.appendChild(grid);
+        }
+
+        button.addEventListener('click', () => openZoneSheet(zone.id));
+        card.appendChild(button);
+        dashboardZoneList.appendChild(card);
+      });
+    }
+
+    function renderMovementRecords() {
+      recordsList.innerHTML = '';
+      recordsState.hidden = movementLogs.length > 0;
+      if (!movementLogs.length) {
+        recordsState.textContent = '저장된 이동 기록이 없습니다.';
+        return;
+      }
+
+      movementLogs
+        .slice()
+        .sort((a, b) => new Date(b.departureTime).getTime() - new Date(a.departureTime).getTime())
+        .forEach(log => {
+          const card = document.createElement('article');
+          card.className = 'record-card';
+          const destinationZone = zones.find(zone => zone.id === log.zoneId);
+          card.style.setProperty('--record-color', destinationZone?.color || '#2563eb');
+          card.innerHTML = `
+            <div class="record-card-head">
+              <h3 class="record-card-name"></h3>
+            </div>
+            <div class="record-route">
+              <span class="record-origin"></span><i>→</i><span class="record-destination"></span>
+            </div>
+            <dl class="record-card-info">
+              <dt>출발</dt><dd class="record-time-value record-departure"></dd>
+              <dt>도착 예정</dt><dd class="record-expected"></dd>
+              <dt>도착</dt><dd class="record-arrival"></dd>
+            </dl>
+          `;
+          card.querySelector('.record-card-name').textContent = log.destinationZoneName || log.zoneName || '이동 기록';
+          card.querySelector('.record-origin').textContent = log.originZoneName || '출발지 미기록';
+          card.querySelector('.record-destination').textContent = log.destinationZoneName || log.zoneName || '도착지 미기록';
+          card.querySelector('.record-departure').textContent = formatRecordDateTime(log.departureTime);
+          card.querySelector('.record-expected').textContent = formatRecordDateTime(log.expectedReturnTime);
+          const arrival = card.querySelector('.record-arrival');
+          arrival.textContent = log.arrivalTime ? formatRecordDateTime(log.arrivalTime) : '미복귀';
+          arrival.classList.toggle('missing', !log.arrivalTime);
+          recordsList.appendChild(card);
+        });
+    }
+
+    function renderZonePeople(zoneId) {
+      const zone = getZone(zoneId);
+      if (!zone) return;
+      const zonePeople = getZonePeople(zoneId);
+      sheetTitle.textContent = zone.name;
+      sheetSubtitle.textContent = `등록된 인원 ${zonePeople.length}명`;
+      zonePeopleContent.innerHTML = '';
+
+      if (!zonePeople.length) {
+        zonePeopleContent.innerHTML = '<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';
+        return;
+      }
+
+      zonePeople.forEach(person => {
+        const row = document.createElement('article');
+        row.className = 'sheet-person';
+        const homeZone = getZone(person.homeZoneId);
+        row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
+        const atHome = isPersonAtHome(person);
+        row.innerHTML = atHome ? `
+          <div class="person-card-head">
+            <strong class="person-card-name"></strong>
+            <span class="person-card-company"></span>
+          </div>
+        ` : `
+          <div class="person-card-head">
+            <strong class="person-card-name"></strong>
+            <span class="person-card-company"></span>
+          </div>
+          <div class="person-card-grid">
+            <span class="person-card-label">출발</span>
+            <span class="person-card-value">${formatTime(person.departureTime)}</span>
+            <span class="person-card-label">도착 예정</span>
+            <span class="person-card-value">${formatTime(person.returnTime)}</span>
+            <span class="person-card-label">지난 시간</span>
+            <span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+          </div>
+        `;
+        row.querySelector('.person-card-name').textContent = person.name || '이름 없음';
+        row.querySelector('.person-card-company').textContent = person.company || '중대 미입력';
+        zonePeopleContent.appendChild(row);
+      });
+    }
+
+    function openZoneSheet(zoneId) {
+      selectedSheetZoneId = zoneId;
+      renderZonePeople(zoneId);
+      sheetBackdrop.classList.remove('closing');
+      bottomSheet.classList.remove('closing');
+      sheetBackdrop.classList.add('open');
+      document.body.classList.add('sheet-open-lock');
+      updateBodyOverlayLock();
+    }
+
+    function closeZoneSheet() {
+      if (!sheetBackdrop.classList.contains('open')) return;
+      sheetBackdrop.classList.add('closing');
+      bottomSheet.classList.add('closing');
+      window.setTimeout(() => {
+        sheetBackdrop.classList.remove('open', 'closing');
+        bottomSheet.classList.remove('closing');
+        selectedSheetZoneId = null;
+        document.body.classList.remove('sheet-open-lock');
+        updateBodyOverlayLock();
+      }, 220);
+    }
+
+    function renderZones() {
+      renderDetailZones();
+      renderDashboardZones();
+      renderMovementRecords();
       updateMetrics();
+      updateReturnButton();
+      if (selectedSheetZoneId && sheetBackdrop.classList.contains('open')) renderZonePeople(selectedSheetZoneId);
+    }
+
+    function switchUserTab(type) {
+      document.querySelectorAll('[data-user-tab-view]').forEach(view => {
+        view.hidden = view.dataset.userTabView !== type;
+      });
+      document.querySelectorAll('[data-user-tab]').forEach(button => {
+        const active = button.dataset.userTab === type;
+        button.classList.toggle('active', active);
+        if (active) button.setAttribute('aria-current', 'page');
+        else button.removeAttribute('aria-current');
+      });
+      window.scrollTo({ top: 0, behavior: 'auto' });
     }
 
 
@@ -1797,17 +2559,13 @@
         return { date: formatDateInputForDate(now), time: '' };
       }
 
-      let base;
-      if (zone.attribute === 'duty') {
-        base = new Date(now.getTime() + (2 * 60 * 60 * 1000));
-        const parts = getKstParts(base);
-        base = kstPartsToDate(parts.year, parts.month, parts.day, parts.hour, 55);
-      } else {
-        base = new Date(now.getTime() + (60 * 60 * 1000));
-        const fiveMinutes = 5 * 60 * 1000;
-        base = new Date(Math.ceil(base.getTime() / fiveMinutes) * fiveMinutes);
+      if (zone.attribute !== 'duty') {
+        return { date: '', time: '' };
       }
 
+      let base = new Date(now.getTime() + (2 * 60 * 60 * 1000));
+      const parts = getKstParts(base);
+      base = kstPartsToDate(parts.year, parts.month, parts.day, parts.hour, 55);
       return {
         date: formatDateInputForDate(base),
         time: formatTimeInputForDate(base)
@@ -1889,24 +2647,17 @@
       moveDialogTitle.textContent = zone.name;
 
       const defaults = getDefaultArrivalDateTime(zone);
-      arrivalDateInput.value = defaults.date;
-      arrivalTimeInput.value = defaults.time;
+      const requiresReturnTime = zone.attribute === 'duty';
+      arrivalDateInput.value = requiresReturnTime ? defaults.date : '';
+      arrivalTimeInput.value = requiresReturnTime ? defaults.time : '';
 
-      if (isOwnHomeZone(zone)) {
-        setArrivalControlsDisabled(true);
-        arrivalDateInput.required = false;
-        arrivalTimeInput.required = false;
-        arrivalTimeNote.hidden = false;
-        arrivalTimeNote.textContent = '본인의 생활관으로 복귀하면 출발 시간과 도착 예정 시간이 지워집니다.';
-      } else {
-        setArrivalControlsDisabled(false);
-        arrivalDateInput.required = true;
-        arrivalTimeInput.required = true;
-        arrivalTimeNote.hidden = zone.attribute !== 'duty';
-        arrivalTimeNote.textContent = zone.attribute === 'duty'
-          ? '근무 시간은 자동 입력되며 직접 수정할 수 있습니다.'
-          : '';
-      }
+      setArrivalControlsDisabled(false);
+      arrivalDateInput.required = requiresReturnTime;
+      arrivalTimeInput.required = requiresReturnTime;
+      arrivalTimeNote.hidden = !requiresReturnTime;
+      arrivalTimeNote.textContent = requiresReturnTime
+        ? '근무 시간은 자동 입력되며 직접 수정할 수 있습니다.'
+        : '';
 
       openModal(moveModal, moveDialog);
     }
@@ -1916,37 +2667,52 @@
       closeModal(moveModal, moveDialog);
     }
 
-    async function saveCompany(company) {
-      const normalized = String(company || '').trim();
-      if (!normalized) throw new Error('중대를 입력해주세요.');
-      if (normalized.length > 30) throw new Error('중대는 30자 이하로 입력해주세요.');
-      const result = await sb.rpc('set_my_company', { p_company: normalized });
-      if (result.error) {
-        if (isMissingFunctionError(result.error, 'set_my_company')) {
-          throw new Error('중대 저장 함수가 설치되지 않았습니다. location_home_zone_upgrade.sql을 먼저 실행해주세요.');
-        }
-        throw result.error;
-      }
-      userAccess.profile.company = normalized;
-      companyInput.value = normalized;
-      settingsCompanyInput.value = normalized;
+    async function saveName(name) {
+      const normalized = String(name || '').trim();
+      if (!normalized) throw new Error('이름을 입력해주세요.');
+      if (normalized.length > 20) throw new Error('이름은 20자 이하로 입력해주세요.');
+
+      const profileResult = await sb
+        .from('profiles')
+        .update({ name: normalized })
+        .eq('id', userAccess.user.id);
+      if (profileResult.error) throw profileResult.error;
+
+      const authResult = await sb.auth.updateUser({
+        data: { display_name: normalized, name: normalized }
+      });
+      if (authResult.error) console.warn('인증 메타데이터 이름 동기화 실패:', authResult.error);
+
+      userAccess.profile.name = normalized;
       return normalized;
     }
 
-    async function saveHomeZone(zoneId, setCurrentLocation = false) {
-      const result = await sb.rpc('set_my_home_zone', {
-        p_zone_id: zoneId,
-        p_set_current_location: setCurrentLocation
-      });
-      if (result.error) {
-        if (isMissingFunctionError(result.error, 'set_my_home_zone')) {
-          throw new Error('생활관 저장 함수가 설치되지 않았습니다. location_home_zone_upgrade.sql을 먼저 실행해주세요.');
-        }
-        throw result.error;
-      }
-      userAccess.profile.home_zone_id = zoneId;
-      return zoneId;
-    }
+    
+async function saveCompany(company) {
+  const normalized = String(company || '').trim();
+  if (!normalized) throw new Error('중대를 입력해주세요.');
+  if (normalized.length > 30) throw new Error('중대는 30자 이하로 입력해주세요.');
+  const directResult = await sb.from('profiles').update({ company: normalized }).eq('id', userAccess.user.id);
+  if (directResult.error) throw directResult.error;
+  userAccess.profile.company = normalized;
+  companyInput.value = normalized;
+  settingsCompanyInput.value = normalized;
+  return normalized;
+}
+
+
+    
+async function saveHomeZone(zoneId, setCurrentLocation = false) {
+  const directResult = await sb.from('profiles').update({ home_zone_id: zoneId }).eq('id', userAccess.user.id);
+  if (directResult.error) throw directResult.error;
+  if (setCurrentLocation) {
+    const zone = getZone(zoneId);
+    if (zone) await moveOwnLocation(zone, null);
+  }
+  userAccess.profile.home_zone_id = zoneId;
+  return zoneId;
+}
+
 
     async function moveOwnLocation(zone, arrivalIso) {
       const rpcResult = await sb.rpc('move_my_location', {
@@ -1969,17 +2735,36 @@
       }
     }
 
-    async function ensureInitialLocation() {
-      const result = await sb.rpc('ensure_my_initial_location');
-      if (!result.error) return;
-      if (!isMissingFunctionError(result.error, 'ensure_my_initial_location')) {
-        console.warn('최초 위치 확인 실패:', result.error);
-      }
-    }
+    
+async function ensureInitialLocation() {
+  const homeZoneId = userAccess?.profile?.home_zone_id;
+  if (!homeZoneId) return;
+  const existing = await sb.from('user_locations').select('user_id').eq('user_id', userAccess.user.id).maybeSingle();
+  if (existing.error || existing.data) return;
+  const insertResult = await sb.from('user_locations').upsert({ user_id: userAccess.user.id, unit_id: userAccess.profile.unit_id, zone_id: homeZoneId, return_time: null, updated_by: userAccess.user.id }, { onConflict: 'user_id' });
+  if (insertResult.error) console.warn('초기 위치 직접 저장 실패:', insertResult.error);
+}
 
-    async function loadLocationMembers(unitId) {
-      return sb.rpc('get_location_members', { p_unit_id: unitId });
-    }
+
+    
+async function loadLocationMembers(unitId) {
+  const directResult = await sb.from('profiles').select('id, name, role, company, home_zone_id, phone, user_approved, approval_status').eq('unit_id', unitId).eq('role', 'user').eq('user_approved', true).eq('approval_status', 'approved');
+  if (directResult.error) return { data: null, error: directResult.error };
+  return {
+    data: (directResult.data || []).map(row => ({ user_id: row.id, display_name: row.name, name: row.name, member_role: row.role, company: row.company, phone: row.phone, home_zone_id: row.home_zone_id })),
+    error: null
+  };
+}
+
+
+    
+async function loadOwnMovementLogs(unitId) {
+  const direct = await sb.from('location_movement_logs').select('*').eq('user_id', userAccess.user.id).order('departure_time', { ascending: false }).limit(100);
+  if (direct.error) { console.warn('이동 기록 조회 실패:', direct.error); return []; }
+  const rows = direct.data || [];
+  return rows.filter(log => log.user_id === userAccess.user.id).map(log => ({ id: log.log_id ?? log.id, userId: log.user_id, zoneId: log.to_zone_id || log.destination_zone_id || log.zone_id || null, zoneName: log.to_zone_name || log.destination_zone_name || log.zone_name || null, originZoneId: log.from_zone_id || log.origin_zone_id || log.departure_zone_id || log.previous_zone_id || null, destinationZoneId: log.to_zone_id || log.destination_zone_id || log.arrival_zone_id || log.zone_id || null, originZoneName: log.from_zone_name || log.origin_zone_name || log.departure_zone_name || log.previous_zone_name || null, destinationZoneName: log.to_zone_name || log.destination_zone_name || log.arrival_zone_name || log.zone_name || null, departureTime: log.departure_time, expectedReturnTime: log.expected_return_time || log.return_time || null, arrivalTime: log.arrival_time }));
+}
+
 
     async function loadProfile() {
       const { data, error } = await getProfile(userAccess.user.id);
@@ -2017,11 +2802,12 @@
 
       await ensureInitialLocation();
 
-      const [locationResult, memberResult] = await Promise.all([
+      const [locationResult, memberResult, movementResult] = await Promise.all([
         sb.from('user_locations')
           .select('user_id, unit_id, zone_id, departure_time, return_time, updated_at')
           .eq('unit_id', unitId),
-        loadLocationMembers(unitId)
+        loadLocationMembers(unitId),
+        loadOwnMovementLogs(unitId)
       ]);
       const secondError = locationResult.error || memberResult.error;
       if (secondError) throw secondError;
@@ -2033,8 +2819,11 @@
         if (!member || !location.zone_id) return null;
         return {
           id: location.user_id,
-          name: member.display_name,
+          name: member.display_name || member.name || '이름 없음',
           role: member.member_role,
+          company: member.company || member.company_name || null,
+          homeZoneId: member.home_zone_id || null,
+          homeZoneName: member.home_zone_name || getZone(member.home_zone_id || null)?.name || null,
           zoneId: location.zone_id,
           departureTime: location.departure_time,
           returnTime: location.return_time,
@@ -2044,6 +2833,8 @@
 
 
       const ownRow = (locationResult.data || []).find(location => location.user_id === userAccess.user.id);
+      movementLogs = Array.isArray(movementResult) ? movementResult : [];
+
       ownLocation = ownRow ? {
         zoneId: ownRow.zone_id,
         departureTime: ownRow.departure_time,
@@ -2115,7 +2906,8 @@
         .on('postgres_changes', { event: '*', schema: 'public', table: 'location_zones', filter: `unit_id=eq.${userAccess.profile.unit_id}` }, scheduleRealtimeReload)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'user_locations', filter: `unit_id=eq.${userAccess.profile.unit_id}` }, scheduleRealtimeReload)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'units', filter: `id=eq.${userAccess.profile.unit_id}` }, scheduleRealtimeReload)
-        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `id=eq.${userAccess.user.id}` }, scheduleRealtimeReload)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'location_movement_logs', filter: `user_id=eq.${userAccess.user.id}` }, scheduleRealtimeReload)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles', filter: `unit_id=eq.${userAccess.profile.unit_id}` }, scheduleRealtimeReload)
         .subscribe(status => {
           if (status === 'SUBSCRIBED') setSyncStatus(formatSyncTime());
           else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSyncStatus('실시간 연결 재시도 중...', true);
@@ -2124,10 +2916,7 @@
 
     function fillSettings() {
       const livingZones = zones.filter(zone => zone.attribute === 'inside');
-      settingsNameText.textContent = userAccess?.profile?.name || '미입력';
-      settingsUnitText.textContent = currentUnit?.unit_name || '미지정';
-      settingsHomeZoneText.textContent = getHomeZone()?.name || '미지정';
-      settingsZoneText.textContent = getOwnZone()?.name || '미지정';
+      settingsNameInput.value = userAccess?.profile?.name || '';
       settingsCompanyInput.value = userAccess?.profile?.company || '';
       settingsHomeZoneSelect.innerHTML = '';
       livingZones.forEach(zone => {
@@ -2145,7 +2934,6 @@
     function openSettings() {
       fillSettings();
       openModal(settingsModal, settingsDialog);
-      window.setTimeout(() => settingsDialog.focus({ preventScroll: true }), 0);
     }
 
 
@@ -2172,7 +2960,8 @@
       const zone = selectedMoveZone;
       if (!zone) return;
       let arrivalIso = null;
-      if (!isOwnHomeZone(zone)) {
+      const hasAnyArrivalInput = Boolean(arrivalDateInput.value || arrivalTimeInput.value);
+      if (zone.attribute === 'duty' || hasAnyArrivalInput) {
         if (!parseDateValue(arrivalDateInput.value)) {
           showMessage('도착 예정 날짜를 입력해주세요.', '입력 확인');
           arrivalDateInput.focus();
@@ -2210,6 +2999,21 @@
       const minutes = Number(button.dataset.addMinutes);
       if (Number.isFinite(minutes)) setArrivalAfterMinutes(minutes);
     }));
+
+    settingsNameForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      settingsNameSaveBtn.disabled = true;
+      try {
+        const savedName = await saveName(settingsNameInput.value);
+        await loadPageData({ quiet: true });
+        fillSettings();
+        triggerToast(`${savedName}(으)로 이름이 수정되었습니다.`);
+      } catch (error) {
+        showMessage(escapeMessage(error), '이름 저장 실패');
+      } finally {
+        settingsNameSaveBtn.disabled = false;
+      }
+    });
 
     settingsCompanyForm.addEventListener('submit', async event => {
       event.preventDefault();
@@ -2255,23 +3059,60 @@
       }
     });
 
+    document.querySelectorAll('[data-user-tab]').forEach(button => {
+      button.addEventListener('click', () => switchUserTab(button.dataset.userTab));
+    });
+
+    returnHomeBtn.addEventListener('click', () => {
+      if (returnHomeBtn.disabled) return;
+      requestConfirmation({
+        title: '생활관 복귀',
+        message: '생활관으로 복귀하시겠습니까?',
+        confirmText: '예',
+        action: returnToHomeZone
+      });
+    });
+
+    document.getElementById('sheetClose').addEventListener('click', closeZoneSheet);
+    sheetBackdrop.addEventListener('click', event => {
+      if (event.target === sheetBackdrop) closeZoneSheet();
+    });
+
     document.getElementById('settingsBtn').addEventListener('click', openSettings);
     document.getElementById('settingsCloseBtn').addEventListener('click', () => closeModal(settingsModal, settingsDialog));
     document.getElementById('settingsBottomCloseBtn').addEventListener('click', () => closeModal(settingsModal, settingsDialog));
     document.getElementById('moveCloseBtn').addEventListener('click', closeMoveModal);
     document.getElementById('moveCancelBtn').addEventListener('click', closeMoveModal);
     document.getElementById('messageCloseBtn').addEventListener('click', () => closeModal(messageModal, messageDialog));
-    document.getElementById('confirmCancelBtn').addEventListener('click', () => closeModal(confirmModal, confirmDialog));
+    document.getElementById('confirmCancelBtn').addEventListener('click', () => { pendingConfirmAction = null; closeModal(confirmModal, confirmDialog); });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
       closeModal(settingsModal, settingsDialog);
-      openModal(confirmModal, confirmDialog);
+      requestConfirmation({
+        title: '로그아웃',
+        message: '정말 로그아웃하시겠습니까?',
+        confirmText: '로그아웃',
+        action: async () => {
+          try { await sb.auth.signOut(); }
+          finally { location.replace('index.html'); }
+        }
+      });
     });
 
     confirmOkBtn.addEventListener('click', async () => {
+      const action = pendingConfirmAction;
+      if (!action) return;
       confirmOkBtn.disabled = true;
-      try { await sb.auth.signOut(); }
-      finally { location.replace('index.html'); }
+      try {
+        await action();
+        closeModal(confirmModal, confirmDialog);
+      } catch (error) {
+        closeModal(confirmModal, confirmDialog);
+        showMessage(escapeMessage(error), '처리 실패');
+      } finally {
+        pendingConfirmAction = null;
+        confirmOkBtn.disabled = false;
+      }
     });
 
     [moveModal, settingsModal, messageModal, confirmModal].forEach(backdrop => {
@@ -2286,7 +3127,8 @@
 
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
-      if (messageModal.classList.contains('open')) closeModal(messageModal, messageDialog);
+      if (sheetBackdrop.classList.contains('open')) closeZoneSheet();
+      else if (messageModal.classList.contains('open')) closeModal(messageModal, messageDialog);
       else if (confirmModal.classList.contains('open')) closeModal(confirmModal, confirmDialog);
       else if (moveModal.classList.contains('open')) closeMoveModal();
       else if (settingsModal.classList.contains('open')) closeModal(settingsModal, settingsDialog);
@@ -2303,6 +3145,7 @@
         if (!userAccess) return;
         await loadPageData();
         await subscribeToRealtime();
+        switchUserTab('detail');
         promptRequiredProfileSetup();
       } catch (error) {
         console.error('일반 사용자 페이지 초기화 실패:', error);
@@ -2316,5 +3159,2375 @@
 
     initializeUserPage();
   </script>
+<script>
+(function(){
+  const extraStyle = document.createElement('style');
+  extraStyle.textContent = `
+    .sticky-dashboard.js-sticky-fixed{position:fixed!important;top:0!important;left:50%!important;transform:translateX(-50%)!important;width:var(--sticky-fixed-width, min(100%,480px))!important;margin:0!important;z-index:95!important;box-shadow:0 10px 24px rgba(15,23,42,.1)!important}
+    .sticky-dashboard-spacer{display:none;width:100%}
+    .sticky-dashboard-spacer.active{display:block}
+    #view-detail .sticky-actions{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
+    .current-location-summary{display:flex;align-items:center;gap:8px;min-width:0;padding:10px 12px;border:1px solid rgba(37,99,235,.16);border-radius:15px;background:#fff;box-shadow:var(--shadow)}
+    .current-location-summary .summary-label{color:#64748b;font-size:12px;font-weight:800;white-space:nowrap}
+    .current-location-summary .summary-value{display:inline-flex;align-items:center;gap:6px;min-width:0;padding:6px 10px;border-radius:999px;border:1px solid color-mix(in srgb, var(--badge-color,#64748b) 26%, var(--line));background:color-mix(in srgb, var(--badge-color,#64748b) 9%, white);color:var(--badge-color,#64748b);font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .current-location-summary .summary-value svg,.zone-badge svg,.route-zone-badge svg{width:14px;height:14px;fill:currentColor;flex:none}
+    .dashboard-zone-title,.location-title{white-space:nowrap!important;word-break:keep-all!important;overflow:hidden!important;text-overflow:ellipsis!important}
+    #view-records .records-content{padding-top:16px!important}
+    #view-records .records-list{display:grid;grid-template-columns:1fr!important;gap:10px!important;margin-top:0!important}
+    #view-records .record-card{padding:14px!important;border-radius:18px!important;background:#fff!important;border:1px solid #e2e8f0!important;box-shadow:0 10px 24px rgba(15,23,42,.06)!important}
+    #view-records .record-card-head{display:none!important}
+    .record-route-badges{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .route-arrow{font-size:14px;font-weight:900;color:#64748b}
+    .route-zone-badge{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:6px 10px;border-radius:999px;border:1px solid color-mix(in srgb, var(--badge-color,#64748b) 26%, var(--line));background:color-mix(in srgb, var(--badge-color,#64748b) 9%, white);color:var(--badge-color,#64748b);font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .route-zone-badge b{overflow:hidden;text-overflow:ellipsis}
+    .sheet-head-actions{display:flex;align-items:center;gap:10px}
+    .sheet-head.sheet-drag-zone{touch-action:none;cursor:grab}
+    .sheet-head.sheet-drag-zone:active{cursor:grabbing}
+    .user-popup-company{font-size:13px!important;font-weight:800!important}
+    .zone-badge{display:inline-flex;align-items:center;gap:5px;max-width:100%;padding:5px 9px;border-radius:999px;border:1px solid color-mix(in srgb, var(--badge-color,#64748b) 26%, var(--line));background:color-mix(in srgb, var(--badge-color,#64748b) 9%, white);color:var(--badge-color,#64748b);font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .user-settings-form{display:grid;gap:14px}
+    .user-settings-form .field-group{display:grid;gap:7px}
+    .user-settings-form .field-help{color:#64748b;font-size:11px;font-weight:700;line-height:1.45}
+    .user-settings-save{margin-top:2px}
+    @media (max-width:360px){#view-detail .sticky-actions{grid-template-columns:1fr}.current-location-summary{padding:9px 10px}.current-location-summary .summary-value{font-size:11px}}
+  `;
+  document.head.appendChild(extraStyle);
+
+  function svgHome(){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.4 3.5 10v10.2c0 .44.36.8.8.8h5.6c.44 0 .8-.36.8-.8v-5.1h2.6v5.1c0 .44.36.8.8.8h5.6c.44 0 .8-.36.8-.8V10L12 3.4Z"/></svg>';
+  }
+  function escapeHtml(v){ return String(v ?? '').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
+  function getZoneColorByName(name){ const zone = zones.find(item => item.name === name); return zone?.color || '#64748b'; }
+  function zoneBadgeMarkup(label, color){ const safe = escapeHtml(label || '미지정'); return `<span class="route-zone-badge" style="--badge-color:${color || '#64748b'}">${svgHome()}<b>${safe}</b></span>`; }
+  function makeZoneBadge(label, color){ const span=document.createElement('span'); span.className='zone-badge'; span.style.setProperty('--badge-color', color || '#64748b'); span.innerHTML = svgHome() + `<span>${escapeHtml(label || '미지정')}</span>`; return span; }
+
+  function renderCurrentLocationSummary(){
+    const actions = document.querySelector('#view-detail .sticky-actions');
+    if(!actions) return;
+    let summary = document.getElementById('currentLocationSummary');
+    if(!summary){
+      summary = document.createElement('div');
+      summary.id = 'currentLocationSummary';
+      summary.className = 'current-location-summary';
+      const btn = document.getElementById('returnHomeBtn');
+      actions.innerHTML = '';
+      actions.appendChild(summary);
+      if (btn) actions.appendChild(btn);
+    }
+    const currentZone = getZone(ownLocation?.zoneId) || getHomeZone();
+    const zoneName = currentZone?.name || '미지정';
+    const color = currentZone?.color || '#64748b';
+    summary.innerHTML = `<span class="summary-label">현위치</span><span class="summary-value" style="--badge-color:${color}">${svgHome()}<span>${escapeHtml(zoneName)}</span></span>`;
+  }
+
+  const app = document.querySelector('.app');
+  const header = document.querySelector('.header');
+  let stickyFrame = 0;
+  function syncSticky(){
+    stickyFrame = 0;
+    const activeView = document.querySelector('[data-user-tab-view]:not([hidden])');
+    document.querySelectorAll('.user-tab-view > .sticky-dashboard').forEach(d => {
+      const view = d.parentElement;
+      let spacer = view.querySelector(':scope > .sticky-dashboard-spacer');
+      if (!spacer){ spacer = document.createElement('div'); spacer.className='sticky-dashboard-spacer'; view.insertBefore(spacer, d); }
+      if (view !== activeView){ d.classList.remove('js-sticky-fixed'); spacer.classList.remove('active'); spacer.style.height='0px'; }
+    });
+    if(!activeView) return;
+    const dashboard = activeView.querySelector(':scope > .sticky-dashboard');
+    const spacer = activeView.querySelector(':scope > .sticky-dashboard-spacer');
+    if(!dashboard || !spacer) return;
+    const shouldFix = spacer.getBoundingClientRect().top <= 0 && header.getBoundingClientRect().bottom <= 0;
+    if(shouldFix){ spacer.classList.add('active'); spacer.style.height = Math.max(dashboard.offsetHeight,1)+'px'; dashboard.style.setProperty('--sticky-fixed-width', `${Math.round(app.getBoundingClientRect().width)}px`); dashboard.classList.add('js-sticky-fixed'); }
+    else { dashboard.classList.remove('js-sticky-fixed'); spacer.classList.remove('active'); spacer.style.height='0px'; }
+  }
+  function scheduleSticky(){ if(!stickyFrame) stickyFrame = requestAnimationFrame(syncSticky); }
+  window.addEventListener('scroll', scheduleSticky, {passive:true});
+  window.addEventListener('resize', scheduleSticky, {passive:true});
+  const originalSwitchUserTab = switchUserTab;
+  switchUserTab = function(type){ originalSwitchUserTab(type); scheduleSticky(); };
+  const originalRenderZones = renderZones;
+  renderZones = function(){ originalRenderZones(); renderCurrentLocationSummary(); scheduleSticky(); };
+
+  renderMovementRecords = function() {
+    recordsList.innerHTML = '';
+    recordsState.hidden = movementLogs.length > 0;
+    if (!movementLogs.length) { recordsState.textContent = '저장된 이동 기록이 없습니다.'; return; }
+    movementLogs.slice().sort((a,b)=> new Date(b.departureTime).getTime() - new Date(a.departureTime).getTime()).forEach(log => {
+      const originName = log.originZoneName || getZone(log.originZoneId)?.name || '출발지 미기록';
+      const destName = log.destinationZoneName || getZone(log.destinationZoneId || log.zoneId)?.name || log.zoneName || '도착지 미기록';
+      const originColor = getZone(log.originZoneId)?.color || getZoneColorByName(originName);
+      const destColor = getZone(log.destinationZoneId || log.zoneId)?.color || getZoneColorByName(destName) || '#2563eb';
+      const card = document.createElement('article');
+      card.className = 'record-card';
+      card.innerHTML = `<div class="record-route-badges">${zoneBadgeMarkup(originName, originColor)}<span class="route-arrow" aria-hidden="true">→</span>${zoneBadgeMarkup(destName, destColor)}</div><dl class="record-card-info"><dt>출발</dt><dd class="record-time-value record-departure">${formatRecordDateTime(log.departureTime)}</dd><dt>도착 예정</dt><dd class="record-expected">${formatRecordDateTime(log.expectedReturnTime)}</dd><dt>도착</dt><dd class="record-arrival ${log.arrivalTime ? '' : 'missing'}">${log.arrivalTime ? formatRecordDateTime(log.arrivalTime) : '미복귀'}</dd></dl>`;
+      recordsList.appendChild(card);
+    });
+  };
+
+  const sheetHead = document.querySelector('#bottomSheet .sheet-head');
+  const sheetCloseBtn = document.getElementById('sheetClose');
+  if (sheetHead && sheetCloseBtn && !sheetHead.querySelector('.sheet-head-actions')) { sheetHead.classList.add('sheet-drag-zone'); const actions = document.createElement('div'); actions.className = 'sheet-head-actions'; sheetCloseBtn.replaceWith(actions); actions.appendChild(sheetCloseBtn); } else if (sheetHead) { sheetHead.classList.add('sheet-drag-zone'); }
+
+  renderZonePeople = function(zoneId) {
+    const zone = getZone(zoneId);
+    if (!zone) return;
+    const zonePeople = getZonePeople(zoneId);
+    sheetTitle.textContent = zone.name;
+    sheetSubtitle.textContent = `등록된 인원 ${zonePeople.length}명`;
+    zonePeopleContent.innerHTML = '';
+    if (!zonePeople.length) { zonePeopleContent.innerHTML = '<div class="sheet-empty-state">등록된 인원이 없습니다.</div>'; return; }
+    zonePeople.forEach(person => {
+      const row = document.createElement('article');
+      row.className = 'sheet-person';
+      const homeZone = getZone(person.homeZoneId);
+      row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
+      const atHome = isPersonAtHome(person);
+      row.innerHTML = atHome ? `<div class="person-card-head"><strong class="person-card-name"></strong><span class="person-card-company user-popup-company"></span></div>` : `<div class="person-card-head"><strong class="person-card-name"></strong><span class="person-card-company user-popup-company"></span></div><div class="person-card-grid"><span class="person-card-label">출발</span><span class="person-card-value">${formatTime(person.departureTime)}</span><span class="person-card-label">도착 예정</span><span class="person-card-value">${formatTime(person.returnTime)}</span><span class="person-card-label">지난 시간</span><span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span></div>`;
+      const head = row.querySelector('.person-card-head');
+      row.querySelector('.person-card-name').textContent = person.name || '이름 없음';
+      row.querySelector('.person-card-company').textContent = person.company || '중대 미입력';
+      if (homeZone) head.appendChild(makeZoneBadge(homeZone.name, homeZone.color));
+      zonePeopleContent.appendChild(row);
+    });
+  };
+
+  (function attachSheetDragClose(){
+    const dragZone = document.querySelector('#bottomSheet .sheet-drag-zone');
+    if (!dragZone) return;
+    let dragging = false, startY = 0, currentY = 0;
+    function reset(shouldClose){
+      if (!dragging) return; dragging = false; const distance = Math.max(0, currentY - startY); bottomSheet.style.transition = 'transform .2s ease'; sheetBackdrop.style.transition = 'opacity .2s ease';
+      if (shouldClose || distance > 96) { bottomSheet.style.transform = 'translate(-50%, 100%)'; sheetBackdrop.style.opacity = '0'; setTimeout(() => { bottomSheet.style.transition=''; sheetBackdrop.style.transition=''; bottomSheet.style.transform=''; sheetBackdrop.style.opacity=''; closeZoneSheet(); }, 180); }
+      else { bottomSheet.style.transform = ''; sheetBackdrop.style.opacity = ''; setTimeout(() => { bottomSheet.style.transition=''; sheetBackdrop.style.transition=''; }, 180); }
+    }
+    dragZone.addEventListener('touchstart', e => { if(!sheetBackdrop.classList.contains('open') || e.touches.length !== 1) return; dragging = true; startY = e.touches[0].clientY; currentY = startY; }, {passive:true});
+    dragZone.addEventListener('touchmove', e => { if(!dragging || e.touches.length !== 1) return; currentY = e.touches[0].clientY; const distance = Math.max(0, currentY - startY); bottomSheet.style.transform = `translate(-50%, ${distance}px)`; sheetBackdrop.style.opacity = `${Math.max(.0, 1 - distance / 260)}`; if(distance > 0) e.preventDefault(); }, {passive:false});
+    dragZone.addEventListener('touchend', () => reset(false));
+    dragZone.addEventListener('touchcancel', () => reset(true));
+  })();
+
+  function enhanceUserSettingsUI(){
+    const section = settingsDialog.querySelector('.settings-section');
+    if (!section || section.dataset.enhanced === 'true') return;
+    section.dataset.enhanced = 'true';
+    section.innerHTML = `<form class="user-settings-form" id="enhancedUserSettingsForm" novalidate><div class="field-group"><label class="field-label" for="enhancedSettingsName">이름</label><input class="text-input" id="enhancedSettingsName" type="text" maxlength="20" autocomplete="name" placeholder="이름 입력"></div><div class="field-group"><label class="field-label" for="enhancedSettingsCompany">중대</label><input class="text-input" id="enhancedSettingsCompany" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대"></div><div class="field-group"><label class="field-label" for="enhancedSettingsHome">생활관</label><select class="text-input" id="enhancedSettingsHome"></select></div><div class="field-group"><label class="field-label" for="enhancedSettingsPhone">휴대폰 번호</label><input class="text-input" id="enhancedSettingsPhone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="01012345678"></div><div class="field-group"><label class="field-label" for="enhancedSettingsPassword">현재 비밀번호</label><input class="text-input" id="enhancedSettingsPassword" type="password" autocomplete="current-password" placeholder="수정을 위해 비밀번호 입력"><div class="field-help">이름, 중대, 생활관, 휴대폰 번호를 수정하려면 현재 비밀번호를 입력해주세요.</div></div><button class="primary-btn full-btn user-settings-save" id="enhancedUserSettingsSaveBtn" type="submit">저장</button></form>`;
+    const form = document.getElementById('enhancedUserSettingsForm');
+    const phoneInput = document.getElementById('enhancedSettingsPhone');
+    phoneInput.addEventListener('input', () => { const digits = phoneInput.value.replace(/\D/g,'').slice(0,11); if (digits.length > 7) phoneInput.value = `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`; else if (digits.length > 3) phoneInput.value = `${digits.slice(0,3)}-${digits.slice(3)}`; else phoneInput.value = digits; });
+    form.addEventListener('submit', async event => {
+      event.preventDefault();
+      const name = document.getElementById('enhancedSettingsName').value.trim();
+      const company = document.getElementById('enhancedSettingsCompany').value.trim();
+      const homeZoneId = document.getElementById('enhancedSettingsHome').value || null;
+      const phone = document.getElementById('enhancedSettingsPhone').value.replace(/\D/g,'');
+      const password = document.getElementById('enhancedSettingsPassword').value;
+      const saveBtn = document.getElementById('enhancedUserSettingsSaveBtn');
+      if (!name || !company || !password) { showMessage('이름, 중대, 현재 비밀번호를 입력해주세요.', '입력 확인'); return; }
+      if (phone && !/^01\d{8,9}$/.test(phone)) { showMessage('휴대폰 번호를 정확히 입력해주세요.', '입력 확인'); return; }
+      saveBtn.disabled = true;
+      try {
+        const verify = await sb.auth.signInWithPassword({ email: userAccess.user.email, password });
+        if (verify.error) throw new Error('현재 비밀번호가 올바르지 않습니다.');
+        const updateResult = await sb.from('profiles').update({ name, company, phone: phone || null, home_zone_id: homeZoneId }).eq('id', userAccess.user.id);
+        if (updateResult.error) throw updateResult.error;
+        const authResult = await sb.auth.updateUser({ data: { display_name: name, name, phone: phone || null, company, home_zone_id: homeZoneId } });
+        if (authResult.error) console.warn('인증 메타데이터 동기화 실패:', authResult.error);
+        userAccess.profile = { ...userAccess.profile, name, company, phone: phone || null, home_zone_id: homeZoneId };
+        document.getElementById('enhancedSettingsPassword').value = '';
+        triggerToast('설정이 저장되었습니다.');
+        await loadPageData({ quiet: true });
+      } catch (error) { showMessage(escapeMessage ? escapeMessage(error) : (error.message || '설정을 저장하지 못했습니다.'), '저장 실패'); }
+      finally { saveBtn.disabled = false; }
+    });
+  }
+  const originalFillSettings = fillSettings;
+  fillSettings = function(){
+    enhanceUserSettingsUI();
+    if (typeof originalFillSettings === 'function') originalFillSettings();
+    const nameInput = document.getElementById('enhancedSettingsName');
+    const companyInputEl = document.getElementById('enhancedSettingsCompany');
+    const homeSelect = document.getElementById('enhancedSettingsHome');
+    const phoneInput = document.getElementById('enhancedSettingsPhone');
+    nameInput.value = userAccess?.profile?.name || '';
+    companyInputEl.value = userAccess?.profile?.company || '';
+    phoneInput.value = userAccess?.profile?.phone || userAccess?.user?.user_metadata?.phone || '';
+    homeSelect.innerHTML = '';
+    const livingZones = zones.filter(zone => zone.attribute === 'inside' || zone.attribute === 'barracks_inside');
+    livingZones.forEach(zone => { const option = document.createElement('option'); option.value = zone.id; option.textContent = zone.name; option.selected = zone.id === userAccess?.profile?.home_zone_id; homeSelect.appendChild(option); });
+    homeSelect.disabled = livingZones.length === 0;
+  };
+
+
+  enhanceUserSettingsUI();
+  setTimeout(() => { try { renderZones(); scheduleSticky(); } catch(_){} }, 180);
+})();
+</script>
+
+
+<script>
+(function(){
+  function finalEscapeHtml(value){
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+      '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+    })[character]);
+  }
+  function finalLocationMarkerSvg(){
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.4 3.5 10v10.2c0 .44.36.8.8.8h5.6c.44 0 .8-.36.8-.8v-5.1h2.6v5.1c0 .44.36.8.8.8h5.6c.44 0 .8-.36.8-.8V10L12 3.4Z"/></svg>';
+  }
+  function zoneBadgeMarkup(label, color){
+    return `<span class="route-zone-badge" style="--badge-color:${color || '#64748b'}">${finalLocationMarkerSvg()}<b>${finalEscapeHtml(label || '미지정')}</b></span>`;
+  }
+  const finalStyle = document.createElement('style');
+  finalStyle.textContent = `
+    #view-detail .sticky-actions{
+      display:grid!important;
+      grid-template-columns:minmax(0,2fr) minmax(0,1fr)!important;
+      gap:10px!important;
+      align-items:stretch!important;
+    }
+    #view-detail .current-location-summary,
+    #view-detail .return-home-btn{
+      width:100%!important;
+      min-width:0!important;
+    }
+    #view-detail .current-location-summary{
+      overflow:hidden!important;
+    }
+    #view-detail .current-location-summary .summary-value{
+      min-width:0!important;
+      max-width:100%!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+    #view-records .records-state{
+      display:none!important;
+      height:0!important;
+      min-height:0!important;
+      margin:0!important;
+      padding:0!important;
+      border:0!important;
+    }
+    #view-records .records-content{
+      padding-top:16px!important;
+    }
+    #view-records .records-list{
+      margin-top:0!important;
+    }
+    #view-records .record-card{
+      background:#fff!important;
+      border-color:#e2e8f0!important;
+    }
+    #view-records .record-card-info{
+      grid-template-columns:minmax(68px,auto) minmax(0,1fr)!important;
+    }
+    .location-card:not(.current) .location-title{
+      padding-right:0!important;
+    }
+    .location-card.current .location-title{
+      padding-right:30px!important;
+    }
+    .location-title{
+      display:block!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      word-break:normal!important;
+    }
+    .user-delete-account-btn{
+      width:100%;
+      min-height:48px;
+      margin-top:10px;
+      border:0;
+      border-radius:15px;
+      background:#fff1f2;
+      color:#dc2626;
+      font-size:14px;
+      font-weight:900;
+    }
+    .user-delete-account-btn:active{
+      background:#ffe4e6;
+      transform:scale(.985);
+    }
+    body.user-tab-switching{
+      overflow:hidden!important;
+      touch-action:none!important;
+    }
+    @media (max-width:360px){
+      #view-detail .sticky-actions{
+        grid-template-columns:minmax(0,2fr) minmax(88px,1fr)!important;
+        gap:8px!important;
+      }
+      #view-detail .current-location-summary{
+        padding-left:9px!important;
+        padding-right:9px!important;
+      }
+    }
+  `;
+  document.head.appendChild(finalStyle);
+
+  function getMovementElapsed(expectedReturnTime, arrivalTime){
+    if (!expectedReturnTime) return '-';
+    const expected = new Date(expectedReturnTime).getTime();
+    const compared = arrivalTime ? new Date(arrivalTime).getTime() : Date.now();
+    if (!Number.isFinite(expected) || !Number.isFinite(compared)) return '-';
+    return `${Math.max(0, Math.floor((compared - expected) / 60000))}분`;
+  }
+
+  function normalizeOwnMovementRows(rows){
+    const mapped = (rows || []).map(log => ({
+      id: log.log_id ?? log.id,
+      userId: log.user_id,
+      zoneId: log.to_zone_id || log.destination_zone_id || log.zone_id || null,
+      zoneName: log.to_zone_name || log.destination_zone_name || log.zone_name || null,
+      originZoneId: log.from_zone_id || log.origin_zone_id || log.departure_zone_id || log.previous_zone_id || null,
+      destinationZoneId: log.to_zone_id || log.destination_zone_id || log.arrival_zone_id || log.zone_id || null,
+      originZoneName: log.from_zone_name || log.origin_zone_name || log.departure_zone_name || log.previous_zone_name || null,
+      destinationZoneName: log.to_zone_name || log.destination_zone_name || log.arrival_zone_name || log.zone_name || null,
+      departureTime: log.departure_time,
+      expectedReturnTime: log.expected_return_time || log.return_time || null,
+      arrivalTime: log.arrival_time
+    })).sort((a,b) => new Date(a.departureTime || 0).getTime() - new Date(b.departureTime || 0).getTime());
+
+    let previousZoneId = userAccess?.profile?.home_zone_id || null;
+    let previousZoneName = getZone(previousZoneId)?.name || null;
+
+    mapped.forEach(log => {
+      if (!log.originZoneId && previousZoneId) log.originZoneId = previousZoneId;
+      if (!log.originZoneName) {
+        log.originZoneName = getZone(log.originZoneId)?.name || previousZoneName || getZone(userAccess?.profile?.home_zone_id)?.name || null;
+      }
+      const destinationId = log.destinationZoneId || log.zoneId;
+      const destinationName = log.destinationZoneName || log.zoneName || getZone(destinationId)?.name || null;
+      if (destinationId) previousZoneId = destinationId;
+      if (destinationName) previousZoneName = destinationName;
+    });
+
+    return mapped;
+  }
+
+  loadOwnMovementLogs = async function(unitId){
+    const direct = await sb
+      .from('location_movement_logs')
+      .select('*')
+      .eq('user_id', userAccess.user.id)
+      .order('departure_time', { ascending: true })
+      .limit(200);
+
+    if (direct.error) {
+      console.warn('이동 기록 조회 실패:', direct.error);
+      return [];
+    }
+    return normalizeOwnMovementRows(direct.data || []);
+  };
+
+  renderMovementRecords = function(){
+    recordsList.innerHTML = '';
+    recordsState.hidden = true;
+    recordsState.textContent = '';
+    if (!movementLogs.length) return;
+
+    const sorted = movementLogs.slice().sort((a,b) => new Date(b.departureTime || 0).getTime() - new Date(a.departureTime || 0).getTime());
+    sorted.forEach(log => {
+      const homeZone = getHomeZone();
+      const originName = log.originZoneName || getZone(log.originZoneId)?.name || homeZone?.name || '위치 미기록';
+      const destinationName = log.destinationZoneName || getZone(log.destinationZoneId || log.zoneId)?.name || log.zoneName || '도착지 미기록';
+      const originColor = getZone(log.originZoneId)?.color || homeZone?.color || '#64748b';
+      const destinationColor = getZone(log.destinationZoneId || log.zoneId)?.color || '#2563eb';
+      const card = document.createElement('article');
+      card.className = 'record-card';
+      card.innerHTML = `
+        <div class="record-route-badges">
+          ${zoneBadgeMarkup(originName, originColor)}
+          <span class="route-arrow" aria-hidden="true">→</span>
+          ${zoneBadgeMarkup(destinationName, destinationColor)}
+        </div>
+        <dl class="record-card-info">
+          <dt>출발</dt><dd class="record-time-value">${formatRecordDateTime(log.departureTime)}</dd>
+          <dt>도착 예정</dt><dd>${formatRecordDateTime(log.expectedReturnTime)}</dd>
+          <dt>도착</dt><dd class="${log.arrivalTime ? '' : 'missing'}">${log.arrivalTime ? formatRecordDateTime(log.arrivalTime) : '미복귀'}</dd>
+          <dt>지난 시간</dt><dd class="record-elapsed">${getMovementElapsed(log.expectedReturnTime, log.arrivalTime)}</dd>
+        </dl>`;
+      const elapsed = card.querySelector('.record-elapsed');
+      if (elapsed && elapsed.textContent !== '-' && elapsed.textContent !== '0분') elapsed.style.color = '#dc2626';
+      recordsList.appendChild(card);
+    });
+  };
+
+  subscribeToRealtime = async function(){
+    if (realtimeChannel) await sb.removeChannel(realtimeChannel);
+    const unitId = userAccess.profile.unit_id;
+    realtimeChannel = sb
+      .channel(`location-user-${userAccess.user.id}-${Date.now()}`)
+      .on('postgres_changes', { event:'*', schema:'public', table:'location_zones', filter:`unit_id=eq.${unitId}` }, scheduleRealtimeReload)
+      .on('postgres_changes', { event:'*', schema:'public', table:'user_locations', filter:`unit_id=eq.${unitId}` }, scheduleRealtimeReload)
+      .on('postgres_changes', { event:'*', schema:'public', table:'units', filter:`id=eq.${unitId}` }, scheduleRealtimeReload)
+      .on('postgres_changes', { event:'*', schema:'public', table:'location_movement_logs', filter:`user_id=eq.${userAccess.user.id}` }, scheduleRealtimeReload)
+      .on('postgres_changes', { event:'*', schema:'public', table:'profiles', filter:`unit_id=eq.${unitId}` }, scheduleRealtimeReload)
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') setSyncStatus(formatSyncTime());
+        else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSyncStatus('실시간 연결 재시도 중...', true);
+      });
+  };
+
+  function getRapidServiceError(error){
+    return error?.message || '회원탈퇴 요청을 처리하지 못했습니다.';
+  }
+
+  function installDeleteAccountButton(){
+    if (document.getElementById('userDeleteAccountBtn')) return;
+    const logoutButton = document.getElementById('logoutBtn');
+    if (!logoutButton) return;
+    const button = document.createElement('button');
+    button.id = 'userDeleteAccountBtn';
+    button.type = 'button';
+    button.className = 'user-delete-account-btn';
+    button.textContent = '회원탈퇴';
+    logoutButton.insertAdjacentElement('afterend', button);
+
+    button.addEventListener('click', () => {
+      const passwordInput = document.getElementById('enhancedSettingsPassword');
+      const currentPassword = passwordInput?.value || '';
+      if (!currentPassword) {
+        showMessage('회원탈퇴를 진행하려면 현재 비밀번호를 입력해주세요.', '비밀번호 확인');
+        return;
+      }
+
+      closeModal(settingsModal, settingsDialog);
+      requestConfirmation({
+        title: '회원탈퇴',
+        message: '정말 탈퇴하시겠습니까?\n계정과 연결된 위치 정보가 삭제되며 복구할 수 없습니다.',
+        confirmText: '회원탈퇴',
+        action: async () => {
+          const { data, error } = await sb.functions.invoke('rapid-service', {
+            body: { action:'delete_account', current_password: currentPassword }
+          });
+          if (error) throw new Error(getRapidServiceError(error));
+          if (!data?.ok) throw new Error(data?.error || '회원탈퇴 요청을 처리하지 못했습니다.');
+          try { await sb.auth.signOut(); } finally { location.replace('index.html'); }
+        }
+      });
+    });
+  }
+
+  const originalEnhancedFillSettings = fillSettings;
+  fillSettings = function(){
+    originalEnhancedFillSettings();
+    installDeleteAccountButton();
+  };
+  installDeleteAccountButton();
+
+  function restoreInlineStyle(element, value){
+    if (!element) return;
+    if (value === null) element.removeAttribute('style');
+    else element.setAttribute('style', value);
+  }
+
+  (function initAdminStyleUserSwipe(){
+    const area = document.getElementById('userTabMain');
+    if (!area || area.dataset.adminStyleSwipeReady) return;
+    area.dataset.adminStyleSwipeReady = '1';
+    const order = ['detail','dashboard','records'];
+    let animating = false;
+    let startX=0, startY=0, lastX=0, lastTime=0, velocityX=0;
+    let tracking=false, axisLocked=null, prepared=false;
+    let currentView=null, targetView=null, targetType='', direction=0, width=1, wrap=null;
+    let currentStyle=null, targetStyle=null, wrapStyle=null;
+    const gap=12;
+
+    function activeType(){ return document.querySelector('[data-user-tab-view]:not([hidden])')?.dataset.userTabView || 'detail'; }
+    function overlayOpen(){ return Boolean(document.querySelector('.modal-backdrop.open, .sheet-backdrop.open')); }
+
+    function clearSwipe(complete){
+      restoreInlineStyle(currentView,currentStyle);
+      restoreInlineStyle(targetView,targetStyle);
+      restoreInlineStyle(wrap,wrapStyle);
+      if (currentView && targetView) {
+        if (complete) {
+          currentView.hidden = true;
+          targetView.hidden = false;
+          switchUserTab(targetType);
+          void targetView.offsetHeight;
+        } else {
+          currentView.hidden = false;
+          targetView.hidden = true;
+          void currentView.offsetHeight;
+        }
+      }
+      animating=false; prepared=false; currentView=null; targetView=null; wrap=null;
+      currentStyle=targetStyle=wrapStyle=null;
+      document.body.classList.remove('user-tab-switching');
+      if (typeof scheduleSticky === 'function') scheduleSticky();
+    }
+
+    function prepare(deltaX){
+      const currentType = activeType();
+      const index = order.indexOf(currentType);
+      if (index < 0) return false;
+      direction = deltaX < 0 ? 1 : -1;
+      targetType = order[(index + direction + order.length) % order.length];
+      currentView = document.getElementById(`view-${currentType}`);
+      targetView = document.getElementById(`view-${targetType}`);
+      if (!currentView || !targetView || currentView === targetView) return false;
+
+      wrap = currentView.parentElement;
+      const currentRect = currentView.getBoundingClientRect();
+      const wrapRect = wrap.getBoundingClientRect();
+      width = Math.max(currentRect.width,1);
+      currentStyle=currentView.getAttribute('style');
+      targetStyle=targetView.getAttribute('style');
+      wrapStyle=wrap.getAttribute('style');
+      targetView.hidden=false;
+      const targetHeight=Math.max(targetView.scrollHeight||0,targetView.getBoundingClientRect().height||0,1);
+      if (getComputedStyle(wrap).position === 'static') wrap.style.position='relative';
+      wrap.style.overflow='hidden';
+      wrap.style.minHeight=`${Math.max(currentRect.height,targetHeight)}px`;
+      Object.assign(currentView.style,{position:'relative',zIndex:'5',width:'100%',transform:'translate3d(0,0,0)',transition:'none',willChange:'transform',pointerEvents:'none'});
+      Object.assign(targetView.style,{position:'absolute',left:`${currentRect.left-wrapRect.left}px`,top:`${currentRect.top-wrapRect.top}px`,zIndex:'6',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,margin:'0',boxSizing:'border-box',transition:'none',willChange:'transform',pointerEvents:'none',transform:`translate3d(${direction*(width+gap)}px,0,0)`});
+      animating=true; prepared=true; document.body.classList.add('user-tab-switching');
+      return true;
+    }
+
+    function move(deltaX){
+      const clamped=Math.max(-width,Math.min(width,deltaX));
+      currentView.style.transform=`translate3d(${clamped}px,0,0)`;
+      targetView.style.transform=`translate3d(${direction*(width+gap)+clamped}px,0,0)`;
+    }
+
+    function settle(complete){
+      if (!prepared) return;
+      const duration=complete?200:160;
+      const easing='cubic-bezier(.22,.61,.36,1)';
+      currentView.style.transition=`transform ${duration}ms ${easing}`;
+      targetView.style.transition=`transform ${duration}ms ${easing}`;
+      requestAnimationFrame(()=>{
+        if (complete) {
+          currentView.style.transform=`translate3d(${-direction*(width+gap)}px,0,0)`;
+          targetView.style.transform='translate3d(0,0,0)';
+        } else {
+          currentView.style.transform='translate3d(0,0,0)';
+          targetView.style.transform=`translate3d(${direction*(width+gap)}px,0,0)`;
+        }
+      });
+      let done=false;
+      const finish=()=>{ if(done)return; done=true; clearSwipe(complete); };
+      targetView.addEventListener('transitionend',finish,{once:true});
+      setTimeout(finish,duration+80);
+    }
+
+    area.addEventListener('touchstart',event=>{
+      if (overlayOpen() || animating || event.touches.length!==1) return;
+      const locationCard=event.target.closest('.location-card,.dashboard-zone-card,.record-card');
+      if (!locationCard && event.target.closest('input,textarea,select,button,a,[contenteditable="true"]')) return;
+      const touch=event.touches[0];
+      startX=lastX=touch.clientX; startY=touch.clientY; lastTime=performance.now(); velocityX=0; tracking=true; axisLocked=null; prepared=false;
+    },{passive:true});
+
+    area.addEventListener('touchmove',event=>{
+      if (!tracking || event.touches.length!==1) return;
+      const touch=event.touches[0];
+      const deltaX=touch.clientX-startX, deltaY=touch.clientY-startY;
+      const absX=Math.abs(deltaX), absY=Math.abs(deltaY);
+      if (!axisLocked) {
+        if (absX<5 && absY<5) return;
+        axisLocked=absX>absY*1.05?'x':'y';
+        if (axisLocked==='y') { tracking=false; return; }
+      }
+      if (axisLocked!=='x') return;
+      event.preventDefault();
+      if (!prepared && !prepare(deltaX)) { tracking=false; return; }
+      const now=performance.now();
+      velocityX=(touch.clientX-lastX)/Math.max(now-lastTime,1);
+      lastX=touch.clientX; lastTime=now;
+      move(deltaX);
+    },{passive:false});
+
+    area.addEventListener('touchend',event=>{
+      if (!tracking) return;
+      tracking=false;
+      if (!prepared || event.changedTouches.length!==1) return;
+      const deltaX=event.changedTouches[0].clientX-startX;
+      const expected=Math.sign(deltaX)===-direction;
+      const passedDistance=Math.abs(deltaX)>=width*.12;
+      const passedVelocity=Math.abs(velocityX)>=.24;
+      settle(expected&&(passedDistance||passedVelocity));
+    },{passive:true});
+
+    area.addEventListener('touchcancel',()=>{ tracking=false; if(prepared)settle(false); },{passive:true});
+  })();
+
+  setTimeout(() => {
+    installDeleteAccountButton();
+    try { renderZones(); } catch (_) {}
+  }, 240);
+})();
+</script>
+
+
+<script>
+(function locationUserV13Fix(){
+  const css = document.createElement('style');
+  css.textContent = `
+    /* 관리자 페이지와 같은 구역 상세 팝업 */
+    .sheet-backdrop{background:rgba(15,23,42,.42)!important;backdrop-filter:blur(3px)!important}
+    .bottom-sheet{
+      position:absolute!important;left:50%!important;bottom:0!important;width:min(100%,480px)!important;
+      height:100vh!important;height:100dvh!important;max-height:100dvh!important;
+      transform:translateX(-50%)!important;border-radius:18px 18px 0 0!important;
+      animation:none!important;will-change:transform!important;
+    }
+    .bottom-sheet.sheet-entering{animation:sheetUp .22s ease!important}
+    .bottom-sheet.sheet-opened,.bottom-sheet.sheet-following,.bottom-sheet.sheet-returning{animation:none!important}
+    .bottom-sheet.sheet-following{transition:none!important}
+    .bottom-sheet.sheet-returning{transition:transform .24s cubic-bezier(.2,.8,.2,1)!important}
+    .bottom-sheet.closing{animation:sheetDown .22s ease forwards!important}
+    .sheet-head{padding:18px 18px 15px!important}
+    .sheet-head h3{font-size:22px!important;letter-spacing:-.35px!important}
+    .sheet-head p{font-size:15px!important;font-weight:900!important}
+    #zonePeopleContent{
+      display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-flow:row!important;align-content:start!important;align-items:stretch!important;
+      gap:10px!important;padding:14px 14px calc(24px + env(safe-area-inset-bottom))!important;
+    }
+    #zonePeopleContent > .sheet-person{
+      display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+      margin:0!important;padding:11px!important;border-radius:16px!important;
+    }
+    #zonePeopleContent > .sheet-empty-state{grid-column:1/-1!important}
+    #zonePeopleContent .person-card-head{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:6px!important;align-items:center!important}
+    #zonePeopleContent .person-card-name{
+      display:block!important;min-width:0!important;max-width:100%!important;padding:6px 7px!important;
+      font-size:13px!important;line-height:1.2!important;white-space:nowrap!important;
+      overflow:hidden!important;text-overflow:ellipsis!important;
+    }
+    #zonePeopleContent .person-card-company{font-size:12px!important;font-weight:850!important;white-space:nowrap!important}
+    #zonePeopleContent .zone-badge{
+      grid-column:1/-1!important;justify-self:stretch!important;justify-content:center!important;
+      text-align:center!important;min-width:0!important;max-width:100%!important;
+    }
+    #zonePeopleContent .zone-badge span{min-width:0!important;text-align:center!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+
+    /* 현위치 2/3, 복귀 1/3 */
+    #view-detail .sticky-actions{grid-template-columns:minmax(0,2fr) minmax(0,1fr)!important;gap:10px!important}
+    #view-detail .return-home-btn{width:100%!important;min-width:0!important}
+
+    /* 설정 로그아웃/회원탈퇴 동일 계열 디자인 */
+    #logoutBtn,#userDeleteAccountBtn{
+      width:100%!important;min-height:48px!important;margin-top:10px!important;border:0!important;
+      border-radius:15px!important;font-size:14px!important;font-weight:900!important;
+      transition:transform .12s ease,background-color .16s ease!important;
+    }
+    #logoutBtn{background:#eef2ff!important;color:#3730a3!important}
+    #userDeleteAccountBtn{background:#fff1f2!important;color:#dc2626!important}
+    #logoutBtn:active,#userDeleteAccountBtn:active{transform:scale(.985)!important}
+
+    /* 긴 구역명 */
+    .location-main > span:first-child{min-width:0!important;max-width:calc(100% - 44px)!important;overflow:hidden!important}
+    .location-title{display:block!important;min-width:0!important;max-width:100%!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+
+    @media (max-width:400px){
+      #zonePeopleContent{gap:8px!important;padding-left:10px!important;padding-right:10px!important}
+      #zonePeopleContent > .sheet-person{padding:9px!important}
+      #zonePeopleContent .person-card-name{font-size:12px!important}
+      #zonePeopleContent .person-card-company{font-size:11px!important}
+    }
+  `;
+  document.head.appendChild(css);
+
+  function userV13HomeBadge(label,color){
+    const span=document.createElement('span');
+    span.className='zone-badge';
+    span.style.setProperty('--badge-color',color||'#64748b');
+    span.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    span.querySelector('span').textContent=label||'미지정';
+    return span;
+  }
+
+  // 동일 부대 전체 인원 조회용 RPC 우선 사용
+  loadLocationMembers = async function(unitId){
+    const rpc = await sb.rpc('get_location_personnel', { p_unit_id: unitId });
+    if (!rpc.error) return rpc;
+    console.warn('get_location_personnel RPC 실패, 직접 조회로 대체:', rpc.error);
+    const direct = await sb
+      .from('profiles')
+      .select('id,name,role,company,home_zone_id,phone,user_approved,approval_status')
+      .eq('unit_id', unitId)
+      .eq('role','user')
+      .eq('user_approved',true)
+      .eq('approval_status','approved');
+    if (direct.error) return {data:null,error:direct.error};
+    return {
+      data:(direct.data||[]).map(row => ({
+        user_id:row.id,display_name:row.name,member_role:row.role,company:row.company,
+        phone:row.phone,home_zone_id:row.home_zone_id
+      })),
+      error:null
+    };
+  };
+
+  // RPC 스냅샷이 있으면 RLS와 무관하게 같은 부대 전체 위치를 읽음
+  loadPageData = async function({quiet=false}={}){
+    const requestId = ++loadSequence;
+    if (!quiet) setSyncStatus('동기화 중...');
+    await loadProfile();
+    const unitId = userAccess.profile.unit_id;
+    if (!unitId) throw new Error('소속 부대가 지정되어 있지 않습니다.');
+
+    const [unitResult, zoneResult] = await Promise.all([
+      sb.from('units').select('id,unit_name,unit_code').eq('id',unitId).single(),
+      sb.from('location_zones').select('id,unit_id,name,attribute,color,sort_order,created_at')
+        .eq('unit_id',unitId).order('sort_order',{ascending:true}).order('created_at',{ascending:true})
+    ]);
+    const firstError = unitResult.error || zoneResult.error;
+    if (firstError) throw firstError;
+    if (requestId !== loadSequence) return;
+
+    currentUnit = unitResult.data;
+    zones = (zoneResult.data||[]).map(zone => ({
+      id:zone.id,unitId:zone.unit_id,name:zone.name,attribute:zone.attribute,
+      color:zone.color,sortOrder:zone.sort_order
+    }));
+    await ensureInitialLocation();
+
+    const [snapshotResult, movementResult] = await Promise.all([
+      sb.rpc('get_location_snapshot',{p_unit_id:unitId}),
+      loadOwnMovementLogs(unitId)
+    ]);
+
+    let snapshotRows = null;
+    if (!snapshotResult.error){
+      snapshotRows = snapshotResult.data || [];
+    } else {
+      const [locationResult, memberResult] = await Promise.all([
+        sb.from('user_locations').select('user_id,unit_id,zone_id,departure_time,return_time,updated_at').eq('unit_id',unitId),
+        loadLocationMembers(unitId)
+      ]);
+      const fallbackError = locationResult.error || memberResult.error;
+      if (fallbackError) throw fallbackError;
+      const memberMap = new Map((memberResult.data||[]).map(member => [member.user_id,member]));
+      snapshotRows = (locationResult.data||[]).map(location => {
+        const member = memberMap.get(location.user_id);
+        if (!member) return null;
+        return {
+          user_id:location.user_id,display_name:member.display_name || member.name,
+          member_role:member.member_role,company:member.company,
+          home_zone_id:member.home_zone_id,home_zone_name:member.home_zone_name,
+          zone_id:location.zone_id,departure_time:location.departure_time,
+          return_time:location.return_time,updated_at:location.updated_at
+        };
+      }).filter(Boolean);
+    }
+    if (requestId !== loadSequence) return;
+
+    people = (snapshotRows||[]).filter(row => row.zone_id).map(row => ({
+      id:row.user_id,name:row.display_name || '이름 없음',role:row.member_role,
+      company:row.company || null,homeZoneId:row.home_zone_id || null,
+      homeZoneName:row.home_zone_name || getZone(row.home_zone_id)?.name || null,
+      zoneId:row.zone_id,departureTime:row.departure_time,
+      returnTime:row.return_time,updatedAt:row.updated_at
+    }));
+    const ownRow = (snapshotRows||[]).find(row => row.user_id === userAccess.user.id);
+    movementLogs = Array.isArray(movementResult) ? movementResult : [];
+    ownLocation = ownRow ? {
+      zoneId:ownRow.zone_id,departureTime:ownRow.departure_time,
+      returnTime:ownRow.return_time,updatedAt:ownRow.updated_at
+    } : null;
+
+    updatePageTitle();
+    renderZones();
+    renderHomeZoneChoices();
+    setSyncStatus(formatSyncTime());
+  };
+
+  // 관리자와 동일한 팝업 카드 렌더링
+  renderZonePeople = function(zoneId){
+    const zone = getZone(zoneId);
+    if (!zone) return;
+    const zonePeople = getZonePeople(zoneId);
+    sheetTitle.textContent = zone.name;
+    sheetSubtitle.textContent = `등록된 인원 ${zonePeople.length}명`;
+    zonePeopleContent.innerHTML = '';
+    if (!zonePeople.length){
+      zonePeopleContent.innerHTML = '<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';
+      return;
+    }
+    zonePeople.forEach(person => {
+      const row = document.createElement('article');
+      row.className = 'sheet-person';
+      const homeZone = getZone(person.homeZoneId);
+      row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
+      const atHome = isPersonAtHome(person);
+      row.innerHTML = atHome ? `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>` : `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>
+        <div class="person-card-grid">
+          <span class="person-card-label">출발</span>
+          <span class="person-card-value">${formatTime(person.departureTime)}</span>
+          <span class="person-card-label">도착 예정</span>
+          <span class="person-card-value">${formatTime(person.returnTime)}</span>
+          <span class="person-card-label">지난 시간</span>
+          <span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+        </div>`;
+      row.querySelector('.person-card-name').textContent = person.name || '이름 없음';
+      row.querySelector('.person-card-company').textContent = person.company || '중대 미입력';
+      if (homeZone) row.querySelector('.person-card-head').appendChild(userV13HomeBadge(homeZone.name,homeZone.color));
+      zonePeopleContent.appendChild(row);
+    });
+  };
+
+  // 관리자와 같은 단일 슬라이드 닫기 동작. 기존 리스너는 헤더 복제로 제거한다.
+  const oldHead = bottomSheet.querySelector('.sheet-head');
+  let dragHead = oldHead;
+  if (oldHead){
+    const replacement = oldHead.cloneNode(true);
+    replacement.classList.add('sheet-drag-zone');
+    oldHead.replaceWith(replacement);
+    dragHead = replacement;
+    replacement.querySelector('#sheetClose')?.addEventListener('click', () => closeZoneSheet());
+  }
+
+  let sheetTimer = 0;
+  openZoneSheet = function(zoneId){
+    selectedSheetZoneId = zoneId;
+    renderZonePeople(zoneId);
+    clearTimeout(sheetTimer);
+    sheetBackdrop.classList.remove('closing');
+    bottomSheet.classList.remove('closing','sheet-opened','sheet-following','sheet-returning','sheet-entering');
+    bottomSheet.style.removeProperty('transform');
+    sheetBackdrop.style.removeProperty('background-color');
+    sheetBackdrop.classList.add('open');
+    bottomSheet.classList.add('sheet-entering');
+    document.body.classList.add('sheet-open-lock');
+    updateBodyOverlayLock();
+    sheetTimer = setTimeout(() => {
+      bottomSheet.classList.remove('sheet-entering');
+      if (sheetBackdrop.classList.contains('open')) bottomSheet.classList.add('sheet-opened');
+    },230);
+  };
+
+  closeZoneSheet = function(){
+    if (!sheetBackdrop.classList.contains('open')) return;
+    clearTimeout(sheetTimer);
+    bottomSheet.classList.remove('sheet-opened','sheet-following','sheet-returning','sheet-entering');
+    bottomSheet.style.removeProperty('transform');
+    sheetBackdrop.style.removeProperty('background-color');
+    sheetBackdrop.classList.add('closing');
+    bottomSheet.classList.add('closing');
+    sheetTimer = setTimeout(() => {
+      sheetBackdrop.classList.remove('open','closing');
+      bottomSheet.classList.remove('closing','sheet-opened','sheet-following','sheet-returning','sheet-entering');
+      bottomSheet.style.removeProperty('transform');
+      sheetBackdrop.style.removeProperty('background-color');
+      selectedSheetZoneId = null;
+      document.body.classList.remove('sheet-open-lock');
+      updateBodyOverlayLock();
+    },220);
+  };
+
+  if (dragHead){
+    let dragging=false,startY=0,currentY=0,startTime=0,pointerId=null;
+    const setOffset = offset => {
+      const y=Math.max(0,offset);
+      bottomSheet.style.transform=`translate3d(-50%,${y}px,0)`;
+      const progress=Math.min(y/(window.innerHeight*.6),1);
+      sheetBackdrop.style.backgroundColor=`rgba(15,23,42,${Math.max(0,.42*(1-progress))})`;
+    };
+    const reset = () => {
+      bottomSheet.classList.remove('sheet-following','sheet-returning');
+      bottomSheet.classList.add('sheet-opened');
+      bottomSheet.style.removeProperty('transform');
+      sheetBackdrop.style.removeProperty('background-color');
+    };
+    const returnTop = () => {
+      bottomSheet.classList.remove('sheet-following');
+      bottomSheet.classList.add('sheet-returning');
+      bottomSheet.style.transform='translate3d(-50%,0,0)';
+      sheetBackdrop.style.backgroundColor='rgba(15,23,42,.42)';
+      setTimeout(reset,240);
+    };
+    const closeSwipe = () => {
+      bottomSheet.classList.remove('sheet-following');
+      bottomSheet.classList.add('sheet-returning');
+      bottomSheet.style.transform='translate3d(-50%,100vh,0)';
+      sheetBackdrop.style.backgroundColor='rgba(15,23,42,0)';
+      setTimeout(() => {
+        bottomSheet.classList.remove('sheet-opened','sheet-following','sheet-returning','closing');
+        bottomSheet.style.removeProperty('transform');
+        sheetBackdrop.style.removeProperty('background-color');
+        sheetBackdrop.classList.remove('open','closing');
+        selectedSheetZoneId=null;
+        document.body.classList.remove('sheet-open-lock');
+        updateBodyOverlayLock();
+      },240);
+    };
+    const finish = () => {
+      if(!dragging)return;
+      dragging=false;
+      const distance=Math.max(0,currentY-startY);
+      const velocity=distance/Math.max(1,performance.now()-startTime);
+      if(distance>=120||velocity>=.65)closeSwipe();else returnTop();
+    };
+    dragHead.addEventListener('pointerdown',event=>{
+      if(!sheetBackdrop.classList.contains('open')||event.target.closest('button'))return;
+      if(event.pointerType==='mouse'&&event.button!==0)return;
+      dragging=true;pointerId=event.pointerId;startY=currentY=event.clientY;startTime=performance.now();
+      bottomSheet.classList.remove('sheet-returning');bottomSheet.classList.add('sheet-following');
+      try{dragHead.setPointerCapture(pointerId)}catch(_){}
+    });
+    dragHead.addEventListener('pointermove',event=>{
+      if(!dragging||event.pointerId!==pointerId)return;
+      currentY=event.clientY;const distance=currentY-startY;
+      if(distance>=0){event.preventDefault();setOffset(distance)}
+    },{passive:false});
+    dragHead.addEventListener('pointerup',event=>{if(!dragging||event.pointerId!==pointerId)return;currentY=event.clientY;finish()});
+    dragHead.addEventListener('pointercancel',()=>{if(dragging){dragging=false;returnTop()}});
+    dragHead.addEventListener('touchstart',event=>{
+      if(!sheetBackdrop.classList.contains('open')||event.target.closest('button')||event.touches.length!==1)return;
+      dragging=true;startY=currentY=event.touches[0].clientY;startTime=performance.now();
+      bottomSheet.classList.remove('sheet-returning');bottomSheet.classList.add('sheet-following');
+    },{passive:true});
+    dragHead.addEventListener('touchmove',event=>{
+      if(!dragging||event.touches.length!==1)return;
+      currentY=event.touches[0].clientY;const distance=currentY-startY;
+      if(distance>=0){event.preventDefault();setOffset(distance)}
+    },{passive:false});
+    dragHead.addEventListener('touchend',finish,{passive:true});
+  }
+
+  // 근무가 아닌 구역도 현재 날짜/시간을 기본값으로 제공
+  const originalDefaultArrival = getDefaultArrivalDateTime;
+  getDefaultArrivalDateTime = function(zone){
+    if (zone?.attribute === 'duty') return originalDefaultArrival(zone);
+    const now = new Date();
+    return {date:formatDateInputForDate(now),time:formatTimeInputForDate(now)};
+  };
+  openMoveModal = function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+    selectedMoveZone=zone;
+    moveDialogTitle.textContent=zone.name;
+    const defaults=getDefaultArrivalDateTime(zone);
+    arrivalDateInput.value=defaults.date;
+    arrivalTimeInput.value=defaults.time;
+    setArrivalControlsDisabled(false);
+    const requiresReturnTime=zone.attribute==='duty';
+    arrivalDateInput.required=requiresReturnTime;
+    arrivalTimeInput.required=requiresReturnTime;
+    arrivalTimeNote.hidden=!requiresReturnTime;
+    arrivalTimeNote.textContent=requiresReturnTime?'근무 시간은 자동 입력되며 직접 수정할 수 있습니다.':'';
+    moveDialog.setAttribute('tabindex','-1');
+    openModal(moveModal,moveDialog);
+    requestAnimationFrame(()=>{
+      arrivalDateInput.blur();arrivalTimeInput.blur();
+      moveDialog.focus({preventScroll:true});
+    });
+  };
+
+  // 다른 인원의 이동은 Realtime으로, 프로필 변경은 짧은 보강 주기로 동기화
+  subscribeToRealtime = async function(){
+    if(realtimeChannel)await sb.removeChannel(realtimeChannel);
+    const unitId=userAccess.profile.unit_id;
+    realtimeChannel=sb.channel(`location-user-unit-${unitId}-${Date.now()}`)
+      .on('postgres_changes',{event:'*',schema:'public',table:'location_zones',filter:`unit_id=eq.${unitId}`},scheduleRealtimeReload)
+      .on('postgres_changes',{event:'*',schema:'public',table:'user_locations',filter:`unit_id=eq.${unitId}`},scheduleRealtimeReload)
+      .on('postgres_changes',{event:'*',schema:'public',table:'location_movement_logs',filter:`unit_id=eq.${unitId}`},scheduleRealtimeReload)
+      .on('postgres_changes',{event:'*',schema:'public',table:'units',filter:`id=eq.${unitId}`},scheduleRealtimeReload)
+      .subscribe(status=>{
+        if(status==='SUBSCRIBED')setSyncStatus(formatSyncTime());
+        else if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setSyncStatus('실시간 연결 재시도 중...',true);
+      });
+  };
+  if(!window.__locationPeerRefresh){
+    window.__locationPeerRefresh=window.setInterval(()=>{
+      if(!document.hidden&&!document.querySelector('.modal-backdrop.open,.sheet-backdrop.open')){
+        loadPageData({quiet:true}).catch(error=>console.warn('동일 부대 인원 보강 동기화 실패:',error));
+      }
+    },10000);
+  }
+
+  // 기존 스와이프 리스너보다 먼저 실행되는 관리자 방식 스와이프
+  (function installCaptureSwipe(){
+    const area=document.getElementById('userTabMain');
+    if(!area||area.dataset.v13CaptureSwipe)return;
+    area.dataset.v13CaptureSwipe='1';
+    const order=['detail','dashboard','records'];
+    let tracking=false,axis=null,startX=0,startY=0,lastX=0,lastTime=0,velocity=0;
+    let prepared=false,current=null,target=null,targetType='',direction=0,width=1,wrap=null;
+    let currentStyle=null,targetStyle=null,wrapStyle=null;
+    const gap=12;
+    const restore=(el,style)=>{if(!el)return;if(style===null)el.removeAttribute('style');else el.setAttribute('style',style)};
+    const overlay=()=>Boolean(document.querySelector('.modal-backdrop.open,.sheet-backdrop.open'));
+    const active=()=>document.querySelector('[data-user-tab-view]:not([hidden])')?.dataset.userTabView||'detail';
+    const clear=complete=>{
+      restore(current,currentStyle);restore(target,targetStyle);restore(wrap,wrapStyle);
+      if(current&&target){if(complete){current.hidden=true;target.hidden=false;switchUserTab(targetType)}else{current.hidden=false;target.hidden=true}}
+      prepared=false;current=target=wrap=null;document.body.classList.remove('user-tab-switching');
+    };
+    const prepare=dx=>{
+      const type=active(),idx=order.indexOf(type);if(idx<0)return false;
+      direction=dx<0?1:-1;targetType=order[(idx+direction+order.length)%order.length];
+      current=document.getElementById(`view-${type}`);target=document.getElementById(`view-${targetType}`);
+      if(!current||!target||current===target)return false;
+      wrap=current.parentElement;const cr=current.getBoundingClientRect(),wr=wrap.getBoundingClientRect();width=Math.max(cr.width,1);
+      currentStyle=current.getAttribute('style');targetStyle=target.getAttribute('style');wrapStyle=wrap.getAttribute('style');
+      target.hidden=false;const targetHeight=Math.max(target.scrollHeight||0,target.getBoundingClientRect().height||0,1);
+      if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';wrap.style.overflow='hidden';wrap.style.minHeight=`${Math.max(cr.height,targetHeight)}px`;
+      Object.assign(current.style,{position:'relative',zIndex:'5',width:'100%',transform:'translate3d(0,0,0)',transition:'none',willChange:'transform',pointerEvents:'none'});
+      Object.assign(target.style,{position:'absolute',left:`${cr.left-wr.left}px`,top:`${cr.top-wr.top}px`,zIndex:'6',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,margin:'0',boxSizing:'border-box',transition:'none',willChange:'transform',pointerEvents:'none',transform:`translate3d(${direction*(width+gap)}px,0,0)`});
+      prepared=true;document.body.classList.add('user-tab-switching');return true;
+    };
+    const settle=complete=>{
+      if(!prepared)return;const duration=complete?200:160,easing='cubic-bezier(.22,.61,.36,1)';
+      current.style.transition=`transform ${duration}ms ${easing}`;target.style.transition=`transform ${duration}ms ${easing}`;
+      requestAnimationFrame(()=>{if(complete){current.style.transform=`translate3d(${-direction*(width+gap)}px,0,0)`;target.style.transform='translate3d(0,0,0)'}else{current.style.transform='translate3d(0,0,0)';target.style.transform=`translate3d(${direction*(width+gap)}px,0,0)`}});
+      let done=false;const finish=()=>{if(done)return;done=true;clear(complete)};target.addEventListener('transitionend',finish,{once:true});setTimeout(finish,duration+80);
+    };
+    area.addEventListener('touchstart',event=>{
+      if(overlay()||event.touches.length!==1)return;
+      const card=event.target.closest('.location-card,.dashboard-zone-card,.record-card');
+      if(!card&&event.target.closest('input,textarea,select,button,a,[contenteditable="true"]'))return;
+      const t=event.touches[0];startX=lastX=t.clientX;startY=t.clientY;lastTime=performance.now();velocity=0;tracking=true;axis=null;prepared=false;
+    },{capture:true,passive:true});
+    area.addEventListener('touchmove',event=>{
+      if(!tracking||event.touches.length!==1)return;
+      const t=event.touches[0],dx=t.clientX-startX,dy=t.clientY-startY,ax=Math.abs(dx),ay=Math.abs(dy);
+      if(!axis){if(ax<5&&ay<5)return;axis=ax>ay*1.05?'x':'y';if(axis==='y'){tracking=false;return}}
+      if(axis!=='x')return;event.stopImmediatePropagation();event.preventDefault();if(!prepared&&!prepare(dx)){tracking=false;return}
+      const now=performance.now();velocity=(t.clientX-lastX)/Math.max(now-lastTime,1);lastX=t.clientX;lastTime=now;
+      const clamped=Math.max(-width,Math.min(width,dx));current.style.transform=`translate3d(${clamped}px,0,0)`;target.style.transform=`translate3d(${direction*(width+gap)+clamped}px,0,0)`;
+    },{capture:true,passive:false});
+    area.addEventListener('touchend',event=>{
+      if(!tracking)return;tracking=false;if(!prepared||event.changedTouches.length!==1)return;event.stopImmediatePropagation();
+      const dx=event.changedTouches[0].clientX-startX;settle(Math.sign(dx)===-direction&&(Math.abs(dx)>=width*.12||Math.abs(velocity)>=.24));
+    },{capture:true,passive:true});
+    area.addEventListener('touchcancel',event=>{if(prepared)event.stopImmediatePropagation();tracking=false;if(prepared)settle(false)},{capture:true,passive:true});
+  })();
+
+  setTimeout(() => {
+    try{renderZones()}catch(error){console.warn('v13 초기 렌더링 보강 실패:',error)}
+  },300);
+})();
+</script>
+
+
+<script>
+(function(){
+  const css = document.createElement('style');
+  css.textContent = `
+    /* 관리자 페이지 팝업 카드와 동일한 최종 규격 */
+    #zonePeopleContent{
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-flow:row!important;
+      align-content:start!important;
+      align-items:stretch!important;
+      gap:10px!important;
+      padding:14px 14px calc(24px + env(safe-area-inset-bottom))!important;
+    }
+    #zonePeopleContent > .sheet-person{
+      display:block!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:none!important;
+      margin:0!important;
+      padding:11px!important;
+      border:1px solid color-mix(in srgb,var(--home-zone-color,#64748b) 28%,var(--line))!important;
+      border-radius:16px!important;
+      background:color-mix(in srgb,var(--home-zone-color,#64748b) 6%,white)!important;
+      box-shadow:0 6px 16px rgba(15,23,42,.05)!important;
+    }
+    #zonePeopleContent > .sheet-empty-state{grid-column:1/-1!important}
+    #zonePeopleContent .person-card-head{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) auto!important;
+      gap:6px!important;
+      align-items:center!important;
+    }
+    #zonePeopleContent .person-card-name{
+      display:block!important;
+      min-width:0!important;
+      max-width:100%!important;
+      padding:6px 7px!important;
+      border-radius:10px!important;
+      background:color-mix(in srgb,var(--home-zone-color,#64748b) 12%,white)!important;
+      color:var(--home-zone-color,#1d4ed8)!important;
+      font-size:13px!important;
+      font-weight:900!important;
+      line-height:1.2!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+    #zonePeopleContent .person-card-company{
+      color:var(--muted)!important;
+      font-size:12px!important;
+      font-weight:850!important;
+      line-height:1.3!important;
+      text-align:right!important;
+      white-space:nowrap!important;
+    }
+    #zonePeopleContent .sheet-home-badge{
+      grid-column:1/-1!important;
+      justify-self:stretch!important;
+      display:inline-flex!important;
+      align-items:center!important;
+      justify-content:center!important;
+      gap:5px!important;
+      min-width:0!important;
+      max-width:100%!important;
+      min-height:25px!important;
+      padding:4px 7px!important;
+      border:1px solid color-mix(in srgb,var(--badge-color,#64748b) 26%,var(--line))!important;
+      border-radius:999px!important;
+      background:color-mix(in srgb,var(--badge-color,#64748b) 9%,white)!important;
+      color:var(--badge-color,#64748b)!important;
+      font-size:10px!important;
+      font-weight:900!important;
+      text-align:center!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+    #zonePeopleContent .sheet-home-badge svg{width:14px!important;height:14px!important;fill:currentColor!important;flex:none!important}
+    #zonePeopleContent .sheet-home-badge span{display:block!important;min-width:0!important;text-align:center!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+    #zonePeopleContent .person-card-grid{
+      display:grid!important;
+      grid-template-columns:minmax(55px,auto) minmax(0,1fr)!important;
+      gap:7px 8px!important;
+      margin-top:10px!important;
+      align-items:center!important;
+    }
+    #zonePeopleContent .person-card-label{font-size:10px!important;font-weight:800!important;color:var(--muted)!important}
+    #zonePeopleContent .person-card-value{font-size:11px!important;font-weight:850!important;text-align:right!important;min-width:0!important}
+    @media(max-width:380px){
+      #zonePeopleContent{gap:8px!important;padding-left:10px!important;padding-right:10px!important}
+      #zonePeopleContent > .sheet-person{padding:9px!important}
+      #zonePeopleContent .person-card-name{font-size:12px!important}
+      #zonePeopleContent .person-card-company{font-size:11px!important}
+    }
+  `;
+  document.head.appendChild(css);
+
+  function createV14HomeBadge(label, color){
+    const badge = document.createElement('span');
+    badge.className = 'sheet-home-badge';
+    badge.style.setProperty('--badge-color', color || '#64748b');
+    badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    badge.querySelector('span').textContent = label || '미지정';
+    return badge;
+  }
+
+  // 헤더 복제 이후의 실제 DOM을 직접 조회하여 구역명/인원수를 갱신
+  renderZonePeople = function(zoneId){
+    const zone = getZone(zoneId);
+    if (!zone) return;
+    const zonePeople = getZonePeople(zoneId);
+    const visibleTitle = document.querySelector('#bottomSheet #sheetTitle');
+    const visibleSubtitle = document.querySelector('#bottomSheet #sheetSubtitle');
+    const visibleContent = document.getElementById('zonePeopleContent');
+    if (visibleTitle) visibleTitle.textContent = zone.name;
+    if (visibleSubtitle) visibleSubtitle.textContent = `등록된 인원 ${zonePeople.length}명`;
+    if (!visibleContent) return;
+    visibleContent.innerHTML = '';
+
+    if (!zonePeople.length){
+      visibleContent.innerHTML = '<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';
+      return;
+    }
+
+    zonePeople.forEach(person => {
+      const row = document.createElement('article');
+      row.className = 'sheet-person';
+      const homeZone = getZone(person.homeZoneId);
+      row.style.setProperty('--home-zone-color', homeZone?.color || '#64748b');
+      const atHome = isPersonAtHome(person);
+      row.innerHTML = atHome ? `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>` : `
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>
+        <div class="person-card-grid">
+          <span class="person-card-label">출발</span>
+          <span class="person-card-value">${formatTime(person.departureTime)}</span>
+          <span class="person-card-label">도착 예정</span>
+          <span class="person-card-value">${formatTime(person.returnTime)}</span>
+          <span class="person-card-label">지난 시간</span>
+          <span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+        </div>`;
+      row.querySelector('.person-card-name').textContent = person.name || '이름 없음';
+      row.querySelector('.person-card-company').textContent = person.company || '중대 미입력';
+      if (homeZone) row.querySelector('.person-card-head').appendChild(createV14HomeBadge(homeZone.name, homeZone.color));
+      visibleContent.appendChild(row);
+    });
+  };
+})();
+</script>
+
+
+<script>
+(function locationUserV15Final(){
+  const css=document.createElement('style');
+  css.textContent=`
+    /* 짧은 구역명까지 잘리던 여백/말줄임 제거 */
+    .location-card:not(.current) .location-title{padding-right:0!important}
+    .location-card.current .location-title{padding-right:34px!important}
+    .location-title,.dashboard-zone-title{
+      white-space:normal!important;
+      overflow:visible!important;
+      text-overflow:clip!important;
+      word-break:keep-all!important;
+      overflow-wrap:anywhere!important;
+    }
+
+    /* 과거 관리자 팝업 카드 디자인과 동일 */
+    #zonePeopleContent{
+      display:grid!important;
+      grid-template-columns:repeat(2,minmax(0,1fr))!important;
+      grid-auto-flow:row!important;
+      align-content:start!important;
+      align-items:stretch!important;
+      gap:10px!important;
+      padding:14px 14px calc(24px + env(safe-area-inset-bottom))!important;
+    }
+    #zonePeopleContent > .sheet-person{
+      display:block!important;width:100%!important;min-width:0!important;max-width:none!important;
+      margin:0!important;padding:10px!important;
+      border:1px solid color-mix(in srgb,var(--home-zone-color,#64748b) 28%,var(--line))!important;
+      border-radius:16px!important;background:color-mix(in srgb,var(--home-zone-color,#64748b) 6%,white)!important;
+      box-shadow:0 6px 16px rgba(15,23,42,.05)!important;
+    }
+    #zonePeopleContent > .sheet-empty-state{grid-column:1/-1!important}
+    #zonePeopleContent .person-card-head{
+      display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;
+      align-items:center!important;gap:7px!important;min-width:0!important;
+    }
+    #zonePeopleContent .person-card-name{
+      display:block!important;min-width:0!important;max-width:100%!important;padding:7px 9px!important;
+      border-radius:10px!important;background:color-mix(in srgb,var(--home-zone-color,#2563eb) 12%,white)!important;
+      color:var(--home-zone-color,#1d4ed8)!important;font-size:14px!important;font-weight:900!important;
+      line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;text-align:left!important;
+    }
+    #zonePeopleContent .person-card-company{color:#64748b!important;font-size:12px!important;font-weight:900!important;line-height:1.2!important;white-space:nowrap!important;text-align:center!important}
+    #zonePeopleContent .sheet-home-badge{
+      grid-column:auto!important;justify-self:end!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+      gap:4px!important;width:auto!important;max-width:72px!important;min-height:25px!important;padding:4px 8px!important;
+      border:1px solid color-mix(in srgb,var(--badge-color,#64748b) 28%,var(--line))!important;border-radius:999px!important;
+      background:color-mix(in srgb,var(--badge-color,#64748b) 9%,white)!important;color:var(--badge-color,#64748b)!important;
+      font-size:10px!important;font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+    }
+    #zonePeopleContent .sheet-home-badge svg{width:13px!important;height:13px!important;fill:currentColor!important;flex:none!important}
+    #zonePeopleContent .sheet-home-badge span{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:center!important}
+    #zonePeopleContent .person-card-grid{display:grid!important;grid-template-columns:minmax(55px,auto) minmax(0,1fr)!important;gap:7px 8px!important;margin-top:10px!important;align-items:center!important}
+    #zonePeopleContent .person-card-label{font-size:10px!important;font-weight:800!important;color:#64748b!important}
+    #zonePeopleContent .person-card-value{font-size:11px!important;font-weight:850!important;text-align:right!important;min-width:0!important}
+
+    /* 팝업은 페이드/중복 애니메이션 없이 한 번만 슬라이드 */
+    .sheet-backdrop.open,.sheet-backdrop.closing{animation:none!important}
+    .bottom-sheet,.bottom-sheet.sheet-entering,.bottom-sheet.sheet-opened,.bottom-sheet.sheet-following,.bottom-sheet.sheet-returning,.bottom-sheet.closing{animation:none!important}
+    #bottomSheet .sheet-head{touch-action:none!important}
+
+    @media(max-width:380px){
+      #zonePeopleContent{gap:8px!important;padding-left:10px!important;padding-right:10px!important}
+      #zonePeopleContent > .sheet-person{padding:8px!important}
+      #zonePeopleContent .person-card-head{gap:5px!important}
+      #zonePeopleContent .person-card-name{font-size:13px!important;padding:6px 7px!important}
+      #zonePeopleContent .person-card-company{font-size:11px!important}
+      #zonePeopleContent .sheet-home-badge{max-width:62px!important;padding:4px 6px!important;font-size:9px!important}
+    }
+  `;
+  document.head.appendChild(css);
+
+  function makeHomeBadge(label,color){
+    const badge=document.createElement('span');
+    badge.className='sheet-home-badge';
+    badge.style.setProperty('--badge-color',color||'#64748b');
+    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    badge.querySelector('span').textContent=label||'미지정';
+    return badge;
+  }
+
+  renderZonePeople=function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+    const zonePeople=getZonePeople(zoneId);
+    const title=bottomSheet?.querySelector('#sheetTitle')||sheetTitle;
+    const subtitle=bottomSheet?.querySelector('#sheetSubtitle')||sheetSubtitle;
+    const content=document.getElementById('zonePeopleContent');
+    if(title)title.textContent=zone.name;
+    if(subtitle)subtitle.textContent=`등록된 인원 ${zonePeople.length}명`;
+    if(!content)return;
+    content.innerHTML='';
+    if(!zonePeople.length){content.innerHTML='<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';return;}
+    zonePeople.forEach(person=>{
+      const row=document.createElement('article');
+      row.className='sheet-person';
+      const homeZone=getZone(person.homeZoneId);
+      row.style.setProperty('--home-zone-color',homeZone?.color||'#64748b');
+      const atHome=isPersonAtHome(person);
+      row.innerHTML=atHome?`
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>`:`
+        <div class="person-card-head">
+          <strong class="person-card-name"></strong>
+          <span class="person-card-company"></span>
+        </div>
+        <div class="person-card-grid">
+          <span class="person-card-label">출발</span><span class="person-card-value">${formatTime(person.departureTime)}</span>
+          <span class="person-card-label">도착 예정</span><span class="person-card-value">${formatTime(person.returnTime)}</span>
+          <span class="person-card-label">지난 시간</span><span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+        </div>`;
+      row.querySelector('.person-card-name').textContent=person.name||'이름 없음';
+      row.querySelector('.person-card-company').textContent=person.company||'미입력';
+      row.querySelector('.person-card-head').appendChild(makeHomeBadge(homeZone?.name||person.homeZoneName||'미지정',homeZone?.color||'#64748b'));
+      content.appendChild(row);
+    });
+  };
+
+  // 빠른 시간 버튼을 현재 입력값 기준으로 누적합니다.
+  setArrivalAfterMinutes=function(minutesToAdd){
+    const add=Number(minutesToAdd);
+    if(!Number.isFinite(add))return;
+    const currentIso=resolveArrivalIso(arrivalDateInput.value,arrivalTimeInput.value);
+    const currentDate=currentIso?new Date(currentIso):new Date();
+    setArrivalInputsFromDate(new Date(currentDate.getTime()+add*60000));
+  };
+
+  // DB 패치 전에도 중복 로그 제약 오류가 발생하면 위치 행 직접 갱신을 한 번 시도합니다.
+  moveOwnLocation=async function(zone,arrivalIso){
+    const rpcResult=await sb.rpc('move_my_location',{p_zone_id:zone.id,p_return_time:arrivalIso});
+    if(!rpcResult.error)return;
+    const duplicateOpenLog=rpcResult.error?.code==='23505'||String(rpcResult.error?.message||'').includes('location_movement_logs_open_user');
+    const missingFunction=isMissingFunctionError(rpcResult.error,'move_my_location');
+    if(!duplicateOpenLog&&!missingFunction)throw rpcResult.error;
+    const payload={
+      user_id:userAccess.user.id,
+      unit_id:userAccess.profile.unit_id,
+      zone_id:zone.id,
+      departure_time:new Date().toISOString(),
+      return_time:isOwnHomeZone(zone)?null:arrivalIso,
+      updated_by:userAccess.user.id
+    };
+    const fallback=await sb.from('user_locations').upsert(payload,{onConflict:'user_id'});
+    if(fallback.error){
+      if(duplicateOpenLog)throw new Error('위치 로그 중복 방지 SQL을 먼저 실행해주세요.');
+      throw fallback.error;
+    }
+  };
+
+  // 이전 드래그 리스너를 DOM 교체로 제거하고 Pointer Event 하나만 사용합니다.
+  const currentHead=bottomSheet?.querySelector('.sheet-head');
+  let dragHead=currentHead;
+  if(currentHead){
+    const replacement=currentHead.cloneNode(true);
+    currentHead.replaceWith(replacement);
+    dragHead=replacement;
+  }
+
+  let sheetClosing=false;
+  let closeTimer=0;
+  const setTransform=(value,transition='none')=>{
+    bottomSheet.style.setProperty('transition',transition,'important');
+    bottomSheet.style.setProperty('transform',value,'important');
+  };
+  const clearSheetStyles=()=>{
+    bottomSheet.style.removeProperty('transition');
+    bottomSheet.style.removeProperty('transform');
+    sheetBackdrop.style.removeProperty('background-color');
+  };
+  const finalizeClosed=()=>{
+    clearTimeout(closeTimer);
+    sheetClosing=false;
+    sheetBackdrop.classList.remove('open','closing');
+    bottomSheet.classList.remove('closing','sheet-entering','sheet-opened','sheet-following','sheet-returning');
+    clearSheetStyles();
+    selectedSheetZoneId=null;
+    document.body.classList.remove('sheet-open-lock');
+    updateBodyOverlayLock();
+  };
+  const animateClose=(fromCurrent=false)=>{
+    if(sheetClosing||!sheetBackdrop.classList.contains('open'))return;
+    sheetClosing=true;
+    clearTimeout(closeTimer);
+    if(!fromCurrent)setTransform('translate3d(-50%,0,0)','none');
+    requestAnimationFrame(()=>{
+      setTransform('translate3d(-50%,100%,0)','transform .22s cubic-bezier(.4,0,1,1)');
+      closeTimer=setTimeout(finalizeClosed,240);
+    });
+  };
+
+  openZoneSheet=function(zoneId){
+    clearTimeout(closeTimer);
+    sheetClosing=false;
+    selectedSheetZoneId=zoneId;
+    renderZonePeople(zoneId);
+    sheetBackdrop.classList.remove('closing');
+    sheetBackdrop.classList.add('open');
+    bottomSheet.classList.remove('closing','sheet-entering','sheet-opened','sheet-following','sheet-returning');
+    setTransform('translate3d(-50%,100%,0)','none');
+    sheetBackdrop.style.setProperty('background-color','rgba(15,23,42,.42)');
+    document.body.classList.add('sheet-open-lock');
+    updateBodyOverlayLock();
+    void bottomSheet.offsetHeight;
+    requestAnimationFrame(()=>{
+      setTransform('translate3d(-50%,0,0)','transform .24s cubic-bezier(.22,.61,.36,1)');
+      closeTimer=setTimeout(()=>{
+        if(sheetBackdrop.classList.contains('open')&&!sheetClosing){
+          bottomSheet.style.setProperty('transition','none','important');
+          bottomSheet.classList.add('sheet-opened');
+        }
+      },260);
+    });
+  };
+  closeZoneSheet=function(){animateClose(false)};
+  dragHead?.querySelector('#sheetClose')?.addEventListener('click',event=>{event.stopPropagation();animateClose(false)});
+
+  if(dragHead){
+    dragHead.style.touchAction='none';
+    let dragging=false,startY=0,currentY=0,startTime=0,activePointer=null;
+    dragHead.addEventListener('pointerdown',event=>{
+      if(sheetClosing||!sheetBackdrop.classList.contains('open')||event.target.closest('button'))return;
+      if(event.pointerType==='mouse'&&event.button!==0)return;
+      dragging=true;activePointer=event.pointerId;startY=currentY=event.clientY;startTime=performance.now();
+      bottomSheet.style.setProperty('transition','none','important');
+      try{dragHead.setPointerCapture(activePointer)}catch(_){}
+    });
+    dragHead.addEventListener('pointermove',event=>{
+      if(!dragging||event.pointerId!==activePointer)return;
+      currentY=event.clientY;
+      const distance=Math.max(0,currentY-startY);
+      if(event.cancelable)event.preventDefault();
+      setTransform(`translate3d(-50%,${distance}px,0)`,'none');
+      const opacity=Math.max(0,.42*(1-Math.min(distance/(window.innerHeight*.55),1)));
+      sheetBackdrop.style.setProperty('background-color',`rgba(15,23,42,${opacity})`);
+    },{passive:false});
+    const finish=event=>{
+      if(!dragging)return;
+      if(event?.pointerId!=null&&event.pointerId!==activePointer)return;
+      if(event?.clientY!=null)currentY=event.clientY;
+      dragging=false;
+      const distance=Math.max(0,currentY-startY);
+      const velocity=distance/Math.max(1,performance.now()-startTime);
+      if(distance>=110||velocity>=.6){
+        animateClose(true);
+      }else{
+        setTransform('translate3d(-50%,0,0)','transform .2s cubic-bezier(.22,.61,.36,1)');
+        sheetBackdrop.style.setProperty('background-color','rgba(15,23,42,.42)');
+      }
+    };
+    dragHead.addEventListener('pointerup',finish);
+    dragHead.addEventListener('pointercancel',finish);
+  }
+})();
+</script>
+
+<script>
+(function locationUserV16Final(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* 현위치 마커가 구역명 레이아웃 공간을 점유하지 않도록 완전 분리 */
+    .location-card.current .location-title,
+    .location-card:not(.current) .location-title{padding-right:0!important}
+    .location-main>span:first-child{min-width:0!important;max-width:100%!important;overflow:visible!important}
+    .location-title,.dashboard-zone-title{
+      display:block!important;width:100%!important;max-width:100%!important;
+      white-space:normal!important;word-break:keep-all!important;overflow-wrap:normal!important;
+      overflow:visible!important;text-overflow:clip!important;
+    }
+    .current-badge{
+      position:absolute!important;top:7px!important;right:7px!important;z-index:4!important;
+      width:23px!important;height:23px!important;padding:0!important;margin:0!important;
+      transform:none!important;border-radius:50%!important;background:#ef4444!important;
+      box-shadow:none!important;filter:none!important;background-image:none!important;
+      pointer-events:none!important;
+    }
+    .current-badge::before,.current-badge::after{display:none!important;content:none!important}
+    .current-badge svg{width:14px!important;height:14px!important;fill:#fff!important;filter:none!important}
+
+    /* 현황판 팝업 인원명 중앙 정렬 */
+    #zonePeopleContent .person-card-name{text-align:center!important}
+
+    /* 이동 기록: 생활관 복귀 기록에만 도착 예정/지난 시간 표시 */
+    #view-records .record-card-info.record-return-home-info{grid-template-columns:minmax(68px,auto) minmax(0,1fr)!important}
+
+    /* 탭 이동 중 DOM 재배치가 보이지 않도록 뷰포트 고정 */
+    #userTabMain{position:relative;overflow-x:hidden!important}
+    body.user-v16-tab-moving{overflow-x:hidden!important}
+    body.user-v16-tab-moving .user-tab-view{backface-visibility:hidden;transform-style:preserve-3d}
+  `;
+  document.head.appendChild(style);
+
+  function getHomeId(){return userAccess?.profile?.home_zone_id||null}
+  function isAwayToAway(zone){
+    const homeId=getHomeId();
+    return Boolean(homeId&&ownLocation?.zoneId&&ownLocation.zoneId!==homeId&&zone?.id!==homeId&&zone?.attribute!=='outside');
+  }
+  function isReturnHomeLog(log){
+    const homeId=getHomeId();
+    return Boolean(homeId&&(log.destinationZoneId||log.zoneId)===homeId);
+  }
+  function movementElapsed(expected,arrival){
+    if(!expected)return '-';
+    const base=new Date(expected).getTime();
+    const end=arrival?new Date(arrival).getTime():Date.now();
+    if(!Number.isFinite(base)||!Number.isFinite(end))return '-';
+    const minutes=Math.max(0,Math.floor((end-base)/60000));
+    if(minutes<60)return `${minutes}분`;
+    const h=Math.floor(minutes/60),m=minutes%60;
+    return m?`${h}시간 ${m}분`:`${h}시간`;
+  }
+  function badgeMarkup(label,color){
+    const safe=String(label||'미지정').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    return `<span class="route-zone-badge" style="--badge-color:${color||'#64748b'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><b>${safe}</b></span>`;
+  }
+
+  function normalizeReturnTiming(logs){
+    const homeId=getHomeId();
+    let rememberedExpected=null;
+    return (logs||[]).slice().sort((a,b)=>new Date(a.departureTime||0)-new Date(b.departureTime||0)).map(log=>{
+      const copy={...log};
+      const destination=copy.destinationZoneId||copy.zoneId;
+      if(destination===homeId){
+        if(!copy.expectedReturnTime&&rememberedExpected)copy.expectedReturnTime=rememberedExpected;
+        rememberedExpected=null;
+      }else if(copy.expectedReturnTime){
+        rememberedExpected=copy.expectedReturnTime;
+      }
+      return copy;
+    });
+  }
+
+  renderMovementRecords=function(){
+    recordsList.innerHTML='';
+    recordsState.hidden=true;
+    recordsState.textContent='';
+    if(!movementLogs.length)return;
+    const prepared=normalizeReturnTiming(movementLogs).sort((a,b)=>new Date(b.departureTime||0)-new Date(a.departureTime||0));
+    prepared.forEach(log=>{
+      const homeZone=getHomeZone();
+      const originName=log.originZoneName||getZone(log.originZoneId)?.name||homeZone?.name||'위치 미기록';
+      const destinationId=log.destinationZoneId||log.zoneId;
+      const destinationName=log.destinationZoneName||getZone(destinationId)?.name||log.zoneName||'도착지 미기록';
+      const originColor=getZone(log.originZoneId)?.color||homeZone?.color||'#64748b';
+      const destinationColor=getZone(destinationId)?.color||'#2563eb';
+      const returnHome=isReturnHomeLog(log);
+      const card=document.createElement('article');
+      card.className='record-card';
+      card.innerHTML=`
+        <div class="record-route-badges">${badgeMarkup(originName,originColor)}<span class="route-arrow" aria-hidden="true">→</span>${badgeMarkup(destinationName,destinationColor)}</div>
+        <dl class="record-card-info ${returnHome?'record-return-home-info':''}">
+          <dt>출발</dt><dd class="record-time-value">${formatRecordDateTime(log.departureTime)}</dd>
+          ${returnHome?`<dt>도착 예정</dt><dd>${formatRecordDateTime(log.expectedReturnTime)}</dd>`:''}
+          <dt>도착</dt><dd class="${log.arrivalTime?'':'missing'}">${log.arrivalTime?formatRecordDateTime(log.arrivalTime):'미복귀'}</dd>
+          ${returnHome?`<dt>지난 시간</dt><dd class="record-v16-elapsed">${movementElapsed(log.expectedReturnTime,log.arrivalTime)}</dd>`:''}
+        </dl>`;
+      const elapsed=card.querySelector('.record-v16-elapsed');
+      if(elapsed&&elapsed.textContent!=='-'&&elapsed.textContent!=='0분')elapsed.style.color='#dc2626';
+      recordsList.appendChild(card);
+    });
+  };
+
+  /* 비생활관 -> 비생활관 이동은 예정시간 입력 UI와 값을 사용하지 않습니다. */
+  const arrivalField=arrivalDateInput.closest('.field-group');
+  openMoveModal=function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+    selectedMoveZone=zone;
+    moveDialogTitle.textContent=zone.name;
+    const noSchedule=isAwayToAway(zone);
+    arrivalField.hidden=noSchedule;
+    if(noSchedule){
+      arrivalDateInput.value='';
+      arrivalTimeInput.value='';
+      arrivalDateInput.required=false;
+      arrivalTimeInput.required=false;
+      setArrivalControlsDisabled(true);
+    }else{
+      const defaults=getDefaultArrivalDateTime(zone);
+      arrivalDateInput.value=defaults.date;
+      arrivalTimeInput.value=defaults.time;
+      setArrivalControlsDisabled(false);
+      const required=zone.attribute==='duty'||zone.attribute==='outside';
+      arrivalDateInput.required=required;
+      arrivalTimeInput.required=required;
+      arrivalTimeNote.hidden=!required;
+      arrivalTimeNote.textContent=zone.attribute==='duty'
+        ?'근무 시간은 자동 입력되며 직접 수정할 수 있습니다.'
+        :zone.attribute==='outside'
+          ?'열외 구역 이동 시 도착 예정 시간을 반드시 입력해주세요.'
+          :'';
+    }
+    moveDialog.setAttribute('tabindex','-1');
+    openModal(moveModal,moveDialog);
+    requestAnimationFrame(()=>{
+      arrivalDateInput.blur();arrivalTimeInput.blur();
+      try{moveDialog.focus({preventScroll:true})}catch(_){moveDialog.focus()}
+    });
+  };
+  const oldCloseMoveModal=closeMoveModal;
+  closeMoveModal=function(){arrivalField.hidden=false;oldCloseMoveModal()};
+
+  /* SQL 미설치 환경의 직접 저장 fallback에서도 기존 복귀 예정 시간을 유지합니다. */
+  moveOwnLocation=async function(zone,arrivalIso){
+    const rpcResult=await sb.rpc('move_my_location',{p_zone_id:zone.id,p_return_time:arrivalIso});
+    if(!rpcResult.error)return;
+    const duplicate=rpcResult.error?.code==='23505'||String(rpcResult.error?.message||'').includes('location_movement_logs_open_user');
+    const missing=isMissingFunctionError(rpcResult.error,'move_my_location');
+    if(!duplicate&&!missing)throw rpcResult.error;
+    const carriedReturn=isAwayToAway(zone)?(ownLocation?.returnTime||null):arrivalIso;
+    const payload={
+      user_id:userAccess.user.id,
+      unit_id:userAccess.profile.unit_id,
+      zone_id:zone.id,
+      departure_time:new Date().toISOString(),
+      return_time:isOwnHomeZone(zone)?null:carriedReturn,
+      updated_by:userAccess.user.id
+    };
+    const fallback=await sb.from('user_locations').upsert(payload,{onConflict:'user_id'});
+    if(fallback.error){
+      if(duplicate)throw new Error('위치 로그 중복 방지 SQL을 먼저 실행해주세요.');
+      throw fallback.error;
+    }
+  };
+
+  moveForm.addEventListener('submit',async event=>{
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const zone=selectedMoveZone;
+    if(!zone)return;
+    const noSchedule=isAwayToAway(zone);
+    let arrivalIso=null;
+    if(!noSchedule){
+      const hasInput=Boolean(arrivalDateInput.value||arrivalTimeInput.value);
+      if(zone.attribute==='duty'||zone.attribute==='outside'||hasInput){
+        if(!parseDateValue(arrivalDateInput.value)){showMessage('도착 예정 날짜를 입력해주세요.','입력 확인');return}
+        arrivalIso=resolveArrivalIso(arrivalDateInput.value,arrivalTimeInput.value);
+        if(!arrivalIso){showMessage('도착 예정 시간을 24시간제 HH:MM 형식으로 입력해주세요.','입력 확인');return}
+      }
+    }
+    moveConfirmBtn.disabled=true;
+    document.getElementById('moveCancelBtn').disabled=true;
+    try{
+      await moveOwnLocation(zone,arrivalIso);
+      closeMoveModal();
+      await loadPageData({quiet:true});
+      triggerToast(`${zone.name}(으)로 위치를 이동했습니다.`);
+    }catch(error){showMessage(escapeMessage(error),'위치이동 실패')}
+    finally{
+      moveConfirmBtn.disabled=false;
+      document.getElementById('moveCancelBtn').disabled=false;
+    }
+  },{capture:true});
+
+  /* 클릭과 터치 모두 동일한 한 장짜리 수평 슬라이드로 처리 */
+  const order=['detail','dashboard','records'];
+  const main=document.getElementById('userTabMain');
+  let tabBusy=false;
+  function activeType(){return document.querySelector('[data-user-tab-view]:not([hidden])')?.dataset.userTabView||'detail'}
+  function updateButtons(type){
+    document.querySelectorAll('[data-user-tab]').forEach(button=>{
+      const active=button.dataset.userTab===type;
+      button.classList.toggle('active',active);
+      active?button.setAttribute('aria-current','page'):button.removeAttribute('aria-current');
+    });
+  }
+  function releaseSticky(){
+    document.querySelectorAll('.user-tab-view>.sticky-dashboard').forEach(d=>d.classList.remove('js-sticky-fixed'));
+    document.querySelectorAll('.sticky-dashboard-spacer').forEach(s=>{s.classList.remove('active');s.style.height='0px'});
+  }
+  function commit(type){
+    document.querySelectorAll('[data-user-tab-view]').forEach(view=>{view.hidden=view.dataset.userTabView!==type});
+    updateButtons(type);
+    requestAnimationFrame(()=>window.dispatchEvent(new Event('scroll')));
+  }
+  function transitionTo(type,direction){
+    const from=activeType();
+    if(tabBusy||from===type||!order.includes(type)||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open')){if(from===type)updateButtons(type);return}
+    const current=document.getElementById(`view-${from}`),target=document.getElementById(`view-${type}`);
+    if(!current||!target)return;
+    tabBusy=true;releaseSticky();
+    const wrap=current.parentElement,cr=current.getBoundingClientRect(),wr=wrap.getBoundingClientRect();
+    const width=Math.max(cr.width,1),gap=0;
+    const currentStyle=current.getAttribute('style'),targetStyle=target.getAttribute('style'),wrapStyle=wrap.getAttribute('style');
+    target.hidden=false;
+    const targetHeight=Math.max(target.scrollHeight,target.getBoundingClientRect().height,1);
+    if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';
+    wrap.style.overflow='hidden';wrap.style.minHeight=`${Math.max(cr.height,targetHeight)}px`;
+    Object.assign(current.style,{position:'relative',zIndex:'2',width:'100%',transition:'none',transform:'translate3d(0,0,0)',willChange:'transform',pointerEvents:'none'});
+    Object.assign(target.style,{position:'absolute',left:`${cr.left-wr.left}px`,top:`${cr.top-wr.top}px`,zIndex:'3',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,margin:'0',transition:'none',transform:`translate3d(${direction*(width+gap)}px,0,0)`,willChange:'transform',pointerEvents:'none'});
+    document.body.classList.add('user-v16-tab-moving');
+    const duration=260,easing='cubic-bezier(.22,.61,.36,1)';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      current.style.transition=`transform ${duration}ms ${easing}`;
+      target.style.transition=`transform ${duration}ms ${easing}`;
+      current.style.transform=`translate3d(${-direction*(width+gap)}px,0,0)`;
+      target.style.transform='translate3d(0,0,0)';
+    }));
+    let done=false;
+    const finish=()=>{
+      if(done)return;done=true;
+      currentStyle===null?current.removeAttribute('style'):current.setAttribute('style',currentStyle);
+      targetStyle===null?target.removeAttribute('style'):target.setAttribute('style',targetStyle);
+      wrapStyle===null?wrap.removeAttribute('style'):wrap.setAttribute('style',wrapStyle);
+      current.hidden=true;target.hidden=false;updateButtons(type);
+      document.body.classList.remove('user-v16-tab-moving');tabBusy=false;
+      void target.offsetHeight;window.dispatchEvent(new Event('scroll'));
+    };
+    target.addEventListener('transitionend',finish,{once:true});
+    setTimeout(finish,duration+100);
+  }
+  switchUserTab=function(type){
+    const from=activeType();
+    if(document.body.classList.contains('user-tab-switching')){commit(type);return}
+    const a=order.indexOf(from),b=order.indexOf(type);
+    if(a<0||b<0||a===b){commit(type);return}
+    transitionTo(type,b>a?1:-1);
+  };
+  document.addEventListener('click',event=>{
+    const button=event.target.closest('[data-user-tab]');
+    if(!button)return;
+    event.preventDefault();event.stopImmediatePropagation();
+    switchUserTab(button.dataset.userTab);
+  },true);
+
+  let gesture=null;
+  document.addEventListener('touchstart',event=>{
+    if(!main?.contains(event.target)||event.touches.length!==1||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open'))return;
+    if(event.target.closest('input,textarea,select,button,a,[contenteditable="true"]'))return;
+    const t=event.touches[0];gesture={x:t.clientX,y:t.clientY,axis:null};
+  },{capture:true,passive:true});
+  document.addEventListener('touchmove',event=>{
+    if(!gesture||event.touches.length!==1)return;
+    const t=event.touches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y;
+    if(!gesture.axis){
+      if(Math.abs(dx)<7&&Math.abs(dy)<7)return;
+      gesture.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';
+      if(gesture.axis==='y'){gesture=null;return}
+    }
+    if(gesture.axis==='x'){event.preventDefault();event.stopImmediatePropagation()}
+  },{capture:true,passive:false});
+  document.addEventListener('touchend',event=>{
+    if(!gesture)return;
+    if(gesture.axis==='x')event.stopImmediatePropagation();
+    const t=event.changedTouches[0],dx=t.clientX-gesture.x;
+    if(gesture.axis==='x'&&Math.abs(dx)>=54){
+      const index=order.indexOf(activeType()),next=index+(dx<0?1:-1);
+      if(next>=0&&next<order.length)transitionTo(order[next],dx<0?1:-1);
+    }
+    gesture=null;
+  },{capture:true,passive:true});
+  document.addEventListener('touchcancel',()=>{gesture=null},{capture:true,passive:true});
+
+  /* 현위치 마커가 갱신된 뒤에도 최종 CSS를 유지 */
+  const originalRenderDetailZones=renderDetailZones;
+  renderDetailZones=function(){originalRenderDetailZones()};
+  setTimeout(()=>{try{renderZones()}catch(_){}},120);
+})();
+</script>
+
+
+<script>
+(function locationUserV17FinalFix(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* 가로만 잘라 세로 스크롤 컨테이너가 새로 생기지 않도록 한다. */
+    #userTabMain{position:relative!important;overflow-x:clip!important;overflow-y:visible!important}
+    body.user-v17-tab-moving{overflow-x:hidden!important}
+    body.user-v17-tab-moving .user-tab-view{backface-visibility:hidden;transform-style:preserve-3d}
+  `;
+  document.head.appendChild(style);
+
+  /* 예정 시간이 지나지 않았으면 지난 시간을 0분으로 표시한다. */
+  getElapsedText=function(returnTime){
+    if(!returnTime)return '-';
+    const target=new Date(returnTime).getTime();
+    if(!Number.isFinite(target))return '-';
+    const diff=Math.floor((Date.now()-target)/60000);
+    if(diff<=0)return '0분';
+    if(diff<60)return `${diff}분`;
+    const hours=Math.floor(diff/60),minutes=diff%60;
+    return minutes?`${hours}시간 ${minutes}분`:`${hours}시간`;
+  };
+
+  function userJourneyBadgeMarkup(label,color){
+    const safe=String(label||'미지정').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    return `<span class="route-zone-badge" style="--badge-color:${color||'#64748b'}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><b>${safe}</b></span>`;
+  }
+
+  function userJourneyLogs(logs){
+    const homeId=userAccess?.profile?.home_zone_id||null;
+    let journeyDeparture=null;
+    let journeyExpected=null;
+    let away=false;
+    return (logs||[])
+      .slice()
+      .sort((a,b)=>new Date(a.departureTime||0)-new Date(b.departureTime||0))
+      .map(log=>{
+        const copy={...log};
+        const origin=copy.originZoneId||null;
+        const destination=copy.destinationZoneId||copy.zoneId||null;
+        const returnsHome=Boolean(homeId&&destination===homeId);
+        const leavesHome=Boolean(homeId&&origin===homeId&&destination!==homeId);
+        copy.isJourneyDeparture=leavesHome;
+
+        if(returnsHome){
+          copy.isReturnHomeJourney=true;
+          copy.journeyDepartureTime=journeyDeparture||copy.departureTime||null;
+          copy.journeyExpectedReturnTime=journeyExpected||copy.expectedReturnTime||null;
+          copy.journeyArrivalTime=copy.arrivalTime||copy.departureTime||null;
+          journeyDeparture=null;
+          journeyExpected=null;
+          away=false;
+        }else{
+          if(leavesHome||!away){
+            journeyDeparture=copy.departureTime||journeyDeparture;
+            journeyExpected=copy.expectedReturnTime||null;
+            away=true;
+          }else if(!journeyExpected&&copy.expectedReturnTime){
+            journeyExpected=copy.expectedReturnTime;
+          }
+          copy.isReturnHomeJourney=false;
+          copy.journeyDepartureTime=copy.departureTime||null;
+        }
+        return copy;
+      });
+  }
+
+  function userJourneyElapsed(expected,arrival){
+    if(!expected)return '-';
+    const expectedMs=new Date(expected).getTime();
+    const arrivalMs=arrival?new Date(arrival).getTime():Date.now();
+    if(!Number.isFinite(expectedMs)||!Number.isFinite(arrivalMs))return '-';
+    const minutes=Math.max(0,Math.floor((arrivalMs-expectedMs)/60000));
+    if(minutes<60)return `${minutes}분`;
+    const hours=Math.floor(minutes/60),rest=minutes%60;
+    return rest?`${hours}시간 ${rest}분`:`${hours}시간`;
+  }
+
+  renderMovementRecords=function(){
+    recordsList.innerHTML='';
+    recordsState.hidden=true;
+    recordsState.textContent='';
+    if(!movementLogs.length)return;
+
+    userJourneyLogs(movementLogs)
+      .sort((a,b)=>new Date(b.departureTime||0)-new Date(a.departureTime||0))
+      .forEach(log=>{
+        const homeZone=getHomeZone();
+        const originName=log.originZoneName||getZone(log.originZoneId)?.name||homeZone?.name||'위치 미기록';
+        const destinationId=log.destinationZoneId||log.zoneId;
+        const destinationName=log.destinationZoneName||getZone(destinationId)?.name||log.zoneName||'도착지 미기록';
+        const originColor=getZone(log.originZoneId)?.color||homeZone?.color||'#64748b';
+        const destinationColor=getZone(destinationId)?.color||'#2563eb';
+        const returnHome=log.isReturnHomeJourney===true;
+        const outsideMovement=getZone(destinationId)?.attribute==='outside';
+        const journeyDeparture=log.isJourneyDeparture===true;
+        const showFullTiming=returnHome||outsideMovement;
+        const showExpected=showFullTiming||journeyDeparture;
+        const departure=returnHome?log.journeyDepartureTime:log.departureTime;
+        const expected=returnHome?log.journeyExpectedReturnTime:log.expectedReturnTime;
+        const arrival=returnHome?log.journeyArrivalTime:log.arrivalTime;
+        const card=document.createElement('article');
+        card.className='record-card';
+        card.innerHTML=`
+          <div class="record-route-badges">${userJourneyBadgeMarkup(originName,originColor)}<span class="route-arrow" aria-hidden="true">→</span>${userJourneyBadgeMarkup(destinationName,destinationColor)}</div>
+          <dl class="record-card-info ${showFullTiming?'record-return-home-info':showExpected?'record-journey-departure-info':''}">
+            <dt>출발</dt><dd class="record-time-value">${formatRecordDateTime(departure)}</dd>
+            ${showExpected?`<dt>도착 예정</dt><dd>${formatRecordDateTime(expected)}</dd>`:''}
+            ${showFullTiming?`
+              <dt>도착</dt><dd class="${arrival?'':'missing'}">${arrival?formatRecordDateTime(arrival):'미복귀'}</dd>
+              <dt>지난 시간</dt><dd class="record-v17-elapsed">${userJourneyElapsed(expected,arrival)}</dd>
+            `:''}
+          </dl>`;
+        const elapsed=card.querySelector('.record-v17-elapsed');
+        if(elapsed&&elapsed.textContent!=='-'&&elapsed.textContent!=='0분')elapsed.style.color='#dc2626';
+        recordsList.appendChild(card);
+      });
+  };
+
+  const tabOrder=['detail','dashboard','records'];
+  const tabMain=document.getElementById('userTabMain');
+  let tabState=null;
+
+  function activeUserTab(){
+    return document.querySelector('[data-user-tab-view]:not([hidden])')?.dataset.userTabView||'detail';
+  }
+  function updateUserTabButtons(type){
+    document.querySelectorAll('[data-user-tab]').forEach(button=>{
+      const active=button.dataset.userTab===type;
+      button.classList.toggle('active',active);
+      active?button.setAttribute('aria-current','page'):button.removeAttribute('aria-current');
+    });
+  }
+  function releaseUserSticky(){
+    document.querySelectorAll('.user-tab-view>.sticky-dashboard').forEach(d=>d.classList.remove('js-sticky-fixed'));
+    document.querySelectorAll('.sticky-dashboard-spacer').forEach(s=>{
+      s.classList.remove('active');
+      s.style.height='0px';
+    });
+  }
+  function restoreInline(element,value){
+    value===null?element.removeAttribute('style'):element.setAttribute('style',value);
+  }
+  function setupUserTransition(type,direction){
+    const from=activeUserTab();
+    if(tabState||from===type||!tabOrder.includes(type)||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open'))return null;
+    const current=document.getElementById(`view-${from}`);
+    const target=document.getElementById(`view-${type}`);
+    if(!current||!target)return null;
+
+    releaseUserSticky();
+    const wrap=current.parentElement;
+    const currentRect=current.getBoundingClientRect();
+    const wrapRect=wrap.getBoundingClientRect();
+    const width=Math.max(currentRect.width,1);
+    const saved={
+      current:current.getAttribute('style'),
+      target:target.getAttribute('style'),
+      wrap:wrap.getAttribute('style'),
+      targetHidden:target.hidden
+    };
+    target.hidden=false;
+    const targetHeight=Math.max(target.scrollHeight,target.getBoundingClientRect().height,1);
+    if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';
+    wrap.style.overflow='hidden';
+    wrap.style.minHeight=`${Math.max(currentRect.height,targetHeight)}px`;
+    Object.assign(current.style,{position:'relative',zIndex:'2',width:'100%',transition:'none',transform:'translate3d(0,0,0)',willChange:'transform',pointerEvents:'none'});
+    Object.assign(target.style,{position:'absolute',left:`${currentRect.left-wrapRect.left}px`,top:`${currentRect.top-wrapRect.top}px`,zIndex:'3',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,margin:'0',boxSizing:'border-box',transition:'none',transform:`translate3d(${direction*width}px,0,0)`,willChange:'transform',pointerEvents:'none'});
+    document.body.classList.add('user-v17-tab-moving');
+    tabState={from,type,direction,current,target,wrap,width,saved,done:false};
+    return tabState;
+  }
+  function setUserTransitionOffset(state,offset){
+    const limited=state.direction>0
+      ?Math.max(-state.width,Math.min(0,offset))
+      :Math.min(state.width,Math.max(0,offset));
+    state.offset=limited;
+    state.current.style.transform=`translate3d(${limited}px,0,0)`;
+    state.target.style.transform=`translate3d(${state.direction*state.width+limited}px,0,0)`;
+  }
+  function finishUserTransition(state,complete){
+    if(!state||state.done)return;
+    state.done=true;
+    restoreInline(state.current,state.saved.current);
+    restoreInline(state.target,state.saved.target);
+    restoreInline(state.wrap,state.saved.wrap);
+    if(complete){
+      state.current.hidden=true;
+      state.target.hidden=false;
+      updateUserTabButtons(state.type);
+    }else{
+      state.current.hidden=false;
+      state.target.hidden=state.saved.targetHidden;
+      updateUserTabButtons(state.from);
+    }
+    document.body.classList.remove('user-v17-tab-moving');
+    tabState=null;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>window.dispatchEvent(new Event('scroll'))));
+  }
+  function animateUserTransition(state,complete){
+    if(!state)return;
+    const duration=complete?250:190;
+    const easing='cubic-bezier(.22,.61,.36,1)';
+    state.current.style.transition=`transform ${duration}ms ${easing}`;
+    state.target.style.transition=`transform ${duration}ms ${easing}`;
+    requestAnimationFrame(()=>{
+      state.current.style.transform=complete?`translate3d(${-state.direction*state.width}px,0,0)`:'translate3d(0,0,0)';
+      state.target.style.transform=complete?'translate3d(0,0,0)':`translate3d(${state.direction*state.width}px,0,0)`;
+    });
+    let ended=false;
+    const done=()=>{if(ended)return;ended=true;finishUserTransition(state,complete)};
+    state.target.addEventListener('transitionend',done,{once:true});
+    setTimeout(done,duration+90);
+  }
+  function goUserTab(type,directionOverride=null){
+    const from=activeUserTab();
+    const fromIndex=tabOrder.indexOf(from),toIndex=tabOrder.indexOf(type);
+    if(fromIndex<0||toIndex<0||fromIndex===toIndex){updateUserTabButtons(from);return}
+    const direction=directionOverride??(toIndex>fromIndex?1:-1);
+    const state=setupUserTransition(type,direction);
+    if(!state)return;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>animateUserTransition(state,true)));
+  }
+  switchUserTab=function(type){goUserTab(type)};
+
+  window.addEventListener('click',event=>{
+    const target=event.target instanceof Element?event.target:null;
+    const button=target?.closest('[data-user-tab]');
+    if(!button)return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    goUserTab(button.dataset.userTab);
+  },true);
+
+  let gesture=null;
+  window.addEventListener('touchstart',event=>{
+    const target=event.target instanceof Element?event.target:null;
+    if(!target||!tabMain?.contains(target)||event.touches.length!==1||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open'))return;
+    if(target.closest('input,textarea,select,button,a,[contenteditable="true"]'))return;
+    const touch=event.touches[0];
+    gesture={x:touch.clientX,y:touch.clientY,time:performance.now(),axis:null,state:null,lastX:touch.clientX};
+    event.stopImmediatePropagation();
+  },{capture:true,passive:false});
+  window.addEventListener('touchmove',event=>{
+    if(!gesture||event.touches.length!==1)return;
+    event.stopImmediatePropagation();
+    const touch=event.touches[0];
+    const dx=touch.clientX-gesture.x,dy=touch.clientY-gesture.y;
+    gesture.lastX=touch.clientX;
+    if(!gesture.axis){
+      if(Math.abs(dx)<7&&Math.abs(dy)<7)return;
+      gesture.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';
+      if(gesture.axis==='y')return;
+      const currentIndex=tabOrder.indexOf(activeUserTab());
+      const direction=dx<0?1:-1;
+      const nextIndex=(currentIndex+direction+tabOrder.length)%tabOrder.length;
+      gesture.state=setupUserTransition(tabOrder[nextIndex],direction);
+    }
+    if(gesture.axis==='x'){
+      event.preventDefault();
+      if(gesture.state)setUserTransitionOffset(gesture.state,dx);
+    }
+  },{capture:true,passive:false});
+  window.addEventListener('touchend',event=>{
+    if(!gesture)return;
+    event.stopImmediatePropagation();
+    const state=gesture.state;
+    if(gesture.axis==='x'&&state){
+      const changed=event.changedTouches[0];
+      const dx=(changed?.clientX??gesture.lastX)-gesture.x;
+      const elapsed=Math.max(performance.now()-gesture.time,1);
+      const velocity=Math.abs(dx)/elapsed;
+      const complete=Math.abs(dx)>=Math.max(54,state.width*.18)||velocity>.55;
+      animateUserTransition(state,complete);
+    }
+    gesture=null;
+  },{capture:true,passive:false});
+  window.addEventListener('touchcancel',event=>{
+    if(!gesture)return;
+    event.stopImmediatePropagation();
+    if(gesture.state)animateUserTransition(gesture.state,false);
+    gesture=null;
+  },{capture:true,passive:false});
+
+  /* 이동 기록 기간 필터 */
+  const userRecordsPeriodFilterButton=document.getElementById('userRecordsPeriodFilterButton');
+  const userRecordsPeriodModal=document.getElementById('userRecordsPeriodModal');
+  const userRecordsPeriodDialog=document.getElementById('userRecordsPeriodDialog');
+  const userRecordsPeriodCloseButton=document.getElementById('userRecordsPeriodCloseButton');
+  const userRecordsPeriodStartInput=document.getElementById('userRecordsPeriodStartInput');
+  const userRecordsPeriodEndInput=document.getElementById('userRecordsPeriodEndInput');
+  const userRecordsPeriodCancelButton=document.getElementById('userRecordsPeriodCancelButton');
+  const userRecordsPeriodClearButton=document.getElementById('userRecordsPeriodClearButton');
+  const userRecordsPeriodApplyButton=document.getElementById('userRecordsPeriodApplyButton');
+  let userAppliedRecordsStartDate='';
+  let userAppliedRecordsEndDate='';
+
+  function userGetKstDateString(value=new Date()){
+    const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(value));
+    const map=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+    return `${map.year}-${map.month}-${map.day}`;
+  }
+  function userAddDaysToDateValue(dateValue,days){
+    const [year,month,day]=String(dateValue||'').split('-').map(Number);
+    if(!year||!month||!day)return '';
+    return new Date(Date.UTC(year,month-1,day+Number(days||0))).toISOString().slice(0,10);
+  }
+  function updateUserRecordsPeriodButtonLabel(){
+    const label=userRecordsPeriodFilterButton?.querySelector('.search-filter-trigger-label,.period-button-label');
+    if(!label)return;
+    label.textContent=userAppliedRecordsStartDate&&userAppliedRecordsEndDate
+      ?`${userAppliedRecordsStartDate} ~ ${userAppliedRecordsEndDate}`
+      :'기간 설정';
+  }
+  function openUserRecordsPeriodModal(){
+    const today=userGetKstDateString();
+    userRecordsPeriodStartInput.value=userAppliedRecordsStartDate||today;
+    userRecordsPeriodEndInput.value=userAppliedRecordsEndDate||userRecordsPeriodStartInput.value;
+    openModal(userRecordsPeriodModal,userRecordsPeriodDialog);
+  }
+  function closeUserRecordsPeriodModal(){
+    closeModal(userRecordsPeriodModal,userRecordsPeriodDialog);
+  }
+
+  const renderMovementRecordsBeforePeriod=renderMovementRecords;
+  renderMovementRecords=function(...args){
+    const sourceLogs=movementLogs;
+    const hasPeriod=Boolean(userAppliedRecordsStartDate&&userAppliedRecordsEndDate);
+    const filteredLogs=hasPeriod
+      ?sourceLogs.filter(log=>{
+        if(!log?.departureTime)return false;
+        const date=userGetKstDateString(log.departureTime);
+        return date>=userAppliedRecordsStartDate&&date<=userAppliedRecordsEndDate;
+      })
+      :sourceLogs;
+    movementLogs=filteredLogs;
+    let result;
+    try{result=renderMovementRecordsBeforePeriod.apply(this,args)}
+    finally{movementLogs=sourceLogs}
+    if(filteredLogs.length===0){
+      recordsState.hidden=false;
+      recordsState.textContent=hasPeriod?'선택한 기간에 해당하는 이동 기록이 없습니다.':'저장된 이동 기록이 없습니다.';
+    }
+    return result;
+  };
+
+  userRecordsPeriodFilterButton?.addEventListener('click',openUserRecordsPeriodModal);
+  userRecordsPeriodCloseButton?.addEventListener('click',closeUserRecordsPeriodModal);
+  userRecordsPeriodCancelButton?.addEventListener('click',closeUserRecordsPeriodModal);
+  userRecordsPeriodModal?.addEventListener('click',event=>{
+    if(event.target===userRecordsPeriodModal)closeUserRecordsPeriodModal();
+  });
+  userRecordsPeriodStartInput?.addEventListener('change',()=>{
+    if(!userRecordsPeriodStartInput.value)userRecordsPeriodStartInput.value=userGetKstDateString();
+    if(!userRecordsPeriodEndInput.value||userRecordsPeriodEndInput.value<userRecordsPeriodStartInput.value){
+      userRecordsPeriodEndInput.value=userRecordsPeriodStartInput.value;
+    }
+  });
+  document.querySelectorAll('[data-user-period-add-days]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      const start=userRecordsPeriodStartInput.value||userGetKstDateString();
+      userRecordsPeriodStartInput.value=start;
+      userRecordsPeriodEndInput.value=userAddDaysToDateValue(start,Number(button.dataset.userPeriodAddDays));
+    });
+  });
+  document.querySelectorAll('[data-user-period-preset]').forEach(button=>{
+    button.addEventListener('click',()=>{
+      const today=userGetKstDateString();
+      if(button.dataset.userPeriodPreset==='today'){
+        userRecordsPeriodStartInput.value=today;
+        userRecordsPeriodEndInput.value=today;
+      }else if(button.dataset.userPeriodPreset==='yesterday'){
+        const yesterday=userAddDaysToDateValue(today,-1);
+        userRecordsPeriodStartInput.value=yesterday;
+        userRecordsPeriodEndInput.value=yesterday;
+      }else{
+        const now=new Date(`${today}T12:00:00+09:00`);
+        const day=now.getDay()||7;
+        const thisMonday=userAddDaysToDateValue(today,1-day);
+        userRecordsPeriodStartInput.value=userAddDaysToDateValue(thisMonday,-7);
+        userRecordsPeriodEndInput.value=userAddDaysToDateValue(thisMonday,-1);
+      }
+    });
+  });
+  userRecordsPeriodClearButton?.addEventListener('click',()=>{
+    userAppliedRecordsStartDate='';
+    userAppliedRecordsEndDate='';
+    userRecordsPeriodStartInput.value='';
+    userRecordsPeriodEndInput.value='';
+    updateUserRecordsPeriodButtonLabel();
+    renderMovementRecords();
+    closeUserRecordsPeriodModal();
+  });
+  userRecordsPeriodApplyButton?.addEventListener('click',()=>{
+    const start=userRecordsPeriodStartInput.value||userGetKstDateString();
+    const end=userRecordsPeriodEndInput.value||start;
+    if(end<start){
+      showMessage('종료일은 시작일보다 빠를 수 없습니다.','기간 확인');
+      return;
+    }
+    userAppliedRecordsStartDate=start;
+    userAppliedRecordsEndDate=end;
+    updateUserRecordsPeriodButtonLabel();
+    renderMovementRecords();
+    closeUserRecordsPeriodModal();
+  });
+
+  setTimeout(()=>{
+    try{renderMovementRecords();renderZones()}catch(_){}
+  },160);
+})();
+</script>
+
+
+
+<script>
+(function locationUserV20Polish(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* 부대명 아래 복귀 카운트다운 */
+    .title-area{flex:1!important;min-width:0!important}
+    .return-countdown-row{
+      min-height:18px;margin-top:5px;display:flex;align-items:center;gap:7px;
+      color:rgba(255,255,255,.74);font-size:11px;font-weight:800;line-height:1.2;
+      white-space:nowrap
+    }
+    .return-countdown-label{flex:0 0 auto}
+    .return-countdown-timer{
+      min-width:62px;color:#fff;font-size:12px;font-weight:950;letter-spacing:.15px;
+      font-variant-numeric:tabular-nums
+    }
+    .return-countdown-overdue{
+      display:inline-flex;align-items:center;gap:4px;padding:3px 7px 3px 4px;
+      border:1px solid rgba(254,202,202,.42);border-radius:999px;
+      background:rgba(220,38,38,.30);color:#fff;font-size:9px;font-weight:950
+    }
+    .return-countdown-overdue[hidden]{display:none!important}
+    .return-countdown-overdue-icon{
+      width:14px;height:14px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+      background:#ef4444;color:#fff;font-size:9px;font-weight:950;line-height:1
+    }
+
+    /* admin 필터 버튼과 동일한 기간 버튼 색상/텍스트 체계 */
+    #userRecordsPeriodFilterButton{
+      width:100%!important;height:46px!important;min-height:46px!important;max-height:46px!important;
+      box-sizing:border-box!important;border:1px solid var(--line)!important;border-radius:13px!important;
+      padding:0 10px!important;background:var(--surface)!important;color:#334155!important;
+      box-shadow:0 5px 14px rgba(15,23,42,.05)!important;
+      display:flex!important;align-items:center!important;justify-content:space-between!important;gap:7px!important;
+      font-size:11px!important;font-weight:850!important;line-height:1.2!important;text-align:left!important
+    }
+    #userRecordsPeriodFilterButton .search-filter-trigger-label{
+      min-width:0!important;flex:1!important;overflow:hidden!important;text-overflow:ellipsis!important;
+      white-space:nowrap!important;text-align:left!important;color:#334155!important
+    }
+    #userRecordsPeriodFilterButton .search-filter-trigger-arrow{
+      flex:0 0 12px!important;width:12px!important;height:12px!important;color:transparent!important;
+      font-size:0!important;line-height:0!important;
+      background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5 6 7.5 9 4.5' fill='none' stroke='%23334155' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/12px 12px no-repeat!important
+    }
+    #view-records .record-card-info.record-journey-departure-info{
+      grid-template-columns:minmax(68px,auto) minmax(0,1fr)!important
+    }
+  `;
+  document.head.appendChild(style);
+
+  const timer=document.getElementById('returnCountdownTimer');
+  const overdue=document.getElementById('returnCountdownOverdue');
+  let lastTimerState='';
+
+  function formatCountdownDuration(milliseconds){
+    const totalSeconds=Math.max(0,Math.floor(Math.abs(milliseconds)/1000));
+    const hours=Math.floor(totalSeconds/3600);
+    const minutes=Math.floor((totalSeconds%3600)/60);
+    const seconds=totalSeconds%60;
+    return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+  }
+  function updateReturnCountdown(){
+    if(!timer||!overdue)return;
+    const homeId=userAccess?.profile?.home_zone_id||null;
+    const atHome=Boolean(homeId&&ownLocation?.zoneId===homeId);
+    const expectedMs=ownLocation?.returnTime?new Date(ownLocation.returnTime).getTime():NaN;
+    let text='--:--:--';
+    let isOverdue=false;
+    let aria='복귀 예정 시간이 설정되지 않았습니다.';
+
+    if(atHome){
+      text='복귀 완료';
+      aria='현재 생활관에 복귀해 있습니다.';
+    }else if(Number.isFinite(expectedMs)){
+      const remaining=expectedMs-Date.now();
+      text=formatCountdownDuration(remaining);
+      isOverdue=remaining<0;
+      aria=isOverdue?`복귀 예정 시간을 ${text} 초과했습니다.`:`복귀까지 ${text} 남았습니다.`;
+    }
+
+    const state=`${text}|${isOverdue}`;
+    if(state!==lastTimerState){
+      timer.textContent=text;
+      overdue.hidden=!isOverdue;
+      const countdownRow=timer.closest('.return-countdown-row');
+      countdownRow?.classList.toggle('is-overdue',isOverdue);
+      countdownRow?.setAttribute('aria-label',aria);
+      lastTimerState=state;
+    }
+  }
+  updateReturnCountdown();
+  setInterval(updateReturnCountdown,1000);
+})();
+</script>
+
+
+<script>
+(function locationUserV21LayoutPolish(){
+  const style=document.createElement('style');
+  style.textContent=`
+    /* 기간 필터 문구를 화살표와 무관하게 버튼 중앙에 고정 */
+    #userRecordsPeriodFilterButton{
+      position:relative!important;
+      justify-content:center!important;
+      text-align:center!important;
+      padding-left:24px!important;
+      padding-right:24px!important;
+    }
+    #userRecordsPeriodFilterButton .search-filter-trigger-label{
+      display:block!important;
+      width:100%!important;
+      min-width:0!important;
+      max-width:100%!important;
+      flex:1 1 auto!important;
+      text-align:center!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+    }
+    #userRecordsPeriodFilterButton .search-filter-trigger-arrow{
+      position:absolute!important;
+      right:9px!important;
+      top:50%!important;
+      transform:translateY(-50%)!important;
+      margin:0!important;
+    }
+
+    /* 초과 배지가 타이머의 위치를 바꾸지 않도록 흐름에서 분리 */
+    .return-countdown-row{
+      position:relative!important;
+      display:flex!important;
+      flex-wrap:nowrap!important;
+      align-items:center!important;
+      justify-content:flex-start!important;
+      min-width:0!important;
+      overflow:visible!important;
+    }
+    .return-countdown-label{flex:0 0 auto!important}
+    .return-countdown-timer{
+      flex:0 0 72px!important;
+      width:72px!important;
+      min-width:72px!important;
+      max-width:72px!important;
+      text-align:left!important;
+      transition:color .16s ease,text-shadow .16s ease!important;
+    }
+    .return-countdown-overdue{
+      position:absolute!important;
+      left:121px!important;
+      top:50%!important;
+      transform:translateY(-50%)!important;
+      z-index:2!important;
+      margin:0!important;
+      white-space:nowrap!important;
+      pointer-events:none!important;
+    }
+    .return-countdown-row.is-overdue .return-countdown-timer{
+      color:#f87171!important;
+      text-shadow:0 0 10px rgba(248,113,113,.30)!important;
+    }
+    .return-countdown-row.is-overdue .return-countdown-overdue-icon{
+      background:#ef4444!important;
+      box-shadow:0 0 0 3px rgba(248,113,113,.16)!important;
+    }
+    @media (max-width:370px){
+      .return-countdown-row{gap:5px!important}
+      .return-countdown-timer{flex-basis:68px!important;width:68px!important;min-width:68px!important;max-width:68px!important;font-size:11px!important}
+      .return-countdown-overdue{left:113px!important;padding-right:5px!important;font-size:8px!important}
+    }
+  `;
+  document.head.appendChild(style);
+})();
+</script>
+
 </body>
 </html>
