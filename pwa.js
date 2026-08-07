@@ -1,6 +1,8 @@
 (function(){
   'use strict';
   let deferredInstallPrompt=null;
+  let swRegistration=null;
+  let updateReloadRequested=false;
   const ua=navigator.userAgent||'';
   const isIOS=/iPad|iPhone|iPod/.test(ua)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
   const isAndroid=/Android/i.test(ua);
@@ -58,6 +60,70 @@
     showGuide();
   }
 
+  function ensureUpdateDialog(){
+    let backdrop=document.getElementById('pwaUpdateDialogBackdrop');
+    if(backdrop) return backdrop;
+    backdrop=document.createElement('div');
+    backdrop.id='pwaUpdateDialogBackdrop';
+    backdrop.className='pwa-update-dialog-backdrop';
+    backdrop.setAttribute('aria-hidden','true');
+    backdrop.innerHTML=`
+      <section class="pwa-update-dialog" role="alertdialog" aria-modal="true" aria-labelledby="pwaUpdateDialogTitle">
+        <div class="pwa-update-dialog-icon" aria-hidden="true">↻</div>
+        <h2 class="pwa-update-dialog-title" id="pwaUpdateDialogTitle">새 버전 업데이트</h2>
+        <p class="pwa-update-dialog-text">새로운 버전이 배포되었습니다.<br>최신 기능과 수정사항을 적용하려면 업데이트해 주세요.</p>
+        <div class="pwa-update-dialog-actions">
+          <button class="pwa-update-dialog-later" type="button">나중에</button>
+          <button class="pwa-update-dialog-update" type="button">지금 업데이트</button>
+        </div>
+      </section>`;
+    document.body.appendChild(backdrop);
+    const close=()=>{
+      backdrop.classList.remove('open');
+      backdrop.setAttribute('aria-hidden','true');
+      document.body.style.overflow='';
+    };
+    backdrop.querySelector('.pwa-update-dialog-later').addEventListener('click',close);
+    backdrop.addEventListener('click',event=>{if(event.target===backdrop) close();});
+    backdrop.querySelector('.pwa-update-dialog-update').addEventListener('click',()=>{
+      const waiting=swRegistration?.waiting;
+      if(!waiting){close();location.reload();return;}
+      updateReloadRequested=true;
+      const button=backdrop.querySelector('.pwa-update-dialog-update');
+      button.disabled=true;
+      button.textContent='업데이트 중...';
+      waiting.postMessage({type:'SKIP_WAITING'});
+    });
+    return backdrop;
+  }
+
+  function showUpdateMessage(registration){
+    if(registration) swRegistration=registration;
+    if(!swRegistration?.waiting || !navigator.serviceWorker.controller) return;
+    const backdrop=ensureUpdateDialog();
+    const button=backdrop.querySelector('.pwa-update-dialog-update');
+    button.disabled=false;
+    button.textContent='지금 업데이트';
+    backdrop.classList.add('open');
+    backdrop.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+
+  function watchRegistration(registration){
+    swRegistration=registration;
+    if(registration.waiting && navigator.serviceWorker.controller) showUpdateMessage(registration);
+
+    registration.addEventListener('updatefound',()=>{
+      const worker=registration.installing;
+      if(!worker) return;
+      worker.addEventListener('statechange',()=>{
+        if(worker.state==='installed' && navigator.serviceWorker.controller){
+          showUpdateMessage(registration);
+        }
+      });
+    });
+  }
+
   window.addEventListener('beforeinstallprompt',event=>{
     event.preventDefault();
     deferredInstallPrompt=event;
@@ -76,6 +142,26 @@
   });
 
   if('serviceWorker' in navigator){
-    window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js',{scope:'./'}).catch(error=>console.warn('PWA service worker registration failed:',error)));
+    let controllerChanged=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(controllerChanged) return;
+      controllerChanged=true;
+      if(updateReloadRequested) location.reload();
+    });
+
+    window.addEventListener('load',async()=>{
+      try{
+        const registration=await navigator.serviceWorker.register('./service-worker.js',{scope:'./'});
+        watchRegistration(registration);
+        // GitHub Pages 등에서 브라우저의 기본 SW 확인 주기를 기다리지 않고 배포본을 즉시 점검한다.
+        registration.update().catch(()=>{});
+        window.setInterval(()=>registration.update().catch(()=>{}),60*60*1000);
+        document.addEventListener('visibilitychange',()=>{
+          if(document.visibilityState==='visible') registration.update().catch(()=>{});
+        });
+      }catch(error){
+        console.warn('PWA service worker registration failed:',error);
+      }
+    });
   }
 })();
