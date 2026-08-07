@@ -1,4 +1,4 @@
-const CACHE_NAME = 'location-1.0.0';
+const CACHE_NAME = 'location-1.0.1';
 
 const APP_SHELL = [
   './',
@@ -11,6 +11,7 @@ const APP_SHELL = [
   './config.js',
   './toast.js',
   './pwa.js',
+  './mobile-back.js',
   './pwa.css',
   './manifest.webmanifest',
   './offline.html',
