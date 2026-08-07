@@ -1727,6 +1727,141 @@
     }
 
   </style>
+
+  <style id="requested-ui-updates-20260807">
+    .header-welcome {
+      margin: 5px 0 0;
+      color: rgba(255,255,255,.78);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.35;
+    }
+
+    .return-countdown-row {
+      margin-top: 4px !important;
+    }
+
+    .action-toast-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 12000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 22px;
+      background: rgba(15,23,42,.60);
+      backdrop-filter: blur(4px);
+    }
+
+    .action-toast-backdrop.open {
+      display: flex;
+      animation: fadeIn .18s ease;
+    }
+
+    .action-toast-backdrop.closing {
+      animation: fadeOut .20s ease forwards;
+    }
+
+    .action-toast-panel {
+      width: min(100%, 360px);
+      padding: 22px;
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: 0 28px 70px rgba(15,23,42,.32);
+      text-align: center;
+      animation: actionToastIn .20s cubic-bezier(.22,.8,.22,1);
+    }
+
+    .action-toast-backdrop.closing .action-toast-panel {
+      animation: actionToastOut .20s ease forwards;
+    }
+
+    .action-toast-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 13px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #fff1f2;
+      color: #dc2626;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .action-toast-title {
+      margin: 0;
+      color: #0f172a;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -.3px;
+    }
+
+    .action-toast-message {
+      margin: 9px 0 0;
+      color: #64748b;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.65;
+      white-space: pre-line;
+    }
+
+    .action-toast-password-wrap {
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    .action-toast-error {
+      min-height: 17px;
+      margin: 10px 0 0;
+      color: #dc2626;
+      font-size: 11px;
+      font-weight: 900;
+      line-height: 1.45;
+    }
+
+    .action-toast-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 9px;
+      margin-top: 15px;
+    }
+
+    .action-toast-cancel,
+    .action-toast-confirm {
+      min-height: 45px;
+      border: 0;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .action-toast-cancel {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .action-toast-confirm {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .action-toast-panel button:disabled {
+      cursor: wait;
+      opacity: .58;
+    }
+
+    @keyframes actionToastIn {
+      from { opacity: 0; transform: translateY(18px) scale(.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes actionToastOut {
+      from { opacity: 1; transform: translateY(0) scale(1); }
+      to { opacity: 0; transform: translateY(18px) scale(.97); }
+    }
+  </style>
 </head>
 <body>
   <div class="loading-cover" id="loadingCover">위치현황을 불러오는 중...</div>
@@ -1736,6 +1871,7 @@
       <div class="header-top">
         <div class="title-area">
           <h1 id="pageTitle">부대 위치현황</h1>
+          <p class="header-welcome" id="headerWelcome">사용자님, 환영합니다!</p>
           <div class="return-countdown-row" id="returnCountdownRow" aria-live="polite">
             <span class="return-countdown-label">복귀까지</span>
             <strong class="return-countdown-timer" id="returnCountdownTimer">--:--:--</strong>
@@ -2023,8 +2159,30 @@
     </section>
   </div>
 
+
+  <div class="action-toast-backdrop" id="actionToastBackdrop" aria-hidden="true">
+    <section class="action-toast-panel danger" id="actionToastPanel" role="alertdialog" aria-modal="true" aria-labelledby="actionToastTitle">
+      <div class="action-toast-icon" id="actionToastIcon" aria-hidden="true">!</div>
+      <h3 class="action-toast-title" id="actionToastTitle">회원탈퇴</h3>
+      <p class="action-toast-message" id="actionToastMessage">정말 탈퇴하시겠습니까?
+계정과 연결된 위치 정보가 삭제되며 복구할 수 없습니다.</p>
+
+      <div class="action-toast-password-wrap" id="actionToastPasswordWrap">
+        <label class="field-label" for="actionToastPasswordInput">현재 비밀번호</label>
+        <input class="text-input" id="actionToastPasswordInput" type="password" autocomplete="current-password" placeholder="현재 비밀번호 입력" />
+      </div>
+      <p class="action-toast-error" id="actionToastError" aria-live="polite"></p>
+
+      <div class="action-toast-actions">
+        <button class="action-toast-cancel" id="actionToastCancelBtn" type="button">취소</button>
+        <button class="action-toast-confirm" id="actionToastConfirmBtn" type="button">회원탈퇴</button>
+      </div>
+    </section>
+  </div>
+
   <script>
     const pageTitle = document.getElementById('pageTitle');
+    const headerWelcome = document.getElementById('headerWelcome');
     const syncText = document.getElementById('syncText');
     const syncDot = document.getElementById('syncDot');
     const refreshIcon = document.getElementById('refreshIcon');
@@ -2088,6 +2246,13 @@
     const confirmText = document.getElementById('confirmText');
     const confirmOkBtn = document.getElementById('confirmOkBtn');
 
+    const actionToastBackdrop = document.getElementById('actionToastBackdrop');
+    const actionToastPanel = document.getElementById('actionToastPanel');
+    const actionToastPasswordInput = document.getElementById('actionToastPasswordInput');
+    const actionToastError = document.getElementById('actionToastError');
+    const actionToastCancelBtn = document.getElementById('actionToastCancelBtn');
+    const actionToastConfirmBtn = document.getElementById('actionToastConfirmBtn');
+
     const sheetBackdrop = document.getElementById('sheetBackdrop');
     const bottomSheet = document.getElementById('bottomSheet');
     const sheetTitle = document.getElementById('sheetTitle');
@@ -2106,6 +2271,7 @@
     let loadSequence = 0;
     let pendingConfirmAction = null;
     let selectedSheetZoneId = null;
+    let pendingUserAction = null;
 
     function setSyncStatus(message, isError = false) {
       syncText.textContent = message;
@@ -2203,9 +2369,17 @@
     }
 
     function isPersonAtHome(person) {
-      if (!person) return false;
-      if (person.homeZoneId) return person.zoneId === person.homeZoneId;
-      return getZone(person.zoneId)?.attribute === 'inside';
+      if (!person || !person.homeZoneId) return false;
+      return person.zoneId === person.homeZoneId;
+    }
+
+    function updateWelcomeMessage() {
+      const name = String(
+        userAccess?.profile?.name ||
+        userAccess?.user?.user_metadata?.display_name ||
+        '사용자'
+      ).trim() || '사용자';
+      headerWelcome.textContent = `${name}님, 환영합니다!`;
     }
 
     function updatePageTitle() {
@@ -2213,6 +2387,7 @@
         ? `${currentUnit.unit_name} 위치현황`
         : '부대 위치현황';
       document.title = pageTitle.textContent;
+      updateWelcomeMessage();
     }
 
     function updateMetrics() {
@@ -2672,10 +2847,7 @@
       if (!normalized) throw new Error('이름을 입력해주세요.');
       if (normalized.length > 20) throw new Error('이름은 20자 이하로 입력해주세요.');
 
-      const profileResult = await sb
-        .from('profiles')
-        .update({ name: normalized })
-        .eq('id', userAccess.user.id);
+      const profileResult = await sb.rpc('set_my_name', { p_name: normalized });
       if (profileResult.error) throw profileResult.error;
 
       const authResult = await sb.auth.updateUser({
@@ -2688,12 +2860,14 @@
     }
 
     
+
+    
 async function saveCompany(company) {
   const normalized = String(company || '').trim();
   if (!normalized) throw new Error('중대를 입력해주세요.');
   if (normalized.length > 30) throw new Error('중대는 30자 이하로 입력해주세요.');
-  const directResult = await sb.from('profiles').update({ company: normalized }).eq('id', userAccess.user.id);
-  if (directResult.error) throw directResult.error;
+  const rpcResult = await sb.rpc('set_my_company', { p_company: normalized });
+  if (rpcResult.error) throw rpcResult.error;
   userAccess.profile.company = normalized;
   companyInput.value = normalized;
   settingsCompanyInput.value = normalized;
@@ -2702,16 +2876,22 @@ async function saveCompany(company) {
 
 
     
+
+
+    
 async function saveHomeZone(zoneId, setCurrentLocation = false) {
-  const directResult = await sb.from('profiles').update({ home_zone_id: zoneId }).eq('id', userAccess.user.id);
-  if (directResult.error) throw directResult.error;
-  if (setCurrentLocation) {
-    const zone = getZone(zoneId);
-    if (zone) await moveOwnLocation(zone, null);
-  }
+  const rpcResult = await sb.rpc('set_my_home_zone', {
+    p_zone_id: zoneId,
+    p_set_current_location: Boolean(setCurrentLocation)
+  });
+  if (rpcResult.error) throw rpcResult.error;
   userAccess.profile.home_zone_id = zoneId;
   return zoneId;
 }
+
+
+
+    
 
 
     async function moveOwnLocation(zone, arrivalIso) {
@@ -2719,42 +2899,51 @@ async function saveHomeZone(zoneId, setCurrentLocation = false) {
         p_zone_id: zone.id,
         p_return_time: arrivalIso
       });
-      if (!rpcResult.error) return;
-      if (!isMissingFunctionError(rpcResult.error, 'move_my_location')) throw rpcResult.error;
-
-      const payload = {
-        user_id: userAccess.user.id,
-        unit_id: userAccess.profile.unit_id,
-        zone_id: zone.id,
-        return_time: isOwnHomeZone(zone) ? null : arrivalIso,
-        updated_by: userAccess.user.id
-      };
-      const fallback = await sb.from('user_locations').upsert(payload, { onConflict: 'user_id' });
-      if (fallback.error) {
-        throw new Error(`위치 이동 함수를 설치해주세요.\n${fallback.error.message}`);
-      }
+      if (rpcResult.error) throw rpcResult.error;
     }
+
+
+    
+
 
     
 async function ensureInitialLocation() {
-  const homeZoneId = userAccess?.profile?.home_zone_id;
-  if (!homeZoneId) return;
-  const existing = await sb.from('user_locations').select('user_id').eq('user_id', userAccess.user.id).maybeSingle();
-  if (existing.error || existing.data) return;
-  const insertResult = await sb.from('user_locations').upsert({ user_id: userAccess.user.id, unit_id: userAccess.profile.unit_id, zone_id: homeZoneId, return_time: null, updated_by: userAccess.user.id }, { onConflict: 'user_id' });
-  if (insertResult.error) console.warn('초기 위치 직접 저장 실패:', insertResult.error);
+  const savedHomeZoneId = userAccess?.profile?.home_zone_id || null;
+  const savedHomeZone = savedHomeZoneId
+    ? (zones.find(zone => zone.id === savedHomeZoneId) || null)
+    : null;
+
+  if (savedHomeZoneId && (!savedHomeZone || String(savedHomeZone.attribute || '').trim() !== 'inside')) {
+    userAccess.profile.home_zone_id = null;
+  }
+
+  // 생활관이 미지정된 경우에도 RPC를 호출해야 구형 함수가 만든
+  // 첫 번째 생활관(예: 우정생활관) 위치 행을 서버에서 정리할 수 있습니다.
+  const rpcResult = await sb.rpc('ensure_my_initial_location');
+  if (rpcResult.error) throw rpcResult.error;
+  return rpcResult.data || null;
 }
+
+
+
+    
+
 
 
     
 async function loadLocationMembers(unitId) {
-  const directResult = await sb.from('profiles').select('id, name, role, company, home_zone_id, phone, user_approved, approval_status').eq('unit_id', unitId).eq('role', 'user').eq('user_approved', true).eq('approval_status', 'approved');
-  if (directResult.error) return { data: null, error: directResult.error };
-  return {
-    data: (directResult.data || []).map(row => ({ user_id: row.id, display_name: row.name, name: row.name, member_role: row.role, company: row.company, phone: row.phone, home_zone_id: row.home_zone_id })),
-    error: null
-  };
+  const personnelResult = await sb.rpc('get_location_personnel', { p_unit_id: unitId });
+  if (!personnelResult.error) return personnelResult;
+
+  const legacyResult = await sb.rpc('get_location_members', { p_unit_id: unitId });
+  if (!legacyResult.error) return legacyResult;
+  return personnelResult;
 }
+
+
+
+    
+
 
 
     
@@ -2849,7 +3038,7 @@ async function loadOwnMovementLogs(unitId) {
     }
 
     function renderHomeZoneChoices() {
-      const livingZones = zones.filter(zone => zone.attribute === 'inside');
+      const livingZones = zones.filter(zone => String(zone.attribute || '').trim() === 'inside');
       homeZoneList.innerHTML = '';
       homeZoneState.hidden = livingZones.length > 0;
       if (!livingZones.length) {
@@ -2915,7 +3104,7 @@ async function loadOwnMovementLogs(unitId) {
     }
 
     function fillSettings() {
-      const livingZones = zones.filter(zone => zone.attribute === 'inside');
+      const livingZones = zones.filter(zone => String(zone.attribute || '').trim() === 'inside');
       settingsNameInput.value = userAccess?.profile?.name || '';
       settingsCompanyInput.value = userAccess?.profile?.company || '';
       settingsHomeZoneSelect.innerHTML = '';
@@ -3127,7 +3316,8 @@ async function loadOwnMovementLogs(unitId) {
 
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
-      if (sheetBackdrop.classList.contains('open')) closeZoneSheet();
+      if (actionToastBackdrop.classList.contains('open')) closeUserActionToast();
+      else if (sheetBackdrop.classList.contains('open')) closeZoneSheet();
       else if (messageModal.classList.contains('open')) closeModal(messageModal, messageDialog);
       else if (confirmModal.classList.contains('open')) closeModal(confirmModal, confirmDialog);
       else if (moveModal.classList.contains('open')) closeMoveModal();
@@ -3137,6 +3327,75 @@ async function loadOwnMovementLogs(unitId) {
 
     window.addEventListener('beforeunload', () => {
       if (realtimeChannel) sb.removeChannel(realtimeChannel);
+    });
+
+    function openUserDeleteToast() {
+      pendingUserAction = 'delete_account';
+      actionToastPasswordInput.value = '';
+      actionToastError.textContent = '';
+      actionToastCancelBtn.disabled = false;
+      actionToastConfirmBtn.disabled = false;
+      actionToastConfirmBtn.textContent = '회원탈퇴';
+      actionToastBackdrop.classList.remove('closing');
+      actionToastBackdrop.classList.add('open');
+      actionToastBackdrop.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('sheet-open-lock');
+      setTimeout(() => actionToastPasswordInput.focus(), 80);
+    }
+
+    function closeUserActionToast() {
+      if (!actionToastBackdrop.classList.contains('open')) return;
+      actionToastBackdrop.classList.add('closing');
+      setTimeout(() => {
+        actionToastBackdrop.classList.remove('open', 'closing');
+        actionToastBackdrop.setAttribute('aria-hidden', 'true');
+        actionToastPasswordInput.value = '';
+        actionToastError.textContent = '';
+        pendingUserAction = null;
+        if (!document.querySelector('.modal-backdrop.open, .sheet-backdrop.open, .action-toast-backdrop.open')) {
+          document.body.classList.remove('sheet-open-lock');
+        }
+      }, 200);
+    }
+
+    async function performUserAction() {
+      if (pendingUserAction !== 'delete_account') return;
+      const currentPassword = actionToastPasswordInput.value;
+      actionToastError.textContent = '';
+
+      if (!currentPassword) {
+        actionToastError.textContent = '현재 비밀번호를 입력해주세요.';
+        actionToastPasswordInput.focus();
+        return;
+      }
+
+      actionToastCancelBtn.disabled = true;
+      actionToastConfirmBtn.disabled = true;
+      actionToastConfirmBtn.textContent = '탈퇴 처리 중...';
+
+      try {
+        const { data, error } = await sb.functions.invoke('rapid-service', {
+          body: { action: 'delete_account', current_password: currentPassword }
+        });
+        if (error) throw new Error(await getRapidServiceError(error));
+        if (!data?.ok) throw new Error(data?.error || '회원탈퇴 요청을 처리하지 못했습니다.');
+        try { await sb.auth.signOut(); } finally { location.replace('index.html'); }
+      } catch (error) {
+        actionToastError.textContent = error?.message || '회원탈퇴 요청을 처리하지 못했습니다.';
+      } finally {
+        actionToastCancelBtn.disabled = false;
+        actionToastConfirmBtn.disabled = false;
+        actionToastConfirmBtn.textContent = '회원탈퇴';
+      }
+    }
+
+    actionToastCancelBtn.addEventListener('click', closeUserActionToast);
+    actionToastConfirmBtn.addEventListener('click', performUserAction);
+    actionToastPasswordInput.addEventListener('keydown', event => {
+      if (event.key === 'Enter') performUserAction();
+    });
+    actionToastBackdrop.addEventListener('click', event => {
+      if (event.target === actionToastBackdrop) closeUserActionToast();
     });
 
     async function initializeUserPage() {
@@ -3188,7 +3447,24 @@ async function loadOwnMovementLogs(unitId) {
     .user-settings-form{display:grid;gap:14px}
     .user-settings-form .field-group{display:grid;gap:7px}
     .user-settings-form .field-help{color:#64748b;font-size:11px;font-weight:700;line-height:1.45}
+    .user-settings-date-grid{display:grid;grid-template-columns:1fr;gap:14px}
+    .user-settings-date-grid .field-group{min-width:0}
+    .user-settings-date-grid .text-input{width:100%;min-width:0}
     .user-settings-save{margin-top:2px}
+    .home-zone-picker-trigger{display:flex!important;align-items:center;justify-content:space-between;gap:10px;text-align:left;cursor:pointer}
+    .home-zone-picker-trigger:disabled{cursor:not-allowed;opacity:.58;background:#f8fafc}
+    .home-zone-picker-label{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .home-zone-picker-label.placeholder{color:#94a3b8}
+    .home-zone-picker-arrow{flex:0 0 auto;color:#64748b;font-size:12px;line-height:1}
+    .settings-home-picker-modal{z-index:11000}
+    .settings-home-picker-dialog{max-width:400px;max-height:min(82vh,680px);max-height:min(82dvh,680px);display:flex;flex-direction:column;overflow:hidden}
+    .settings-home-picker-head{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:10px}
+    .settings-home-picker-search{padding:14px 16px 10px}
+    .settings-home-picker-list{min-height:120px;max-height:52vh;overflow-y:auto;padding:0 12px 14px;-webkit-overflow-scrolling:touch}
+    .settings-home-picker-option{width:100%;min-height:48px;border:0;border-bottom:1px solid #eef2f7;background:#fff;color:var(--text);padding:12px 10px;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;font-size:14px;font-weight:850}
+    .settings-home-picker-option.selected{color:var(--primary);background:#eff6ff}
+    .settings-home-picker-option-mark{flex:0 0 auto;color:var(--primary);font-size:11px;font-weight:900}
+    .settings-home-picker-empty{padding:28px 10px;color:var(--muted);text-align:center;font-size:13px;font-weight:750;line-height:1.55}
     @media (max-width:360px){#view-detail .sticky-actions{grid-template-columns:1fr}.current-location-summary{padding:9px 10px}.current-location-summary .summary-value{font-size:11px}}
   `;
   document.head.appendChild(extraStyle);
@@ -3306,35 +3582,191 @@ async function loadOwnMovementLogs(unitId) {
     dragZone.addEventListener('touchcancel', () => reset(true));
   })();
 
+  async function saveUserServiceDates(enlistDate, dischargeDate){
+    const payload = {
+      p_enlist_date: enlistDate || null,
+      p_discharge_date: dischargeDate || null
+    };
+    const rpcResult = await sb.rpc('update_my_service_dates', payload);
+    if (!rpcResult.error) return rpcResult.data;
+
+    const errorCode = String(rpcResult.error?.code || '');
+    const errorMessage = String(rpcResult.error?.message || '');
+    const functionMissing = ['PGRST202', '42883'].includes(errorCode)
+      || errorMessage.includes('update_my_service_dates');
+    if (!functionMissing) throw rpcResult.error;
+
+    const directResult = await sb
+      .from('profiles')
+      .update({ enlist_date: enlistDate || null, discharge_date: dischargeDate || null })
+      .eq('id', userAccess.user.id);
+    if (directResult.error) {
+      const setupError = new Error('입대일과 전역일 저장용 Supabase 설정이 필요합니다. 함께 제공된 supabase_update_profile_dates.sql을 실행해주세요.');
+      setupError.cause = directResult.error;
+      throw setupError;
+    }
+    return null;
+  }
+
+  let settingsHomePickerModal = null;
+  let settingsHomePickerDialog = null;
+  let settingsHomePickerSearchInput = null;
+  let settingsHomePickerOptionList = null;
+
+  function normalizeHomePickerText(value){
+    return String(value || '').trim().toLocaleLowerCase('ko-KR').replace(/\s+/g, '');
+  }
+
+  function getEnhancedHomeSelect(){
+    return document.getElementById('enhancedSettingsHome');
+  }
+
+  function getEnhancedHomeButton(){
+    return document.getElementById('enhancedSettingsHomeButton');
+  }
+
+  function syncEnhancedHomeButton(){
+    const select = getEnhancedHomeSelect();
+    const button = getEnhancedHomeButton();
+    if (!select || !button) return;
+    const label = button.querySelector('.home-zone-picker-label');
+    const selected = select.options[select.selectedIndex];
+    const hasValue = Boolean(select.value && selected);
+    label.textContent = hasValue ? selected.textContent : '생활관 선택';
+    label.classList.toggle('placeholder', !hasValue);
+    button.disabled = select.disabled || select.options.length === 0;
+  }
+
+  function ensureSettingsHomePicker(){
+    if (settingsHomePickerModal) return;
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `<div class="modal-backdrop settings-home-picker-modal" id="settingsHomePickerModal"><section class="dialog settings-home-picker-dialog" id="settingsHomePickerDialog" role="dialog" aria-modal="true" aria-labelledby="settingsHomePickerTitle" tabindex="-1"><div class="dialog-head settings-home-picker-head"><div><h3 id="settingsHomePickerTitle">생활관 선택</h3><p>생활관을 검색하거나 목록에서 선택하세요.</p></div><button class="dialog-close-btn" id="settingsHomePickerCloseButton" type="button" aria-label="생활관 선택 닫기">✕</button></div><div class="settings-home-picker-search"><div class="personnel-search-wrap"><span class="personnel-search-icon" aria-hidden="true">⌕</span><input class="personnel-search-input" id="settingsHomePickerSearchInput" type="search" placeholder="생활관 검색" autocomplete="off" enterkeyhint="search" aria-label="생활관 검색"></div></div><div class="settings-home-picker-list" id="settingsHomePickerOptionList"></div></section></div>`;
+    settingsHomePickerModal = wrapper.firstElementChild;
+    document.body.appendChild(settingsHomePickerModal);
+    settingsHomePickerDialog = document.getElementById('settingsHomePickerDialog');
+    settingsHomePickerSearchInput = document.getElementById('settingsHomePickerSearchInput');
+    settingsHomePickerOptionList = document.getElementById('settingsHomePickerOptionList');
+
+    document.getElementById('settingsHomePickerCloseButton').addEventListener('click', closeSettingsHomePicker);
+    settingsHomePickerModal.addEventListener('click', event => {
+      if (event.target === settingsHomePickerModal) closeSettingsHomePicker();
+    });
+    settingsHomePickerSearchInput.addEventListener('input', renderSettingsHomePickerOptions);
+    document.addEventListener('keydown', event => {
+      if (event.key !== 'Escape' || !settingsHomePickerModal.classList.contains('open')) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      closeSettingsHomePicker();
+    }, true);
+  }
+
+  function renderSettingsHomePickerOptions(){
+    const select = getEnhancedHomeSelect();
+    if (!select || !settingsHomePickerOptionList) return;
+    const keyword = normalizeHomePickerText(settingsHomePickerSearchInput?.value);
+    const selectedValue = select.value;
+    const options = Array.from(select.options).filter(option => {
+      if (!option.value) return false;
+      return !keyword || normalizeHomePickerText(option.textContent).includes(keyword);
+    });
+    settingsHomePickerOptionList.innerHTML = '';
+    if (!options.length) {
+      const empty = document.createElement('div');
+      empty.className = 'settings-home-picker-empty';
+      empty.textContent = select.options.length ? '검색 결과가 없습니다.' : '선택할 수 있는 생활관이 없습니다.';
+      settingsHomePickerOptionList.appendChild(empty);
+      return;
+    }
+    options.forEach(option => {
+      const button = document.createElement('button');
+      button.className = 'settings-home-picker-option';
+      button.type = 'button';
+      button.classList.toggle('selected', option.value === selectedValue);
+      const label = document.createElement('span');
+      label.textContent = option.textContent;
+      button.appendChild(label);
+      if (option.value === selectedValue) {
+        const mark = document.createElement('span');
+        mark.className = 'settings-home-picker-option-mark';
+        mark.textContent = '선택됨';
+        button.appendChild(mark);
+      }
+      button.addEventListener('click', () => {
+        select.value = option.value;
+        syncEnhancedHomeButton();
+        closeSettingsHomePicker();
+      });
+      settingsHomePickerOptionList.appendChild(button);
+    });
+  }
+
+  function openSettingsHomePicker(){
+    const select = getEnhancedHomeSelect();
+    if (!select || select.disabled || !select.options.length) return;
+    ensureSettingsHomePicker();
+    settingsHomePickerSearchInput.value = '';
+    renderSettingsHomePickerOptions();
+    openModal(settingsHomePickerModal, settingsHomePickerDialog);
+    setTimeout(() => settingsHomePickerSearchInput.focus({ preventScroll: true }), 80);
+  }
+
+  function closeSettingsHomePicker(){
+    if (!settingsHomePickerModal) return;
+    closeModal(settingsHomePickerModal, settingsHomePickerDialog);
+    setTimeout(() => getEnhancedHomeButton()?.focus({ preventScroll: true }), 210);
+  }
+
   function enhanceUserSettingsUI(){
     const section = settingsDialog.querySelector('.settings-section');
     if (!section || section.dataset.enhanced === 'true') return;
     section.dataset.enhanced = 'true';
-    section.innerHTML = `<form class="user-settings-form" id="enhancedUserSettingsForm" novalidate><div class="field-group"><label class="field-label" for="enhancedSettingsName">이름</label><input class="text-input" id="enhancedSettingsName" type="text" maxlength="20" autocomplete="name" placeholder="이름 입력"></div><div class="field-group"><label class="field-label" for="enhancedSettingsCompany">중대</label><input class="text-input" id="enhancedSettingsCompany" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대"></div><div class="field-group"><label class="field-label" for="enhancedSettingsHome">생활관</label><select class="text-input" id="enhancedSettingsHome"></select></div><div class="field-group"><label class="field-label" for="enhancedSettingsPhone">휴대폰 번호</label><input class="text-input" id="enhancedSettingsPhone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="01012345678"></div><div class="field-group"><label class="field-label" for="enhancedSettingsPassword">현재 비밀번호</label><input class="text-input" id="enhancedSettingsPassword" type="password" autocomplete="current-password" placeholder="수정을 위해 비밀번호 입력"><div class="field-help">이름, 중대, 생활관, 휴대폰 번호를 수정하려면 현재 비밀번호를 입력해주세요.</div></div><button class="primary-btn full-btn user-settings-save" id="enhancedUserSettingsSaveBtn" type="submit">저장</button></form>`;
+    section.innerHTML = `<form class="user-settings-form" id="enhancedUserSettingsForm" novalidate><div class="field-group"><label class="field-label" for="enhancedSettingsName">이름</label><input class="text-input" id="enhancedSettingsName" type="text" maxlength="20" autocomplete="name" placeholder="이름 입력"></div><div class="field-group"><label class="field-label" for="enhancedSettingsCompany">중대</label><input class="text-input" id="enhancedSettingsCompany" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대"></div><div class="field-group"><label class="field-label" for="enhancedSettingsHomeButton">생활관</label><button class="text-input home-zone-picker-trigger" id="enhancedSettingsHomeButton" type="button" aria-haspopup="dialog" aria-controls="settingsHomePickerModal"><span class="home-zone-picker-label placeholder">생활관 선택</span><span class="home-zone-picker-arrow" aria-hidden="true">▼</span></button><select id="enhancedSettingsHome" hidden aria-hidden="true" tabindex="-1"></select></div><div class="user-settings-date-grid"><div class="field-group"><label class="field-label" for="enhancedSettingsEnlistDate">입대일</label><input class="text-input" id="enhancedSettingsEnlistDate" type="date"></div><div class="field-group"><label class="field-label" for="enhancedSettingsDischargeDate">전역일</label><input class="text-input" id="enhancedSettingsDischargeDate" type="date"></div></div><div class="field-group"><label class="field-label" for="enhancedSettingsPhone">휴대폰 번호</label><input class="text-input" id="enhancedSettingsPhone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="01012345678"></div><div class="field-group"><label class="field-label" for="enhancedSettingsPassword">현재 비밀번호</label><input class="text-input" id="enhancedSettingsPassword" type="password" autocomplete="current-password" placeholder="수정을 위해 비밀번호 입력"><div class="field-help">이름, 중대, 생활관, 입대일, 전역일, 휴대폰 번호를 수정하려면 현재 비밀번호를 입력해주세요.</div></div><button class="primary-btn full-btn user-settings-save" id="enhancedUserSettingsSaveBtn" type="submit">저장</button></form>`;
     const form = document.getElementById('enhancedUserSettingsForm');
+    const homeButton = document.getElementById('enhancedSettingsHomeButton');
     const phoneInput = document.getElementById('enhancedSettingsPhone');
+    homeButton.addEventListener('click', openSettingsHomePicker);
     phoneInput.addEventListener('input', () => { const digits = phoneInput.value.replace(/\D/g,'').slice(0,11); if (digits.length > 7) phoneInput.value = `${digits.slice(0,3)}-${digits.slice(3,7)}-${digits.slice(7)}`; else if (digits.length > 3) phoneInput.value = `${digits.slice(0,3)}-${digits.slice(3)}`; else phoneInput.value = digits; });
     form.addEventListener('submit', async event => {
       event.preventDefault();
       const name = document.getElementById('enhancedSettingsName').value.trim();
       const company = document.getElementById('enhancedSettingsCompany').value.trim();
       const homeZoneId = document.getElementById('enhancedSettingsHome').value || null;
+      const enlistDate = document.getElementById('enhancedSettingsEnlistDate').value || null;
+      const dischargeDate = document.getElementById('enhancedSettingsDischargeDate').value || null;
       const phone = document.getElementById('enhancedSettingsPhone').value.replace(/\D/g,'');
       const password = document.getElementById('enhancedSettingsPassword').value;
       const saveBtn = document.getElementById('enhancedUserSettingsSaveBtn');
       if (!name || !company || !password) { showMessage('이름, 중대, 현재 비밀번호를 입력해주세요.', '입력 확인'); return; }
+      const selectedHomeZone = homeZoneId ? getZone(homeZoneId) : null;
+      if (!selectedHomeZone || selectedHomeZone.attribute !== 'inside') { showMessage('생활관 속성의 구역을 선택해주세요.', '입력 확인'); return; }
+      if (enlistDate && dischargeDate && dischargeDate < enlistDate) { showMessage('전역일은 입대일보다 빠를 수 없습니다.', '입력 확인'); return; }
       if (phone && !/^01\d{8,9}$/.test(phone)) { showMessage('휴대폰 번호를 정확히 입력해주세요.', '입력 확인'); return; }
       saveBtn.disabled = true;
       try {
         const verify = await sb.auth.signInWithPassword({ email: userAccess.user.email, password });
         if (verify.error) throw new Error('현재 비밀번호가 올바르지 않습니다.');
-        const updateResult = await sb.from('profiles').update({ name, company, phone: phone || null, home_zone_id: homeZoneId }).eq('id', userAccess.user.id);
+        const previousHomeZoneId = userAccess?.profile?.home_zone_id || null;
+        const updateResult = await sb.rpc('update_my_profile', {
+          p_name: name,
+          p_company: company,
+          p_phone: phone || null,
+          // 생활관 변경은 set_my_home_zone()에서 처리합니다.
+          // 최초 선택일 때만 통합 RPC에도 선택값을 전달합니다.
+          p_home_zone_id: previousHomeZoneId || homeZoneId
+        });
         if (updateResult.error) throw updateResult.error;
-        const authResult = await sb.auth.updateUser({ data: { display_name: name, name, phone: phone || null, company, home_zone_id: homeZoneId } });
+
+        if (homeZoneId !== previousHomeZoneId) {
+          await saveHomeZone(homeZoneId, previousHomeZoneId === null);
+        }
+
+        await saveUserServiceDates(enlistDate, dischargeDate);
+        const authResult = await sb.auth.updateUser({ data: { display_name: name, name, phone: phone || null, company, home_zone_id: homeZoneId, enlist_date: enlistDate, discharge_date: dischargeDate, transfer_date: null } });
         if (authResult.error) console.warn('인증 메타데이터 동기화 실패:', authResult.error);
-        userAccess.profile = { ...userAccess.profile, name, company, phone: phone || null, home_zone_id: homeZoneId };
+        userAccess.profile = { ...userAccess.profile, name, company, phone: phone || null, home_zone_id: homeZoneId, enlist_date: enlistDate, discharge_date: dischargeDate, transfer_date: null };
+        updateWelcomeMessage();
         document.getElementById('enhancedSettingsPassword').value = '';
-        triggerToast('설정이 저장되었습니다.');
+        showMessage('개인정보가 수정되었습니다.', '수정 완료');
         await loadPageData({ quiet: true });
       } catch (error) { showMessage(escapeMessage ? escapeMessage(error) : (error.message || '설정을 저장하지 못했습니다.'), '저장 실패'); }
       finally { saveBtn.disabled = false; }
@@ -3347,14 +3779,32 @@ async function loadOwnMovementLogs(unitId) {
     const nameInput = document.getElementById('enhancedSettingsName');
     const companyInputEl = document.getElementById('enhancedSettingsCompany');
     const homeSelect = document.getElementById('enhancedSettingsHome');
+    const enlistDateInput = document.getElementById('enhancedSettingsEnlistDate');
+    const dischargeDateInput = document.getElementById('enhancedSettingsDischargeDate');
     const phoneInput = document.getElementById('enhancedSettingsPhone');
     nameInput.value = userAccess?.profile?.name || '';
     companyInputEl.value = userAccess?.profile?.company || '';
+    enlistDateInput.value = userAccess?.profile?.enlist_date || userAccess?.profile?.enlistment_date || '';
+    dischargeDateInput.value = userAccess?.profile?.discharge_date || userAccess?.user?.user_metadata?.discharge_date || userAccess?.profile?.transfer_date || '';
     phoneInput.value = userAccess?.profile?.phone || userAccess?.user?.user_metadata?.phone || '';
     homeSelect.innerHTML = '';
-    const livingZones = zones.filter(zone => zone.attribute === 'inside' || zone.attribute === 'barracks_inside');
-    livingZones.forEach(zone => { const option = document.createElement('option'); option.value = zone.id; option.textContent = zone.name; option.selected = zone.id === userAccess?.profile?.home_zone_id; homeSelect.appendChild(option); });
+    const livingZones = zones.filter(zone => String(zone.attribute || '').trim() === 'inside');
+    const savedHomeZoneId = userAccess?.profile?.home_zone_id || '';
+    const hasValidSavedHome = livingZones.some(zone => zone.id === savedHomeZoneId);
+    const placeholderOption = document.createElement('option');
+    placeholderOption.value = '';
+    placeholderOption.textContent = '생활관 선택';
+    placeholderOption.selected = !hasValidSavedHome;
+    homeSelect.appendChild(placeholderOption);
+    livingZones.forEach(zone => {
+      const option = document.createElement('option');
+      option.value = zone.id;
+      option.textContent = zone.name;
+      option.selected = hasValidSavedHome && zone.id === savedHomeZoneId;
+      homeSelect.appendChild(option);
+    });
     homeSelect.disabled = livingZones.length === 0;
+    syncEnhancedHomeButton();
   };
 
 
@@ -3572,8 +4022,66 @@ async function loadOwnMovementLogs(unitId) {
       });
   };
 
-  function getRapidServiceError(error){
-    return error?.message || '회원탈퇴 요청을 처리하지 못했습니다.';
+  async function getRapidServiceError(error) {
+    const defaultMessage = '회원탈퇴 요청을 처리하지 못했습니다.';
+    let message = error?.message || defaultMessage;
+
+    const status = Number(
+      error?.context?.status ??
+      error?.status ??
+      0
+    );
+
+    try {
+      if (
+        error?.context &&
+        typeof error.context.json === 'function'
+      ) {
+        const response =
+          typeof error.context.clone === 'function'
+            ? error.context.clone()
+            : error.context;
+
+        const payload = await response.json();
+
+        message =
+          payload?.error ||
+          payload?.message ||
+          message;
+      }
+    } catch (parseError) {
+      console.warn(
+        '[rapid-service] 오류 응답 본문을 읽지 못했습니다.',
+        parseError
+      );
+    }
+
+    if (
+      !message ||
+      message === 'Edge Function returned a non-2xx status code'
+    ) {
+      switch (status) {
+        case 400:
+          return '회원탈퇴 요청 정보가 올바르지 않습니다.';
+        case 401:
+          return '현재 비밀번호가 올바르지 않거나 로그인이 만료되었습니다.';
+        case 403:
+          return '회원탈퇴 요청을 수행할 권한이 없습니다.';
+        case 404:
+          return '회원탈퇴 서비스를 찾을 수 없습니다.';
+        case 429:
+          return '요청이 너무 많습니다. 잠시 후 다시 시도해주세요.';
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          return '회원탈퇴 서버에 문제가 발생했습니다. 계정 데이터는 삭제되지 않았습니다.';
+        default:
+          return defaultMessage;
+      }
+    }
+
+    return message;
   }
 
   function installDeleteAccountButton(){
@@ -3588,27 +4096,8 @@ async function loadOwnMovementLogs(unitId) {
     logoutButton.insertAdjacentElement('afterend', button);
 
     button.addEventListener('click', () => {
-      const passwordInput = document.getElementById('enhancedSettingsPassword');
-      const currentPassword = passwordInput?.value || '';
-      if (!currentPassword) {
-        showMessage('회원탈퇴를 진행하려면 현재 비밀번호를 입력해주세요.', '비밀번호 확인');
-        return;
-      }
-
       closeModal(settingsModal, settingsDialog);
-      requestConfirmation({
-        title: '회원탈퇴',
-        message: '정말 탈퇴하시겠습니까?\n계정과 연결된 위치 정보가 삭제되며 복구할 수 없습니다.',
-        confirmText: '회원탈퇴',
-        action: async () => {
-          const { data, error } = await sb.functions.invoke('rapid-service', {
-            body: { action:'delete_account', current_password: currentPassword }
-          });
-          if (error) throw new Error(getRapidServiceError(error));
-          if (!data?.ok) throw new Error(data?.error || '회원탈퇴 요청을 처리하지 못했습니다.');
-          try { await sb.auth.signOut(); } finally { location.replace('index.html'); }
-        }
-      });
+      window.setTimeout(openUserDeleteToast, 220);
     });
   }
 
@@ -3847,24 +4336,12 @@ async function loadOwnMovementLogs(unitId) {
 
   // 동일 부대 전체 인원 조회용 RPC 우선 사용
   loadLocationMembers = async function(unitId){
-    const rpc = await sb.rpc('get_location_personnel', { p_unit_id: unitId });
-    if (!rpc.error) return rpc;
-    console.warn('get_location_personnel RPC 실패, 직접 조회로 대체:', rpc.error);
-    const direct = await sb
-      .from('profiles')
-      .select('id,name,role,company,home_zone_id,phone,user_approved,approval_status')
-      .eq('unit_id', unitId)
-      .eq('role','user')
-      .eq('user_approved',true)
-      .eq('approval_status','approved');
-    if (direct.error) return {data:null,error:direct.error};
-    return {
-      data:(direct.data||[]).map(row => ({
-        user_id:row.id,display_name:row.name,member_role:row.role,company:row.company,
-        phone:row.phone,home_zone_id:row.home_zone_id
-      })),
-      error:null
-    };
+    const personnelResult = await sb.rpc('get_location_personnel', { p_unit_id: unitId });
+    if (!personnelResult.error) return personnelResult;
+
+    const legacyResult = await sb.rpc('get_location_members', { p_unit_id: unitId });
+    if (!legacyResult.error) return legacyResult;
+    return personnelResult;
   };
 
   // RPC 스냅샷이 있으면 RLS와 무관하게 같은 부대 전체 위치를 읽음
@@ -4506,26 +4983,10 @@ async function loadOwnMovementLogs(unitId) {
     setArrivalInputsFromDate(new Date(currentDate.getTime()+add*60000));
   };
 
-  // DB 패치 전에도 중복 로그 제약 오류가 발생하면 위치 행 직접 갱신을 한 번 시도합니다.
+  // 위치 변경은 검증된 SECURITY DEFINER RPC로만 처리합니다.
   moveOwnLocation=async function(zone,arrivalIso){
     const rpcResult=await sb.rpc('move_my_location',{p_zone_id:zone.id,p_return_time:arrivalIso});
-    if(!rpcResult.error)return;
-    const duplicateOpenLog=rpcResult.error?.code==='23505'||String(rpcResult.error?.message||'').includes('location_movement_logs_open_user');
-    const missingFunction=isMissingFunctionError(rpcResult.error,'move_my_location');
-    if(!duplicateOpenLog&&!missingFunction)throw rpcResult.error;
-    const payload={
-      user_id:userAccess.user.id,
-      unit_id:userAccess.profile.unit_id,
-      zone_id:zone.id,
-      departure_time:new Date().toISOString(),
-      return_time:isOwnHomeZone(zone)?null:arrivalIso,
-      updated_by:userAccess.user.id
-    };
-    const fallback=await sb.from('user_locations').upsert(payload,{onConflict:'user_id'});
-    if(fallback.error){
-      if(duplicateOpenLog)throw new Error('위치 로그 중복 방지 SQL을 먼저 실행해주세요.');
-      throw fallback.error;
-    }
+    if(rpcResult.error)throw rpcResult.error;
   };
 
   // 이전 드래그 리스너를 DOM 교체로 제거하고 Pointer Event 하나만 사용합니다.
@@ -4780,27 +5241,10 @@ async function loadOwnMovementLogs(unitId) {
   const oldCloseMoveModal=closeMoveModal;
   closeMoveModal=function(){arrivalField.hidden=false;oldCloseMoveModal()};
 
-  /* SQL 미설치 환경의 직접 저장 fallback에서도 기존 복귀 예정 시간을 유지합니다. */
+  /* 최종 이동 저장 역시 RPC만 사용하여 RLS 우회용 직접 쓰기를 제거합니다. */
   moveOwnLocation=async function(zone,arrivalIso){
     const rpcResult=await sb.rpc('move_my_location',{p_zone_id:zone.id,p_return_time:arrivalIso});
-    if(!rpcResult.error)return;
-    const duplicate=rpcResult.error?.code==='23505'||String(rpcResult.error?.message||'').includes('location_movement_logs_open_user');
-    const missing=isMissingFunctionError(rpcResult.error,'move_my_location');
-    if(!duplicate&&!missing)throw rpcResult.error;
-    const carriedReturn=isAwayToAway(zone)?(ownLocation?.returnTime||null):arrivalIso;
-    const payload={
-      user_id:userAccess.user.id,
-      unit_id:userAccess.profile.unit_id,
-      zone_id:zone.id,
-      departure_time:new Date().toISOString(),
-      return_time:isOwnHomeZone(zone)?null:carriedReturn,
-      updated_by:userAccess.user.id
-    };
-    const fallback=await sb.from('user_locations').upsert(payload,{onConflict:'user_id'});
-    if(fallback.error){
-      if(duplicate)throw new Error('위치 로그 중복 방지 SQL을 먼저 실행해주세요.');
-      throw fallback.error;
-    }
+    if(rpcResult.error)throw rpcResult.error;
   };
 
   moveForm.addEventListener('submit',async event=>{
@@ -5529,5 +5973,845 @@ async function loadOwnMovementLogs(unitId) {
 })();
 </script>
 
+
+
+<style id="location-user-v22-requested-updates">
+  /* 이름 카드: 이름·중대 / 생활관 / 기타 정보 */
+  #zonePeopleContent{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  }
+  #zonePeopleContent > .sheet-person.person-summary-card{
+    position:relative!important;
+    display:grid!important;
+    gap:10px!important;
+    min-width:0!important;
+    padding:12px!important;
+    cursor:pointer!important;
+    touch-action:manipulation!important;
+  }
+  #zonePeopleContent > .sheet-person.person-summary-card:active{
+    transform:scale(.985)!important;
+  }
+  .person-summary-card .person-summary-top{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,.78fr)!important;
+    gap:8px!important;
+  }
+  .person-summary-card .person-summary-field{
+    min-width:0!important;
+    display:grid!important;
+    gap:4px!important;
+  }
+  .person-summary-card .person-summary-label{
+    color:#64748b!important;
+    font-size:9px!important;
+    font-weight:850!important;
+    line-height:1.1!important;
+  }
+  .person-summary-card .person-summary-value{
+    min-width:0!important;
+    color:#0f172a!important;
+    font-size:12px!important;
+    font-weight:950!important;
+    line-height:1.35!important;
+    overflow-wrap:anywhere!important;
+  }
+  .person-summary-card .person-summary-name{
+    color:var(--home-zone-color,#2563eb)!important;
+    font-size:14px!important;
+  }
+  .person-summary-card .person-summary-row{
+    display:grid!important;
+    grid-template-columns:58px minmax(0,1fr)!important;
+    align-items:start!important;
+    gap:8px!important;
+    padding-top:9px!important;
+    border-top:1px solid #e8edf5!important;
+  }
+  .person-summary-card .person-summary-row .person-summary-label{
+    padding-top:2px!important;
+  }
+  .person-summary-card .person-summary-row .person-summary-value{
+    text-align:right!important;
+    font-size:11px!important;
+  }
+  .person-summary-card .person-summary-home{
+    color:var(--home-zone-color,#64748b)!important;
+  }
+  .person-summary-card .person-summary-extra{
+    color:#475569!important;
+    font-weight:850!important;
+    line-height:1.5!important;
+  }
+
+  .person-card-zoom-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:420;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:rgba(15,23,42,.62);
+    opacity:0;
+    visibility:hidden;
+    transition:opacity .18s ease,visibility .18s ease;
+  }
+  .person-card-zoom-backdrop.open{
+    opacity:1;
+    visibility:visible;
+  }
+  .person-card-zoom-panel{
+    width:min(390px,100%);
+    transform:scale(.92);
+    transition:transform .2s cubic-bezier(.22,.61,.36,1);
+  }
+  .person-card-zoom-backdrop.open .person-card-zoom-panel{
+    transform:scale(1);
+  }
+  .person-card-zoom-panel .person-summary-card{
+    display:grid!important;
+    gap:16px!important;
+    width:100%!important;
+    min-height:250px!important;
+    padding:22px!important;
+    border:1px solid #dbe4f0!important;
+    border-radius:24px!important;
+    background:#fff!important;
+    box-shadow:0 28px 65px rgba(15,23,42,.28)!important;
+    box-sizing:border-box!important;
+    cursor:pointer!important;
+  }
+  .person-card-zoom-panel .person-summary-card .person-summary-label{font-size:11px!important}
+  .person-card-zoom-panel .person-summary-card .person-summary-value{font-size:16px!important}
+  .person-card-zoom-panel .person-summary-card .person-summary-name{font-size:22px!important}
+  .person-card-zoom-panel .person-summary-card .person-summary-row{
+    grid-template-columns:78px minmax(0,1fr)!important;
+    gap:12px!important;
+    padding-top:14px!important;
+  }
+  .person-card-zoom-panel .person-summary-card .person-summary-row .person-summary-value{
+    font-size:14px!important;
+  }
+  .person-card-zoom-hint{
+    margin:12px 0 0;
+    color:#fff;
+    font-size:11px;
+    font-weight:850;
+    text-align:center;
+  }
+  @media(max-width:380px){
+    #zonePeopleContent{grid-template-columns:1fr!important}
+  }
+</style>
+<script>
+(function locationUserV22RequestedUpdates(){
+  const cancelButton=document.getElementById('actionToastCancelBtn');
+  cancelButton?.addEventListener('click',()=>{
+    window.setTimeout(()=>{
+      if(!actionToastBackdrop.classList.contains('open')) openSettings();
+    },230);
+  });
+
+  function personOtherInfo(person){
+    if(isPersonAtHome(person)) return '현재 생활관에 있습니다.';
+    const departure=formatTime(person.departureTime);
+    const expected=formatTime(person.returnTime);
+    const elapsed=getElapsedText(person.returnTime);
+    return `출발 ${departure} · 도착 예정 ${expected} · 지난 시간 ${elapsed}`;
+  }
+
+  function createPersonSummaryCard(person){
+    const row=document.createElement('article');
+    row.className='sheet-person person-summary-card';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+    row.setAttribute('aria-label',`${person.name||'이름 없음'}님의 정보 카드 확대`);
+    const homeZone=getZone(person.homeZoneId);
+    const homeName=homeZone?.name||person.homeZoneName||'미지정';
+    row.style.setProperty('--home-zone-color',homeZone?.color||'#64748b');
+    row.innerHTML=`
+      <div class="person-summary-top">
+        <div class="person-summary-field">
+          <span class="person-summary-label">이름</span>
+          <strong class="person-summary-value person-summary-name"></strong>
+        </div>
+        <div class="person-summary-field">
+          <span class="person-summary-label">중대</span>
+          <span class="person-summary-value person-summary-company"></span>
+        </div>
+      </div>
+      <div class="person-summary-row">
+        <span class="person-summary-label">생활관</span>
+        <span class="person-summary-value person-summary-home"></span>
+      </div>
+      <div class="person-summary-row">
+        <span class="person-summary-label">기타 정보</span>
+        <span class="person-summary-value person-summary-extra"></span>
+      </div>`;
+    row.querySelector('.person-summary-name').textContent=person.name||'이름 없음';
+    row.querySelector('.person-summary-company').textContent=person.company||'중대 미입력';
+    row.querySelector('.person-summary-home').textContent=homeName;
+    row.querySelector('.person-summary-extra').textContent=personOtherInfo(person);
+    return row;
+  }
+
+  let zoomBackdrop=null;
+  function ensureZoomBackdrop(){
+    if(zoomBackdrop)return zoomBackdrop;
+    zoomBackdrop=document.createElement('div');
+    zoomBackdrop.className='person-card-zoom-backdrop';
+    zoomBackdrop.setAttribute('aria-hidden','true');
+    zoomBackdrop.innerHTML='<div class="person-card-zoom-panel" role="dialog" aria-modal="true" aria-label="확대된 병력 정보"></div>';
+    document.body.appendChild(zoomBackdrop);
+    zoomBackdrop.addEventListener('click',closeZoom);
+    return zoomBackdrop;
+  }
+  function openZoom(card){
+    const backdrop=ensureZoomBackdrop();
+    const panel=backdrop.querySelector('.person-card-zoom-panel');
+    panel.innerHTML='';
+    const clone=card.cloneNode(true);
+    clone.removeAttribute('tabindex');
+    clone.removeAttribute('role');
+    clone.removeAttribute('aria-label');
+    panel.appendChild(clone);
+    const hint=document.createElement('p');
+    hint.className='person-card-zoom-hint';
+    hint.textContent='카드를 터치하면 돌아갑니다.';
+    panel.appendChild(hint);
+    backdrop.classList.add('open');
+    backdrop.setAttribute('aria-hidden','false');
+    document.body.classList.add('sheet-open-lock');
+  }
+  function closeZoom(){
+    if(!zoomBackdrop?.classList.contains('open'))return;
+    zoomBackdrop.classList.remove('open');
+    zoomBackdrop.setAttribute('aria-hidden','true');
+    window.setTimeout(()=>{
+      if(!document.querySelector('.modal-backdrop.open,.sheet-backdrop.open,.action-toast-backdrop.open,.person-card-zoom-backdrop.open')){
+        document.body.classList.remove('sheet-open-lock');
+      }
+    },190);
+  }
+
+  renderZonePeople=function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+    const zonePeople=getZonePeople(zoneId);
+    const title=bottomSheet?.querySelector('#sheetTitle')||sheetTitle;
+    const subtitle=bottomSheet?.querySelector('#sheetSubtitle')||sheetSubtitle;
+    const content=document.getElementById('zonePeopleContent');
+    if(title)title.textContent=zone.name;
+    if(subtitle)subtitle.textContent=`등록된 인원 ${zonePeople.length}명`;
+    if(!content)return;
+    content.innerHTML='';
+    if(!zonePeople.length){
+      content.innerHTML='<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';
+      return;
+    }
+    zonePeople.forEach(person=>content.appendChild(createPersonSummaryCard(person)));
+  };
+
+  zonePeopleContent?.addEventListener('click',event=>{
+    const card=event.target.closest('.person-summary-card');
+    if(card)openZoom(card);
+  });
+  zonePeopleContent?.addEventListener('keydown',event=>{
+    if(event.key!=='Enter'&&event.key!==' ')return;
+    const card=event.target.closest('.person-summary-card');
+    if(!card)return;
+    event.preventDefault();
+    openZoom(card);
+  });
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&zoomBackdrop?.classList.contains('open')){
+      event.stopImmediatePropagation();
+      closeZoom();
+    }
+  },true);
+})();
+</script>
+
+
+
+<!-- 2026-08-07 요청 반영 v23: 이름 카드 디자인 복원 -->
+<style id="location-user-v23-person-card-restore">
+  #zonePeopleContent{
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  #zonePeopleContent > .sheet-person.person-summary-card.legacy-person-card{
+    display:block!important;width:100%!important;min-width:0!important;max-width:none!important;min-height:0!important;
+    margin:0!important;padding:10px!important;
+    border:1px solid color-mix(in srgb,var(--home-zone-color,#64748b) 28%,var(--line))!important;
+    border-radius:16px!important;background:color-mix(in srgb,var(--home-zone-color,#64748b) 6%,white)!important;
+    box-shadow:0 6px 16px rgba(15,23,42,.05)!important;box-sizing:border-box!important;cursor:pointer!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-head{
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;align-items:center!important;gap:7px!important;min-width:0!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-name{
+    display:block!important;min-width:0!important;max-width:100%!important;padding:7px 9px!important;border-radius:10px!important;
+    background:color-mix(in srgb,var(--home-zone-color,#2563eb) 12%,white)!important;color:var(--home-zone-color,#1d4ed8)!important;
+    font-size:14px!important;font-weight:900!important;line-height:1.15!important;white-space:nowrap!important;overflow:hidden!important;
+    text-overflow:ellipsis!important;text-align:center!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-company{
+    color:#64748b!important;font-size:12px!important;font-weight:900!important;line-height:1.2!important;white-space:nowrap!important;text-align:center!important;
+  }
+  #zonePeopleContent .legacy-person-card .sheet-home-badge{
+    grid-column:auto!important;justify-self:end!important;display:inline-flex!important;align-items:center!important;justify-content:center!important;
+    gap:4px!important;width:auto!important;max-width:72px!important;min-height:25px!important;padding:4px 8px!important;
+    border:1px solid color-mix(in srgb,var(--badge-color,#64748b) 28%,var(--line))!important;border-radius:999px!important;
+    background:color-mix(in srgb,var(--badge-color,#64748b) 9%,white)!important;color:var(--badge-color,#64748b)!important;
+    font-size:10px!important;font-weight:900!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
+  }
+  #zonePeopleContent .legacy-person-card .sheet-home-badge svg{width:13px!important;height:13px!important;fill:currentColor!important;flex:none!important}
+  #zonePeopleContent .legacy-person-card .sheet-home-badge span{min-width:0!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;text-align:center!important}
+  #zonePeopleContent .legacy-person-card .person-card-grid{
+    display:grid!important;grid-template-columns:minmax(55px,auto) minmax(0,1fr)!important;gap:7px 8px!important;margin-top:10px!important;align-items:center!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-label{font-size:10px!important;font-weight:800!important;color:#64748b!important}
+  #zonePeopleContent .legacy-person-card .person-card-value{font-size:11px!important;font-weight:850!important;text-align:right!important;min-width:0!important}
+
+  .person-card-zoom-panel .legacy-person-card{
+    display:block!important;width:100%!important;min-height:190px!important;padding:22px!important;
+    border:1px solid color-mix(in srgb,var(--home-zone-color,#64748b) 35%,#dbe4f0)!important;border-radius:24px!important;
+    background:color-mix(in srgb,var(--home-zone-color,#64748b) 6%,white)!important;box-shadow:0 28px 65px rgba(15,23,42,.28)!important;
+    box-sizing:border-box!important;cursor:pointer!important;
+  }
+  .person-card-zoom-panel .legacy-person-card .person-card-head{
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;align-items:center!important;gap:12px!important;
+  }
+  .person-card-zoom-panel .legacy-person-card .person-card-name{
+    min-width:0!important;padding:12px 14px!important;border-radius:14px!important;
+    background:color-mix(in srgb,var(--home-zone-color,#2563eb) 12%,white)!important;color:var(--home-zone-color,#1d4ed8)!important;
+    font-size:22px!important;font-weight:950!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;text-align:center!important;
+  }
+  .person-card-zoom-panel .legacy-person-card .person-card-company{color:#64748b!important;font-size:16px!important;font-weight:900!important;white-space:nowrap!important}
+  .person-card-zoom-panel .legacy-person-card .sheet-home-badge{
+    display:inline-flex!important;align-items:center!important;gap:6px!important;max-width:115px!important;padding:7px 11px!important;border-radius:999px!important;
+    border:1px solid color-mix(in srgb,var(--badge-color,#64748b) 28%,#dbe4f0)!important;background:color-mix(in srgb,var(--badge-color,#64748b) 9%,white)!important;
+    color:var(--badge-color,#64748b)!important;font-size:13px!important;font-weight:900!important;white-space:nowrap!important;
+  }
+  .person-card-zoom-panel .legacy-person-card .sheet-home-badge svg{width:17px!important;height:17px!important;fill:currentColor!important;flex:none!important}
+  .person-card-zoom-panel .legacy-person-card .person-card-grid{display:grid!important;grid-template-columns:90px minmax(0,1fr)!important;gap:12px 16px!important;margin-top:22px!important;align-items:center!important}
+  .person-card-zoom-panel .legacy-person-card .person-card-label{color:#64748b!important;font-size:13px!important;font-weight:850!important}
+  .person-card-zoom-panel .legacy-person-card .person-card-value{font-size:16px!important;font-weight:900!important;text-align:right!important}
+
+  @media(max-width:380px){
+    #zonePeopleContent{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+    #zonePeopleContent > .sheet-person.person-summary-card.legacy-person-card{padding:8px!important}
+    #zonePeopleContent .legacy-person-card .person-card-head{gap:5px!important}
+    #zonePeopleContent .legacy-person-card .person-card-name{font-size:13px!important;padding:6px 7px!important}
+    #zonePeopleContent .legacy-person-card .person-card-company{font-size:11px!important}
+    #zonePeopleContent .legacy-person-card .sheet-home-badge{max-width:62px!important;padding:4px 6px!important;font-size:9px!important}
+  }
+</style>
+<script>
+(function locationUserV23PersonCardRestore(){
+  function createHomeBadge(label,color){
+    const badge=document.createElement('span');
+    badge.className='sheet-home-badge';
+    badge.style.setProperty('--badge-color',color||'#64748b');
+    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    badge.querySelector('span').textContent=label||'미지정';
+    return badge;
+  }
+  function createLegacyPersonCard(person){
+    const row=document.createElement('article');
+    row.className='sheet-person person-summary-card legacy-person-card';
+    row.tabIndex=0;
+    row.setAttribute('role','button');
+    row.setAttribute('aria-label',`${person?.name||'이름 없음'} 병력 정보 확대`);
+    const homeZone=getZone(person.homeZoneId);
+    const homeName=homeZone?.name||person.homeZoneName||'미지정';
+    const homeColor=homeZone?.color||'#64748b';
+    row.style.setProperty('--home-zone-color',homeColor);
+    const atHome=isPersonAtHome(person);
+    row.innerHTML=atHome?`
+      <div class="person-card-head"><strong class="person-card-name"></strong><span class="person-card-company"></span></div>`:`
+      <div class="person-card-head"><strong class="person-card-name"></strong><span class="person-card-company"></span></div>
+      <div class="person-card-grid">
+        <span class="person-card-label">출발</span><span class="person-card-value">${formatTime(person.departureTime)}</span>
+        <span class="person-card-label">도착 예정</span><span class="person-card-value">${formatTime(person.returnTime)}</span>
+        <span class="person-card-label">지난 시간</span><span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+      </div>`;
+    row.querySelector('.person-card-name').textContent=person.name||'이름 없음';
+    row.querySelector('.person-card-company').textContent=person.company||'미입력';
+    row.querySelector('.person-card-head').appendChild(createHomeBadge(homeName,homeColor));
+    return row;
+  }
+  renderZonePeople=function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+    const zonePeople=getZonePeople(zoneId);
+    const title=bottomSheet?.querySelector('#sheetTitle')||sheetTitle;
+    const subtitle=bottomSheet?.querySelector('#sheetSubtitle')||sheetSubtitle;
+    const content=document.getElementById('zonePeopleContent');
+    if(title)title.textContent=zone.name;
+    if(subtitle)subtitle.textContent=`등록된 인원 ${zonePeople.length}명`;
+    if(!content)return;
+    content.innerHTML='';
+    if(!zonePeople.length){content.innerHTML='<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';return}
+    zonePeople.forEach(person=>content.appendChild(createLegacyPersonCard(person)));
+  };
+})();
+</script>
+
+
+<!-- 2026-08-07 요청 반영 v24: 인원 카드 이름 영역 확대 및 중대/생활관 세로 배치 -->
+<style id="location-user-v24-person-card-header-layout">
+  /* 기본 카드: 이름은 좌측에서 두 행을 차지하고, 중대/생활관은 우측에 세로로 배치 */
+  #zonePeopleContent .legacy-person-card .person-card-head{
+    grid-template-columns:minmax(0,1.55fr) minmax(58px,.72fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:8px!important;
+    row-gap:5px!important;
+    align-items:center!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-name{
+    grid-column:1!important;
+    grid-row:1 / span 2!important;
+    align-self:stretch!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-height:54px!important;
+    padding:8px 10px!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-company{
+    grid-column:2!important;
+    grid-row:1!important;
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  #zonePeopleContent .legacy-person-card .sheet-home-badge{
+    grid-column:2!important;
+    grid-row:2!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  /* 확대 카드에서도 같은 정보 배치를 유지하되 이름 영역을 더 넓게 확보 */
+  .person-card-zoom-panel .legacy-person-card .person-card-head{
+    grid-template-columns:minmax(0,1.65fr) minmax(105px,.72fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:14px!important;
+    row-gap:9px!important;
+    align-items:center!important;
+  }
+  .person-card-zoom-panel .legacy-person-card .person-card-name{
+    grid-column:1!important;
+    grid-row:1 / span 2!important;
+    align-self:stretch!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-height:82px!important;
+  }
+  .person-card-zoom-panel .legacy-person-card .person-card-company{
+    grid-column:2!important;
+    grid-row:1!important;
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    text-align:center!important;
+  }
+  .person-card-zoom-panel .legacy-person-card .sheet-home-badge{
+    grid-column:2!important;
+    grid-row:2!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+
+  @media(max-width:380px){
+    #zonePeopleContent .legacy-person-card .person-card-head{
+      grid-template-columns:minmax(0,1.6fr) minmax(52px,.68fr)!important;
+      column-gap:6px!important;
+      row-gap:4px!important;
+    }
+    #zonePeopleContent .legacy-person-card .person-card-name{
+      min-height:48px!important;
+      padding:7px 8px!important;
+    }
+    #zonePeopleContent .legacy-person-card .sheet-home-badge{
+      padding:4px 5px!important;
+    }
+  }
+</style>
+
+
+
+<!-- 2026-08-07 요청 반영 v26: 확대 인원 카드 제거 및 3열×2행 카드 배치 -->
+<style id="location-v26-person-card-grid-no-zoom">
+  /* 확대 카드 기능은 사용하지 않음 */
+  .person-card-zoom-backdrop{
+    display:none!important;
+    visibility:hidden!important;
+    pointer-events:none!important;
+  }
+
+  #zonePeopleContent > .sheet-person.person-summary-card.legacy-person-card{
+    cursor:default!important;
+    touch-action:auto!important;
+  }
+  #zonePeopleContent > .sheet-person.person-summary-card.legacy-person-card:active{
+    transform:none!important;
+  }
+
+  /*
+     [1][2][3]
+     [4][5][6]
+
+     1·2 = 이름
+     3   = 중대
+     4·5 = 생활관
+     6   = 빈 공간
+  */
+  #zonePeopleContent .legacy-person-card .person-card-head{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(58px,.78fr)!important;
+    grid-template-rows:auto auto!important;
+    column-gap:6px!important;
+    row-gap:5px!important;
+    align-items:center!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-name{
+    grid-column:1 / span 2!important;
+    grid-row:1!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    min-width:0!important;
+    min-height:32px!important;
+    padding:7px 9px!important;
+    box-sizing:border-box!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-company{
+    grid-column:3!important;
+    grid-row:1!important;
+    align-self:stretch!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:0!important;
+    max-width:100%!important;
+    padding:4px 2px!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #zonePeopleContent .legacy-person-card .sheet-home-badge{
+    grid-column:1 / span 2!important;
+    grid-row:2!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+  }
+
+  @media(max-width:380px){
+    #zonePeopleContent .legacy-person-card .person-card-head{
+      grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(52px,.72fr)!important;
+      column-gap:5px!important;
+      row-gap:4px!important;
+    }
+    #zonePeopleContent .legacy-person-card .person-card-name{
+      min-height:30px!important;
+      padding:6px 7px!important;
+    }
+    #zonePeopleContent .legacy-person-card .person-card-company{
+      padding-left:1px!important;
+      padding-right:1px!important;
+    }
+    #zonePeopleContent .legacy-person-card .sheet-home-badge{
+      padding:4px 6px!important;
+    }
+  }
+</style>
+<script>
+(function locationV26PersonCardGridNoZoom(){
+  function createV26HomeBadge(label,color){
+    const badge=document.createElement('span');
+    badge.className='sheet-home-badge';
+    badge.style.setProperty('--badge-color',color||'#64748b');
+    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
+    badge.querySelector('span').textContent=label||'미지정';
+    return badge;
+  }
+
+  function createV26PersonCard(person){
+    const row=document.createElement('article');
+    row.className='sheet-person person-summary-card legacy-person-card';
+
+    /* 확대 기능 제거: 버튼 역할과 키보드 포커스를 부여하지 않음 */
+    row.removeAttribute('tabindex');
+    row.removeAttribute('role');
+    row.removeAttribute('aria-label');
+
+    const homeZone=getZone(person.homeZoneId);
+    const homeName=homeZone?.name||person.homeZoneName||'미지정';
+    const homeColor=homeZone?.color||'#64748b';
+    row.style.setProperty('--home-zone-color',homeColor);
+
+    const atHome=isPersonAtHome(person);
+    row.innerHTML=atHome?`
+      <div class="person-card-head">
+        <strong class="person-card-name"></strong>
+        <span class="person-card-company"></span>
+      </div>`:`
+      <div class="person-card-head">
+        <strong class="person-card-name"></strong>
+        <span class="person-card-company"></span>
+      </div>
+      <div class="person-card-grid">
+        <span class="person-card-label">출발</span><span class="person-card-value">${formatTime(person.departureTime)}</span>
+        <span class="person-card-label">도착 예정</span><span class="person-card-value">${formatTime(person.returnTime)}</span>
+        <span class="person-card-label">지난 시간</span><span class="person-card-value overdue">${getElapsedText(person.returnTime)}</span>
+      </div>`;
+
+    row.querySelector('.person-card-name').textContent=person.name||'이름 없음';
+    row.querySelector('.person-card-company').textContent=person.company||'미입력';
+    row.querySelector('.person-card-head').appendChild(createV26HomeBadge(homeName,homeColor));
+    return row;
+  }
+
+  renderZonePeople=function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+
+    const zonePeople=getZonePeople(zoneId);
+    const title=bottomSheet?.querySelector('#sheetTitle')||sheetTitle;
+    const subtitle=bottomSheet?.querySelector('#sheetSubtitle')||sheetSubtitle;
+    const content=document.getElementById('zonePeopleContent');
+
+    if(title)title.textContent=zone.name;
+    if(subtitle)subtitle.textContent=`등록된 인원 ${zonePeople.length}명`;
+    if(!content)return;
+
+    content.innerHTML='';
+    if(!zonePeople.length){
+      content.innerHTML='<div class="sheet-empty-state">등록된 인원이 없습니다.</div>';
+      return;
+    }
+
+    zonePeople.forEach(person=>content.appendChild(createV26PersonCard(person)));
+  };
+
+  /* 이전 버전의 확대 클릭/키보드 이벤트가 실행되지 않도록 선점 */
+  const content=document.getElementById('zonePeopleContent');
+  content?.addEventListener('click',event=>{
+    if(event.target.closest('.person-summary-card')){
+      event.stopImmediatePropagation();
+    }
+  },true);
+  content?.addEventListener('keydown',event=>{
+    if(event.target.closest('.person-summary-card')){
+      event.stopImmediatePropagation();
+    }
+  },true);
+
+  document.querySelectorAll('.person-card-zoom-backdrop').forEach(element=>element.remove());
+})();
+</script>
+
+
+<!-- 2026-08-07 요청 반영 v28: 인원 카드 4열 × 2행 배치 -->
+<style id="location-v28-person-card-four-column-two-row">
+  /*
+     [1][2][3][4]
+     [5][6][7][8]
+      1·2 = 이름
+      5·6 = 중대
+      7·8 = 생활관
+      3·4 = 빈 공간
+  */
+  #zonePeopleContent .legacy-person-card .person-card-head{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    grid-template-rows:auto auto!important;
+    column-gap:5px!important;
+    row-gap:5px!important;
+    align-items:stretch!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-name{
+    grid-column:1 / span 2!important;
+    grid-row:1!important;
+    min-height:32px!important;
+    height:auto!important;
+    padding:7px 8px!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    min-width:0!important;
+    max-width:100%!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #zonePeopleContent .legacy-person-card .person-card-company{
+    grid-column:1 / span 2!important;
+    grid-row:2!important;
+    font-size:13px!important;
+    align-self:stretch!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:30px!important;
+    padding:5px 7px!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  #zonePeopleContent .legacy-person-card .sheet-home-badge{
+    grid-column:3 / span 2!important;
+    grid-row:2!important;
+    align-self:stretch!important;
+    justify-self:stretch!important;
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+    min-height:30px!important;
+    padding:5px 7px!important;
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+  }
+  #zonePeopleContent .legacy-person-card .sheet-home-badge svg{
+    width:12px!important;
+    height:12px!important;
+    flex:none!important;
+  }
+  #zonePeopleContent .legacy-person-card .sheet-home-badge span{
+    min-width:0!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+
+  @media(max-width:380px){
+    #zonePeopleContent .legacy-person-card .person-card-head{
+      column-gap:4px!important;
+      row-gap:4px!important;
+    }
+    #zonePeopleContent .legacy-person-card .person-card-name{
+      min-height:30px!important;
+      padding:6px 6px!important;
+    }
+    #zonePeopleContent .legacy-person-card .person-card-company,
+    #zonePeopleContent .legacy-person-card .sheet-home-badge{
+      min-height:28px!important;
+      padding:4px 5px!important;
+    }
+    #zonePeopleContent .legacy-person-card .person-card-company{
+      font-size:11px!important;
+    }
+    #zonePeopleContent .legacy-person-card .sheet-home-badge{
+      gap:3px!important;
+      font-size:9px!important;
+    }
+    #zonePeopleContent .legacy-person-card .sheet-home-badge svg{
+      width:10px!important;
+      height:10px!important;
+    }
+  }
+</style>
+
+
+
+<script>
+/* 2026-08-07: 생활관 속성 분리, 미선택 자동배정 방지, 최초 배정 로그 숨김 */
+(function(){
+  function isDormitoryZone(zone){
+    return Boolean(zone && String(zone.attribute || '').trim() === 'inside');
+  }
+  function syncHomeButtonFinal(){
+    const select = document.getElementById('enhancedSettingsHome');
+    const button = document.getElementById('enhancedSettingsHomeButton');
+    if (!select || !button) return;
+    const label = button.querySelector('.home-zone-picker-label');
+    const selected = select.options[select.selectedIndex];
+    const hasValue = Boolean(select.value && selected);
+    if (label) {
+      label.textContent = hasValue ? selected.textContent : '생활관 선택';
+      label.classList.toggle('placeholder', !hasValue);
+    }
+    button.disabled = select.disabled || select.options.length <= 1;
+  }
+  function isInitialHomeAssignmentLog(log){
+    const homeZoneId = userAccess?.profile?.home_zone_id || null;
+    const destinationZoneId = log?.destinationZoneId || log?.zoneId || null;
+    return Boolean(
+      homeZoneId &&
+      destinationZoneId === homeZoneId &&
+      !log?.expectedReturnTime
+    );
+  }
+
+  const previousRenderHomeZoneChoices = renderHomeZoneChoices;
+  renderHomeZoneChoices = function(){
+    const originalZones = zones;
+    try {
+      zones = originalZones.filter(isDormitoryZone);
+      return previousRenderHomeZoneChoices();
+    } finally {
+      zones = originalZones;
+    }
+  };
+
+  const previousLoadOwnMovementLogs = loadOwnMovementLogs;
+  loadOwnMovementLogs = async function(unitId){
+    const rows = await previousLoadOwnMovementLogs(unitId);
+    return Array.isArray(rows) ? rows : [];
+  };
+
+  const previousFillSettingsFinal = fillSettings;
+  fillSettings = function(){
+    previousFillSettingsFinal();
+    const homeSelect = document.getElementById('enhancedSettingsHome');
+    if (!homeSelect) return;
+
+    const validZoneIds = new Set(zones.filter(isDormitoryZone).map(zone => zone.id));
+    Array.from(homeSelect.options).forEach(option => {
+      if (option.value && !validZoneIds.has(option.value)) option.remove();
+    });
+
+    const savedHomeZoneId = userAccess?.profile?.home_zone_id || '';
+    if (!validZoneIds.has(savedHomeZoneId)) homeSelect.value = '';
+    syncHomeButtonFinal();
+  };
+})();
+</script>
+<!-- 2026-08-07: user 설정 생활관 선택 목록을 inside 속성으로 제한하고 저장 시 재검증 -->
 </body>
 </html>
