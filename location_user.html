@@ -5465,7 +5465,11 @@ async function loadOwnMovementLogs(unitId) {
     recordsList.innerHTML='';
     recordsState.hidden=true;
     recordsState.textContent='';
-    if(!movementLogs.length)return;
+    if(!movementLogs.length){
+      recordsState.hidden=false;
+      recordsState.textContent='저장된 이동 기록이 없습니다.';
+      return;
+    }
 
     userJourneyLogs(movementLogs)
       .sort((a,b)=>new Date(b.departureTime||0)-new Date(a.departureTime||0))
@@ -6813,5 +6817,45 @@ async function loadOwnMovementLogs(unitId) {
 })();
 </script>
 <!-- 2026-08-07: user 설정 생활관 선택 목록을 inside 속성으로 제한하고 저장 시 재검증 -->
+
+
+<!-- 2026-08-07: 빈 이동 기록 화면에서도 전체 본문을 터치 슬라이드 영역으로 유지 -->
+<style id="location-user-empty-records-swipe-fix">
+  #view-records{
+    min-height:calc(100dvh - 84px)!important;
+  }
+  #view-records .records-content{
+    display:flex!important;
+    flex-direction:column!important;
+    min-height:max(260px, calc(100dvh - 260px))!important;
+    box-sizing:border-box!important;
+  }
+  #view-records .records-state[hidden]{
+    display:none!important;
+  }
+  #view-records .records-state:not([hidden]){
+    display:flex!important;
+    flex:1 1 auto!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+    height:auto!important;
+    min-height:220px!important;
+    margin:0!important;
+    padding:28px 16px!important;
+    border:0!important;
+    background:transparent!important;
+    color:#94a3b8!important;
+    font-size:13px!important;
+    font-weight:800!important;
+    text-align:center!important;
+    box-sizing:border-box!important;
+    touch-action:pan-y!important;
+  }
+  #view-records .records-list:empty{
+    min-height:0!important;
+  }
+</style>
+
 </body>
 </html>

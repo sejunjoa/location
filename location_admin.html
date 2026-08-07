@@ -8770,31 +8770,43 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
   function restoreInline(element,value){
     value===null?element.removeAttribute('style'):element.setAttribute('style',value);
   }
+  function refreshUnitManagementAfterTransition(){
+    const jobs=[];
+    try{jobs.push(Promise.resolve(loadUnitManagementState({quiet:true})))}catch(_){}
+    try{jobs.push(Promise.resolve(loadUnitAdmins({quiet:true})))}catch(_){}
+    try{jobs.push(Promise.resolve(searchUnitsForManagement({quiet:true})))}catch(_){}
+    try{jobs.push(Promise.resolve(loadPendingUnitApplications({quiet:true})))}catch(_){}
+    if(jobs.length){
+      Promise.allSettled(jobs).finally(()=>requestAnimationFrame(()=>requestAnimationFrame(scheduleFinalAdminSticky)));
+    }
+  }
   function setupAdminTransition(type,direction){
     const from=activeAdminTab();
     if(tabState||from===type||!tabOrder.includes(type)||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open,.action-toast-backdrop.open')||document.body.classList.contains('zone-card-dragging'))return null;
     const current=document.getElementById(`view-${from}`);
     const target=document.getElementById(`view-${type}`);
     if(!current||!target)return null;
-    if(type==='unit'){
-      try{loadUnitManagementState({quiet:true}).catch(()=>{});loadUnitAdmins({quiet:true}).catch(()=>{});searchUnitsForManagement({quiet:true}).catch(()=>{});loadPendingUnitApplications({quiet:true}).catch(()=>{})}catch(_){}
-    }
 
+    /* 애니메이션 중 다른 비동기 렌더링이 패널 높이와 DOM 순서를 바꾸지 않도록 한다. */
+    document.querySelectorAll('[data-admin-tab-view]').forEach(view=>{
+      if(view!==current&&view!==target)view.hidden=true;
+    });
     releaseAdminSticky();
     const wrap=current.parentElement;
     const currentRect=current.getBoundingClientRect();
     const wrapRect=wrap.getBoundingClientRect();
     const width=Math.max(currentRect.width,1);
+    const currentHeight=Math.max(current.scrollHeight,currentRect.height,1);
     const saved={current:current.getAttribute('style'),target:target.getAttribute('style'),wrap:wrap.getAttribute('style'),targetHidden:target.hidden};
     target.hidden=false;
     const targetHeight=Math.max(target.scrollHeight,target.getBoundingClientRect().height,1);
     if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';
     wrap.style.overflow='hidden';
-    wrap.style.minHeight=`${Math.max(currentRect.height,targetHeight)}px`;
-    Object.assign(current.style,{position:'relative',zIndex:'2',width:'100%',transition:'none',transform:'translate3d(0,0,0)',willChange:'transform',pointerEvents:'none'});
-    Object.assign(target.style,{position:'absolute',left:`${currentRect.left-wrapRect.left}px`,top:`${currentRect.top-wrapRect.top}px`,zIndex:'3',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,margin:'0',boxSizing:'border-box',transition:'none',transform:`translate3d(${direction*width}px,0,0)`,willChange:'transform',pointerEvents:'none'});
+    wrap.style.minHeight=`${Math.max(currentHeight,targetHeight)}px`;
+    Object.assign(current.style,{position:'relative',zIndex:'2',width:'100%',height:`${currentHeight}px`,overflow:'hidden',contain:'layout paint',transition:'none',transform:'translate3d(0,0,0)',willChange:'transform',pointerEvents:'none'});
+    Object.assign(target.style,{position:'absolute',left:`${currentRect.left-wrapRect.left}px`,top:`${currentRect.top-wrapRect.top}px`,zIndex:'3',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,height:`${targetHeight}px`,overflow:'hidden',contain:'layout paint',margin:'0',boxSizing:'border-box',transition:'none',transform:`translate3d(${direction*width}px,0,0)`,willChange:'transform',pointerEvents:'none'});
     document.body.classList.add('admin-final-tab-moving');
-    tabState={from,type,direction,current,target,wrap,width,saved,done:false};
+    tabState={from,type,direction,current,target,wrap,width,saved,done:false,refreshUnit:type==='unit'};
     return tabState;
   }
   function setAdminTransitionOffset(state,offset){
@@ -8826,6 +8838,9 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
       detail:{from:state.from,to:complete?state.type:state.from,completed:complete}
     }));
     requestAnimationFrame(()=>requestAnimationFrame(scheduleFinalAdminSticky));
+    if(complete&&state.refreshUnit){
+      requestAnimationFrame(refreshUnitManagementAfterTransition);
+    }
   }
   function animateAdminTransition(state,complete){
     if(!state)return;
@@ -8845,7 +8860,12 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
   function goAdminTab(type,directionOverride=null){
     const from=activeAdminTab();
     const fromIndex=tabOrder.indexOf(from),toIndex=tabOrder.indexOf(type);
-    if(fromIndex<0||toIndex<0||fromIndex===toIndex){updateAdminTabButtons(from);scheduleFinalAdminSticky();return}
+    if(fromIndex<0||toIndex<0||fromIndex===toIndex){
+      updateAdminTabButtons(from);
+      scheduleFinalAdminSticky();
+      if(from===type&&type==='unit')refreshUnitManagementAfterTransition();
+      return;
+    }
     const direction=directionOverride??(toIndex>fromIndex?1:-1);
     const state=setupAdminTransition(type,direction);
     if(!state)return;
@@ -10867,5 +10887,27 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
   };
 })();
 </script>
+
+
+<!-- 2026-08-07: 부대관리 탭 슬라이드 중 패널 내부 요소가 섞이지 않도록 격리 -->
+<style id="location-admin-unit-swipe-isolation-fix">
+  #adminTabMain{
+    isolation:isolate!important;
+  }
+  body.admin-final-tab-moving #adminTabMain{
+    overflow:hidden!important;
+  }
+  body.admin-final-tab-moving .admin-tab-view{
+    overflow:hidden!important;
+    isolation:isolate!important;
+    backface-visibility:hidden!important;
+    transform-style:flat!important;
+  }
+  body.admin-final-tab-moving .unit-management-shell,
+  body.admin-final-tab-moving .unit-management-card{
+    contain:layout paint!important;
+  }
+</style>
+
 </body>
 </html>
