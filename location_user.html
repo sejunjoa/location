@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="위치현황">
+<link rel="stylesheet" href="./pwa.css">
+<script src="./pwa.js" defer></script>
   <title>부대 병력 위치현황</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
@@ -1862,6 +1871,61 @@
       to { opacity: 0; transform: translateY(18px) scale(.97); }
     }
   </style>
+
+  <style id="location-user-v23-header-settings-cleanup">
+    /* 복귀 타이머와 동기화 상태를 서로 다른 grid 행에 고정 */
+    .header{
+      display:grid!important;
+      grid-template-columns:minmax(0,1fr) 40px!important;
+      grid-template-rows:auto auto!important;
+      column-gap:14px!important;
+      row-gap:7px!important;
+      align-items:start!important;
+    }
+    .header-top{display:contents!important}
+    .header .title-area{
+      grid-column:1!important;
+      grid-row:1!important;
+      min-width:0!important;
+    }
+    .header .header-actions{
+      grid-column:2!important;
+      grid-row:1 / span 2!important;
+      align-self:start!important;
+    }
+    .header .sync-line{
+      position:static!important;
+      grid-column:1!important;
+      grid-row:2!important;
+      align-self:end!important;
+      min-width:0!important;
+      max-width:100%!important;
+    }
+    .header .sync-line #syncText{
+      min-width:0!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      white-space:nowrap!important;
+    }
+
+    /* 설정 > 개인정보 수정 */
+    #settingsDialog .privacy-settings-section{
+      padding:16px!important;
+      border:1px solid #dbe3ee!important;
+      border-radius:18px!important;
+      background:#fff!important;
+      box-shadow:0 6px 18px rgba(15,23,42,.04)!important;
+    }
+    #settingsDialog .privacy-settings-title{
+      margin:0 0 14px!important;
+      color:#0f172a!important;
+      font-size:15px!important;
+      font-weight:950!important;
+      line-height:1.25!important;
+      text-align:left!important;
+    }
+  </style>
+
 </head>
 <body>
   <div class="loading-cover" id="loadingCover">위치현황을 불러오는 중...</div>
@@ -1986,7 +2050,6 @@
       <div class="dialog-head" style="grid-template-columns:1fr;">
         <div>
           <h3 id="companyDialogTitle">중대를 입력해주세요.</h3>
-          <p>입력한 중대는 병력 현황에 표시됩니다.</p>
         </div>
       </div>
       <form class="dialog-body" id="companyForm" novalidate>
@@ -2021,7 +2084,6 @@
       <div class="dialog-head">
         <div>
           <h3 id="userRecordsPeriodTitle">기간 설정</h3>
-          <p>선택한 날짜 사이에 출발한 기록만 표시합니다.</p>
         </div>
         <button class="dialog-close-btn" id="userRecordsPeriodCloseButton" type="button" aria-label="기간 설정 닫기">✕</button>
       </div>
@@ -2102,7 +2164,8 @@
         <button class="dialog-close-btn" id="settingsCloseBtn" type="button" aria-label="설정 닫기">✕</button>
       </div>
       <div class="dialog-body settings-dialog-body">
-        <section class="settings-section">
+        <section class="settings-section privacy-settings-section">
+          <h4 class="settings-title privacy-settings-title">개인정보 수정</h4>
           <form class="settings-name-form" id="settingsNameForm" novalidate>
             <label class="field-label" for="settingsNameInput">이름</label>
             <input class="text-input" id="settingsNameInput" type="text" maxlength="20" autocomplete="name" placeholder="이름 입력" />
@@ -2118,6 +2181,11 @@
             <select class="text-input" id="settingsHomeZoneSelect"></select>
             <button class="primary-btn full-btn" id="settingsHomeZoneSaveBtn" type="submit" style="margin-top:12px;">생활관 저장</button>
           </form>
+        </section>
+
+        <section class="settings-section pwa-install-section">
+          <h4 class="settings-title">앱 설치</h4>
+          <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="앱 설치" data-ios-label="홈 화면에 앱 추가">앱 설치</button>
         </section>
 
         <section class="settings-section">
@@ -3640,7 +3708,7 @@ async function loadOwnMovementLogs(unitId) {
   function ensureSettingsHomePicker(){
     if (settingsHomePickerModal) return;
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = `<div class="modal-backdrop settings-home-picker-modal" id="settingsHomePickerModal"><section class="dialog settings-home-picker-dialog" id="settingsHomePickerDialog" role="dialog" aria-modal="true" aria-labelledby="settingsHomePickerTitle" tabindex="-1"><div class="dialog-head settings-home-picker-head"><div><h3 id="settingsHomePickerTitle">생활관 선택</h3><p>생활관을 검색하거나 목록에서 선택하세요.</p></div><button class="dialog-close-btn" id="settingsHomePickerCloseButton" type="button" aria-label="생활관 선택 닫기">✕</button></div><div class="settings-home-picker-search"><div class="personnel-search-wrap"><span class="personnel-search-icon" aria-hidden="true">⌕</span><input class="personnel-search-input" id="settingsHomePickerSearchInput" type="search" placeholder="생활관 검색" autocomplete="off" enterkeyhint="search" aria-label="생활관 검색"></div></div><div class="settings-home-picker-list" id="settingsHomePickerOptionList"></div></section></div>`;
+    wrapper.innerHTML = `<div class="modal-backdrop settings-home-picker-modal" id="settingsHomePickerModal"><section class="dialog settings-home-picker-dialog" id="settingsHomePickerDialog" role="dialog" aria-modal="true" aria-labelledby="settingsHomePickerTitle" tabindex="-1"><div class="dialog-head settings-home-picker-head"><div><h3 id="settingsHomePickerTitle">생활관 선택</h3></div><button class="dialog-close-btn" id="settingsHomePickerCloseButton" type="button" aria-label="생활관 선택 닫기">✕</button></div><div class="settings-home-picker-search"><div class="personnel-search-wrap"><span class="personnel-search-icon" aria-hidden="true">⌕</span><input class="personnel-search-input" id="settingsHomePickerSearchInput" type="search" placeholder="생활관 검색" autocomplete="off" enterkeyhint="search" aria-label="생활관 검색"></div></div><div class="settings-home-picker-list" id="settingsHomePickerOptionList"></div></section></div>`;
     settingsHomePickerModal = wrapper.firstElementChild;
     document.body.appendChild(settingsHomePickerModal);
     settingsHomePickerDialog = document.getElementById('settingsHomePickerDialog');
@@ -3717,10 +3785,10 @@ async function loadOwnMovementLogs(unitId) {
   }
 
   function enhanceUserSettingsUI(){
-    const section = settingsDialog.querySelector('.settings-section');
+    const section = settingsDialog.querySelector('.privacy-settings-section, .settings-section');
     if (!section || section.dataset.enhanced === 'true') return;
     section.dataset.enhanced = 'true';
-    section.innerHTML = `<form class="user-settings-form" id="enhancedUserSettingsForm" novalidate><div class="field-group"><label class="field-label" for="enhancedSettingsName">이름</label><input class="text-input" id="enhancedSettingsName" type="text" maxlength="20" autocomplete="name" placeholder="이름 입력"></div><div class="field-group"><label class="field-label" for="enhancedSettingsCompany">중대</label><input class="text-input" id="enhancedSettingsCompany" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대"></div><div class="field-group"><label class="field-label" for="enhancedSettingsHomeButton">생활관</label><button class="text-input home-zone-picker-trigger" id="enhancedSettingsHomeButton" type="button" aria-haspopup="dialog" aria-controls="settingsHomePickerModal"><span class="home-zone-picker-label placeholder">생활관 선택</span><span class="home-zone-picker-arrow" aria-hidden="true">▼</span></button><select id="enhancedSettingsHome" hidden aria-hidden="true" tabindex="-1"></select></div><div class="user-settings-date-grid"><div class="field-group"><label class="field-label" for="enhancedSettingsEnlistDate">입대일</label><input class="text-input" id="enhancedSettingsEnlistDate" type="date"></div><div class="field-group"><label class="field-label" for="enhancedSettingsDischargeDate">전역일</label><input class="text-input" id="enhancedSettingsDischargeDate" type="date"></div></div><div class="field-group"><label class="field-label" for="enhancedSettingsPhone">휴대폰 번호</label><input class="text-input" id="enhancedSettingsPhone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="01012345678"></div><div class="field-group"><label class="field-label" for="enhancedSettingsPassword">현재 비밀번호</label><input class="text-input" id="enhancedSettingsPassword" type="password" autocomplete="current-password" placeholder="수정을 위해 비밀번호 입력"><div class="field-help">이름, 중대, 생활관, 입대일, 전역일, 휴대폰 번호를 수정하려면 현재 비밀번호를 입력해주세요.</div></div><button class="primary-btn full-btn user-settings-save" id="enhancedUserSettingsSaveBtn" type="submit">저장</button></form>`;
+    section.innerHTML = `<h4 class="settings-title privacy-settings-title">개인정보 수정</h4><form class="user-settings-form" id="enhancedUserSettingsForm" novalidate><div class="field-group"><label class="field-label" for="enhancedSettingsName">이름</label><input class="text-input" id="enhancedSettingsName" type="text" maxlength="20" autocomplete="name" placeholder="이름 입력"></div><div class="field-group"><label class="field-label" for="enhancedSettingsCompany">중대</label><input class="text-input" id="enhancedSettingsCompany" type="text" maxlength="30" autocomplete="organization" placeholder="예: 1중대"></div><div class="field-group"><label class="field-label" for="enhancedSettingsHomeButton">생활관</label><button class="text-input home-zone-picker-trigger" id="enhancedSettingsHomeButton" type="button" aria-haspopup="dialog" aria-controls="settingsHomePickerModal"><span class="home-zone-picker-label placeholder">생활관 선택</span><span class="home-zone-picker-arrow" aria-hidden="true">▼</span></button><select id="enhancedSettingsHome" hidden aria-hidden="true" tabindex="-1"></select></div><div class="user-settings-date-grid"><div class="field-group"><label class="field-label" for="enhancedSettingsEnlistDate">입대일</label><input class="text-input" id="enhancedSettingsEnlistDate" type="date"></div><div class="field-group"><label class="field-label" for="enhancedSettingsDischargeDate">전역일</label><input class="text-input" id="enhancedSettingsDischargeDate" type="date"></div></div><div class="field-group"><label class="field-label" for="enhancedSettingsPhone">휴대폰 번호</label><input class="text-input" id="enhancedSettingsPhone" type="tel" inputmode="numeric" maxlength="13" autocomplete="tel" placeholder="01012345678"></div><div class="field-group"><label class="field-label" for="enhancedSettingsPassword">현재 비밀번호</label><input class="text-input" id="enhancedSettingsPassword" type="password" autocomplete="current-password" placeholder="수정을 위해 비밀번호 입력"></div><button class="primary-btn full-btn user-settings-save" id="enhancedUserSettingsSaveBtn" type="submit">저장</button></form>`;
     const form = document.getElementById('enhancedUserSettingsForm');
     const homeButton = document.getElementById('enhancedSettingsHomeButton');
     const phoneInput = document.getElementById('enhancedSettingsPhone');

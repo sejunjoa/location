@@ -4,6 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0f172a">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="위치현황">
+<link rel="stylesheet" href="./pwa.css">
+<script src="./pwa.js" defer></script>
 <title>부대 병력 위치현황 로그인</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -203,6 +212,7 @@ button,input{font:inherit;}
     <input type="email" id="email" class="input" placeholder="이메일" autocomplete="email">
     <input type="password" id="password" class="input" placeholder="비밀번호" autocomplete="current-password">
     <button id="loginBtn" class="login-btn" type="button">로그인</button>
+    <button class="pwa-install-login-btn" type="button" data-pwa-install hidden data-install-label="앱 설치" data-ios-label="홈 화면에 앱 추가">앱 설치</button>
 
     <div class="bottom">
         <a href="register_user.html" class="user-link">회원가입</a>
