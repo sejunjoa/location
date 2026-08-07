@@ -5190,8 +5190,8 @@ replaceArray(movementLogs, normalizedMovementLogs);
     }
 
     function scheduleRealtimeReload() {
-      // 구역 순서를 여러 행에 저장하는 동안 발생한 Realtime 이벤트가
-      // 중간 상태를 다시 그리지 않도록, 저장 완료 뒤 한 번만 갱신합니다.
+      // 구역 순서 RPC가 완료되기 전에 수신된 Realtime 이벤트는 잠시 보류하고,
+      // RPC 트랜잭션이 끝난 뒤 한 번만 다시 조회합니다.
       if (zoneOrderSaveInProgress) {
         pendingRealtimeReload = true;
         return;
@@ -5276,20 +5276,18 @@ replaceArray(movementLogs, normalizedMovementLogs);
       clearTimeout(reloadTimer);
 
       try {
-        const results = await Promise.all(
-          zones.map((zone, index) => sb
-            .from('location_zones')
-            .update({ sort_order: index * 10 })
-            .eq('id', zone.id)
-            .eq('unit_id', selectedUnitId))
-        );
+        // 전체 구역 ID를 현재 화면 순서대로 한 번만 전달합니다.
+        // DB 함수 내부의 단일 UPDATE가 sort_order를 0, 10, 20... 으로 원자적으로 갱신합니다.
+        const { error } = await sb.rpc('reorder_location_zones', {
+          p_unit_id: selectedUnitId,
+          p_zone_ids: zones.map(zone => zone.id)
+        });
 
-        const failed = results.find(result => result.error);
-        if (failed?.error) throw failed.error;
+        if (error) throw error;
       } finally {
         zoneOrderSaveInProgress = false;
 
-        // 저장 중 수신된 이벤트는 모든 sort_order가 확정된 뒤 한 번만 반영합니다.
+        // 저장 중 수신된 이벤트는 RPC 트랜잭션 종료 뒤 한 번만 반영합니다.
         if (pendingRealtimeReload) {
           pendingRealtimeReload = false;
           scheduleRealtimeReload();
