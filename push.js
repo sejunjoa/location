@@ -4,6 +4,7 @@
   const VAPID_PUBLIC_KEY = 'BEgPJKQnyeHSknIPIwEnxvwoLttja4te8FALzNO34TOpzodB4KhZBgLRepUbH8pRwVEyIeSitSONqrw64N-AZ34';
   const BUTTON_ID = 'pushNotificationSettingsBtn';
   const STATUS_ID = 'pushNotificationStatus';
+  const PUSH_CLIENT_VERSION = '1.0.9';
 
   function button(){ return document.getElementById(BUTTON_ID); }
   function status(){ return document.getElementById(STATUS_ID); }
@@ -79,9 +80,41 @@
     if (error) throw error;
   }
 
-  async function getRegistration(){
+  function withTimeout(promise, timeoutMs, message){
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => window.setTimeout(() => reject(new Error(message)), timeoutMs))
+    ]);
+  }
+
+  async function getRegistration({ timeoutMs = 6000, ensure = true } = {}){
     if (!('serviceWorker' in navigator)) return null;
-    return navigator.serviceWorker.ready;
+
+    let registration = null;
+    try {
+      registration = await navigator.serviceWorker.getRegistration();
+    } catch (_) {}
+
+    if (!registration && ensure) {
+      try {
+        registration = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+      } catch (error) {
+        throw new Error(`Service Worker 등록 실패: ${error?.message || String(error)}`);
+      }
+    }
+
+    if (registration?.active) return registration;
+
+    try {
+      return await withTimeout(
+        navigator.serviceWorker.ready,
+        timeoutMs,
+        'Service Worker가 활성 상태가 되지 않았습니다. 앱을 완전히 종료한 뒤 다시 실행해주세요.'
+      );
+    } catch (error) {
+      const state = registration?.installing?.state || registration?.waiting?.state || '없음';
+      throw new Error(`${error?.message || String(error)} (현재 worker 상태: ${state})`);
+    }
   }
 
   async function refresh({ syncServer = true } = {}){
@@ -235,26 +268,72 @@
   }
 
   async function showLocalTestNotification(){
+    setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 로컬 테스트 준비 중...`);
     try {
-      if (Notification.permission !== 'granted') {
-        setDiagnosticText('알림 권한이 허용되어 있지 않습니다. 먼저 푸시 알림을 켜주세요.');
+      if (!window.isSecureContext) {
+        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 실패: HTTPS 보안 연결이 아닙니다.`);
         return;
       }
-      const registration = await getRegistration();
-      await registration.showNotification('푸시 알림 표시 테스트', {
-        body: '이 알림이 보이면 휴대전화의 알림 표시 기능은 정상입니다.',
-        icon: './icons/icon-192.png',
-        tag: `location-local-test-${Date.now()}`,
-        data: { url: './location_admin.html' }
-      });
-      setDiagnosticText('로컬 테스트 알림 표시를 요청했습니다. 휴대전화 알림창을 확인하세요.');
+      if (!('Notification' in window)) {
+        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 실패: Notification API를 지원하지 않습니다.`);
+        return;
+      }
+      if (Notification.permission !== 'granted') {
+        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 알림 권한=${Notification.permission}. 먼저 푸시 알림을 켜주세요.`);
+        return;
+      }
+      if (!('serviceWorker' in navigator)) {
+        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 실패: Service Worker를 지원하지 않습니다.`);
+        return;
+      }
+
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 확인 중...`);
+      const registration = await getRegistration({ timeoutMs: 6000, ensure: true });
+      if (!registration) throw new Error('Service Worker 등록 정보를 찾지 못했습니다.');
+      if (!registration.active) throw new Error('활성 Service Worker가 없습니다.');
+      if (typeof registration.showNotification !== 'function') throw new Error('showNotification API를 사용할 수 없습니다.');
+
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 알림 표시 API 호출 중...`);
+      await withTimeout(
+        registration.showNotification('푸시 알림 표시 테스트', {
+          body: '이 알림이 보이면 휴대전화의 알림 표시 기능은 정상입니다.',
+          icon: './icons/icon-192.png',
+          badge: './icons/icon-96.png',
+          tag: `location-local-test-${Date.now()}`,
+          data: { url: './location_admin.html' }
+        }),
+        6000,
+        '알림 표시 API 응답 시간이 초과되었습니다.'
+      );
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 로컬 알림 표시 요청 성공 · SW active=${registration.active?.state || 'unknown'} · controller=${navigator.serviceWorker.controller ? 'yes' : 'no'}`);
     } catch (error) {
-      setDiagnosticText(`로컬 테스트 실패: ${error?.message || String(error)}`);
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 로컬 테스트 실패: ${error?.message || String(error)}`);
     }
   }
 
-  function requestPushDiagnostic(){
-    navigator.serviceWorker?.controller?.postMessage?.({ type: 'GET_PUSH_DIAGNOSTIC' });
+  async function requestPushDiagnostic(){
+    if (!('serviceWorker' in navigator)) {
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 미지원`);
+      return;
+    }
+    try {
+      const registration = await getRegistration({ timeoutMs: 4000, ensure: true });
+      const worker = navigator.serviceWorker.controller || registration?.active;
+      if (!worker) {
+        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 활성 Service Worker를 찾지 못했습니다.`);
+        return;
+      }
+      worker.postMessage({ type: 'GET_PUSH_DIAGNOSTIC' });
+      window.setTimeout(() => {
+        const el = diagnosticStatus();
+        if (el && el.textContent.includes('Service Worker 진단 응답 대기 중')) {
+          setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 진단 응답 없음 · controller=${navigator.serviceWorker.controller ? 'yes' : 'no'} · active=${registration?.active?.state || 'no'}`);
+        }
+      }, 2500);
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 진단 응답 대기 중...`);
+    } catch (error) {
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 확인 실패: ${error?.message || String(error)}`);
+    }
   }
 
   navigator.serviceWorker?.addEventListener?.('message', event => {
@@ -262,7 +341,7 @@
     const version = event.data?.serviceWorkerVersion || '?';
     const diag = event.data?.diagnostic;
     if (!diag) {
-      setDiagnosticText(`Service Worker ${version} · 아직 실제 Push 수신 기록이 없습니다.`);
+      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker ${version} · 아직 실제 Push 수신 기록이 없습니다.`);
       return;
     }
     const stateMap = {
@@ -274,25 +353,43 @@
     };
     const state = stateMap[diag.state] || diag.state || '알 수 없음';
     const error = diag.detail?.message ? ` · ${diag.detail.message}` : '';
-    setDiagnosticText(`Service Worker ${version} · ${state}${error} · ${diag.at || ''}`);
+    setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker ${version} · ${state}${error} · ${diag.at || ''}`);
   });
 
-  document.addEventListener('DOMContentLoaded', () => {
+  function initializePushUi(){
     installLogoutCleanup();
     openPushTargetTab();
 
+    setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 스크립트 로드됨 · Service Worker 확인 대기`);
+
     const btn = button();
-    if (!btn) return;
-    btn.addEventListener('click', toggle);
-    document.getElementById('pushNotificationTestBtn')?.addEventListener('click', showLocalTestNotification);
+    if (btn && !btn.dataset.locationPushBound) {
+      btn.dataset.locationPushBound = '1';
+      btn.addEventListener('click', toggle);
+    }
+    const testBtn = document.getElementById('pushNotificationTestBtn');
+    if (testBtn && !testBtn.dataset.locationPushBound) {
+      testBtn.dataset.locationPushBound = '1';
+      testBtn.addEventListener('click', showLocalTestNotification);
+    }
+
     refresh().catch(() => {});
     window.setTimeout(requestPushDiagnostic, 300);
 
     const settingsButton = document.getElementById('settingsBtn');
-    settingsButton?.addEventListener('click', () => {
-      window.setTimeout(() => { refresh().catch(() => {}); requestPushDiagnostic(); }, 80);
-    });
-  });
+    if (settingsButton && !settingsButton.dataset.locationPushBound) {
+      settingsButton.dataset.locationPushBound = '1';
+      settingsButton.addEventListener('click', () => {
+        window.setTimeout(() => { refresh().catch(() => {}); requestPushDiagnostic(); }, 80);
+      });
+    }
+  }
 
-  window.LocationPush = { refresh };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePushUi, { once: true });
+  } else {
+    initializePushUi();
+  }
+
+  window.LocationPush = { refresh, showLocalTestNotification, requestPushDiagnostic, version: PUSH_CLIENT_VERSION };
 })();
