@@ -21,7 +21,7 @@
   <script src="common.js"></script>
   <script src="admin-ui.js" defer></script>
   <script src="toast.js"></script>
-  <script src="./push.js?v=1.0.10" defer></script>
+  <script src="./push.js?v=1.0.11" defer></script>
   <style>
     :root {
       --bg: #eef2f7;
@@ -4200,7 +4200,7 @@
           <div class="push-settings-row">
             <div class="push-settings-copy">
               <h4 class="settings-section-title" id="pushSettingsTitle">푸시 알림</h4>
-              <p class="settings-section-description" id="pushNotificationStatus">이동 기록과 신규 가입 신청 알림 상태를 확인하는 중입니다.</p>
+              <p class="settings-section-description" id="pushNotificationStatus">이동 기록과 병력 가입·이전 신청 알림 상태를 확인하는 중입니다.</p>
             </div>
             <button class="push-notification-toggle" id="pushNotificationSettingsBtn" type="button" role="switch" aria-checked="false" aria-label="푸시 알림 켜기">
               <span class="push-toggle-thumb" aria-hidden="true"></span>
@@ -6880,7 +6880,7 @@ function renderPersonnel() {
       openActionToast({
         action: 'delete_account',
         title: '회원탈퇴',
-        message: '정말 탈퇴하시겠습니까?\n계정과 연결된 위치 정보가 삭제되며 복구할 수 없습니다.',
+        message: '정말 탈퇴하시겠습니까? 계정 정보가 삭제됩니다.',
         confirmText: '회원탈퇴',
         danger: true,
         requirePassword: true

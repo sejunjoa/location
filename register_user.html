@@ -478,6 +478,21 @@ registerBtn.addEventListener("click",async()=>{
             return;
         }
 
+        const {data:phoneAvailable,error:phoneCheckError}=await sb.rpc("is_signup_phone_available",{
+            p_phone:phoneNumber
+        });
+
+        if(phoneCheckError){
+            triggerToast("휴대폰 번호 중복 확인에 실패했습니다.\n잠시 후 다시 시도해주세요.");
+            return;
+        }
+
+        if(phoneAvailable!==true){
+            triggerToast("이미 등록된 휴대폰 번호입니다.");
+            phone.focus();
+            return;
+        }
+
         const {data,error}=await sb.auth.signUp({
             email:emailValue,
             password:password.value,

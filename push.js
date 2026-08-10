@@ -157,7 +157,7 @@
 
       if (subscription) {
         if (syncServer) await saveSubscription(subscription);
-        setUi('enabled', '새 이동 기록과 신규 가입 신청을 이 기기에서 알림으로 받습니다.');
+        setUi('enabled', '새 이동 기록과 병력 가입·이전 신청을 이 기기에서 알림으로 받습니다.');
       } else {
         setUi('disabled', Notification.permission === 'granted'
           ? '알림 권한은 허용되어 있습니다. 오른쪽 스위치를 켜 이 기기를 등록하세요.'
@@ -200,7 +200,7 @@
       }
 
       await saveSubscription(subscription);
-      setUi('enabled', '푸시 알림이 켜졌습니다. 새 이동 기록과 신규 가입 신청을 알려드립니다.');
+      setUi('enabled', '푸시 알림이 켜졌습니다. 새 이동 기록과 병력 가입·이전 신청을 알려드립니다.');
     } catch (error) {
       console.error('푸시 알림 등록 실패:', error);
       setUi('disabled', error?.message || '푸시 알림을 등록하지 못했습니다.');

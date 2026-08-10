@@ -1926,6 +1926,109 @@
       line-height:1.25!important;
       text-align:left!important;
     }
+
+    /* 설정 > 부대 옮기기 */
+    #settingsDialog .unit-transfer-open-btn{
+      width:100%!important;
+      min-height:46px!important;
+      margin-top:12px!important;
+      border:1px solid #bfdbfe!important;
+      border-radius:14px!important;
+      background:#eff6ff!important;
+      color:#1d4ed8!important;
+      font-size:14px!important;
+      font-weight:900!important;
+    }
+    #settingsDialog .unit-transfer-open-btn:active{transform:scale(.985)!important;background:#dbeafe!important}
+
+    /* 회원가입 화면의 부대 선택 팝업과 동일한 레이아웃 */
+    #userUnitTransferModal{
+      background:rgba(15,23,42,.50)!important;
+      backdrop-filter:none!important;
+    }
+    #userUnitTransferDialog{
+      width:min(calc(100% - 40px),448px)!important;
+      max-width:448px!important;
+      max-height:80vh!important;
+      max-height:80dvh!important;
+      border-radius:16px!important;
+      background:#fff!important;
+      box-shadow:0 25px 50px -12px rgba(0,0,0,.25)!important;
+      overflow:hidden!important;
+      display:flex!important;
+      flex-direction:column!important;
+    }
+    .user-unit-picker-title{
+      flex:0 0 auto;
+      padding:16px;
+      border-bottom:1px solid #e2e8f0;
+      color:#0f172a;
+      text-align:center;
+      font-size:18px;
+      font-weight:700;
+      line-height:1.5;
+    }
+    .user-unit-picker-search{
+      flex:0 0 auto;
+      padding:16px;
+    }
+    .user-unit-picker-search-input{
+      width:100%;
+      border:1px solid #e2e8f0;
+      border-radius:12px;
+      padding:12px 16px;
+      background:#fff;
+      color:#0f172a;
+      outline:none;
+      font-size:16px;
+      line-height:1.5;
+    }
+    .user-unit-picker-search-input:focus{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 4px #dbeafe;
+    }
+    .user-unit-transfer-results{
+      flex:1 1 auto;
+      min-height:0;
+      overflow-y:auto;
+      overscroll-behavior:contain;
+    }
+    .user-unit-transfer-state{
+      padding:24px 16px;
+      color:#64748b;
+      text-align:center;
+      font-size:13px;
+      font-weight:600;
+      line-height:1.55;
+    }
+    .user-unit-transfer-result{
+      width:100%;
+      min-height:54px;
+      padding:16px;
+      border:0;
+      border-bottom:1px solid #f1f5f9;
+      border-radius:0;
+      background:#fff;
+      color:#0f172a;
+      text-align:left;
+      font-size:16px;
+      font-weight:600;
+      line-height:1.45;
+    }
+    .user-unit-transfer-result:hover{background:#f8fafc}
+    .user-unit-transfer-result:active{background:#f1f5f9}
+    .user-unit-picker-close{
+      flex:0 0 auto;
+      width:100%;
+      padding:16px;
+      border:0;
+      background:#f1f5f9;
+      color:#334155;
+      font-size:16px;
+      font-weight:600;
+      line-height:1.5;
+    }
+    .user-unit-picker-close:active{background:#e2e8f0}
   </style>
 
 
@@ -2187,6 +2290,8 @@
           </form>
         </section>
 
+        <button class="unit-transfer-open-btn" id="openUserUnitTransferBtn" type="button">부대 옮기기</button>
+
         <div class="settings-account-actions">
           <button class="settings-action-btn logout" id="logoutBtn" type="button">로그아웃</button>
           <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="홈 화면에 앱 추가" data-ios-label="홈 화면에 앱 추가">홈 화면에 앱 추가</button>
@@ -2197,6 +2302,18 @@
       <div class="settings-dialog-footer">
         <button class="settings-close-bottom" id="settingsBottomCloseBtn" type="button">닫기</button>
       </div>
+    </section>
+  </div>
+
+  <!-- 일반 사용자 부대 이전: 회원가입의 부대 선택 팝업과 동일한 구조 -->
+  <div class="modal-backdrop" id="userUnitTransferModal">
+    <section class="dialog" id="userUnitTransferDialog" role="dialog" aria-modal="true" aria-labelledby="userUnitTransferTitle" tabindex="-1">
+      <div class="user-unit-picker-title" id="userUnitTransferTitle">부대 선택</div>
+      <div class="user-unit-picker-search">
+        <input class="user-unit-picker-search-input" id="userUnitTransferSearchInput" type="text" autocomplete="off" placeholder="부대찾기" aria-label="부대명 또는 부대 코드 검색" />
+      </div>
+      <div class="user-unit-transfer-results" id="userUnitTransferResults" aria-live="polite"></div>
+      <button class="user-unit-picker-close" id="userUnitTransferCloseBtn" type="button">닫기</button>
     </section>
   </div>
 
@@ -2232,8 +2349,7 @@
     <section class="action-toast-panel danger" id="actionToastPanel" role="alertdialog" aria-modal="true" aria-labelledby="actionToastTitle">
       <div class="action-toast-icon" id="actionToastIcon" aria-hidden="true">!</div>
       <h3 class="action-toast-title" id="actionToastTitle">회원탈퇴</h3>
-      <p class="action-toast-message" id="actionToastMessage">정말 탈퇴하시겠습니까?
-계정과 연결된 위치 정보가 삭제되며 복구할 수 없습니다.</p>
+      <p class="action-toast-message" id="actionToastMessage">정말 탈퇴하시겠습니까? 계정 정보가 삭제됩니다.</p>
 
       <div class="action-toast-password-wrap" id="actionToastPasswordWrap">
         <label class="field-label" for="actionToastPasswordInput">현재 비밀번호</label>
@@ -7284,6 +7400,133 @@ async function loadOwnMovementLogs(unitId) {
   },{passive:true});
 
   buildQuickNav();
+})();
+</script>
+
+<script id="location-user-unit-transfer-v114">
+(function(){
+  'use strict';
+
+  const modal = document.getElementById('userUnitTransferModal');
+  const dialog = document.getElementById('userUnitTransferDialog');
+  const openButton = document.getElementById('openUserUnitTransferBtn');
+  const closeButton = document.getElementById('userUnitTransferCloseBtn');
+  const searchInput = document.getElementById('userUnitTransferSearchInput');
+  const results = document.getElementById('userUnitTransferResults');
+  let searchTimer = 0;
+  let searchSequence = 0;
+
+  if (!modal || !dialog || !openButton || !closeButton || !searchInput || !results) return;
+
+  function state(message){
+    const node = document.createElement('div');
+    node.className = 'user-unit-transfer-state';
+    node.textContent = message;
+    return node;
+  }
+
+  function setState(message){
+    results.innerHTML = '';
+    results.appendChild(state(message));
+  }
+
+  function closeTransferModal(){
+    closeModal(modal, dialog);
+    window.setTimeout(() => openButton.focus({ preventScroll: true }), 210);
+  }
+
+  function requestTransfer(unit){
+    closeTransferModal();
+    window.setTimeout(() => {
+      requestConfirmation({
+        title: '부대 이전 신청',
+        message: `${unit.unit_name || '선택한 부대'}(으)로 부대 이전을 신청하시겠습니까?\n신청 즉시 현재 부대 소속이 해제되고, 새 부대 관리자의 승인 전까지 사용자 페이지를 이용할 수 없습니다.`,
+        confirmText: '이전 신청',
+        action: async () => {
+          const { error: transferError } = await sb.rpc('request_user_unit_transfer_application', {
+            p_unit_id: unit.id
+          });
+          if (transferError) {
+            if (isMissingFunctionError(transferError, 'request_user_unit_transfer_application')) {
+              throw new Error('부대 이전 기능용 Supabase SQL을 먼저 실행해주세요.');
+            }
+            throw transferError;
+          }
+
+          try { triggerToast('부대 이전 신청이 접수되었습니다.'); } catch (_) {}
+          await new Promise(resolve => window.setTimeout(resolve, 650));
+          try { await sb.auth.signOut({ scope: 'local' }); } catch (_) {}
+          location.replace('index.html');
+        }
+      });
+    }, 210);
+  }
+
+  function renderUnits(rows){
+    const currentUnitId = userAccess?.profile?.unit_id || currentUnit?.id || null;
+    const candidates = (rows || []).filter(unit => unit.id !== currentUnitId);
+    results.innerHTML = '';
+
+    if (!candidates.length){
+      const currentMatch = (rows || []).some(unit => unit.id === currentUnitId);
+      results.appendChild(state(currentMatch ? '현재 소속 부대입니다.' : '검색 결과가 없습니다.'));
+      return;
+    }
+
+    candidates.forEach(unit => {
+      const button = document.createElement('button');
+      button.className = 'user-unit-transfer-result';
+      button.type = 'button';
+      button.textContent = `${unit.unit_name || '이름 없는 부대'} (${unit.unit_code || '-'})`;
+      button.addEventListener('click', () => requestTransfer(unit));
+      results.appendChild(button);
+    });
+  }
+
+  async function searchUnits(){
+    const keyword = searchInput.value.trim();
+    const requestId = ++searchSequence;
+    setState('부대를 불러오는 중입니다.');
+
+    let query = sb
+      .from('units')
+      .select('id,unit_name,unit_code');
+
+    if (keyword){
+      const safeKeyword = keyword.replace(/[%_,]/g, '');
+      query = query.or(`unit_name.ilike.*${safeKeyword}*,unit_code.ilike.*${safeKeyword}*`);
+    }
+
+    const { data, error } = await query
+      .order('unit_name', { ascending: true })
+      .limit(100);
+
+    if (requestId !== searchSequence) return;
+    if (error) throw error;
+    renderUnits(data || []);
+  }
+
+  function openTransferModal(){
+    searchInput.value = '';
+    setState('부대를 불러오는 중입니다.');
+    openModal(modal, dialog);
+    searchUnits().catch(error => setState(escapeMessage(error, '부대를 불러오지 못했습니다.')));
+    window.setTimeout(() => searchInput.focus({ preventScroll: true }), 80);
+  }
+
+  openButton.addEventListener('click', openTransferModal);
+  closeButton.addEventListener('click', closeTransferModal);
+
+  searchInput.addEventListener('input', () => {
+    window.clearTimeout(searchTimer);
+    searchTimer = window.setTimeout(() => {
+      searchUnits().catch(error => setState(escapeMessage(error, '부대를 검색하지 못했습니다.')));
+    }, 220);
+  });
+
+  modal.addEventListener('click', event => {
+    if (event.target === modal) closeTransferModal();
+  });
 })();
 </script>
 

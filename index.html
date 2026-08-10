@@ -136,6 +136,104 @@ button,input{font:inherit;}
 .admin-link{color:var(--primary-dark);}
 .user-link:hover,.admin-link:hover{text-decoration:underline;}
 
+
+
+.forgot-password-wrap{
+    margin-top:12px;
+    text-align:center;
+}
+
+.forgot-password-btn{
+    border:0;
+    background:transparent;
+    color:var(--primary);
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.forgot-password-btn:hover{text-decoration:underline;}
+.forgot-password-btn:active{opacity:.72;}
+
+.password-reset-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:80;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(15,23,42,.56);
+    backdrop-filter:blur(3px);
+}
+
+.password-reset-backdrop.open{display:flex;}
+
+.password-reset-dialog{
+    width:100%;
+    max-width:420px;
+    overflow:hidden;
+    border:1px solid rgba(226,232,240,.95);
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 24px 60px rgba(15,23,42,.24);
+}
+
+.password-reset-head{
+    padding:22px 20px 12px;
+    text-align:center;
+}
+
+.password-reset-head h2{
+    margin:0;
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:-.4px;
+}
+
+.password-reset-head p{
+    margin-top:8px;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.55;
+}
+
+.password-reset-body{padding:4px 18px 20px;}
+.password-reset-body .input{margin-bottom:0;}
+
+.password-reset-actions{
+    display:grid;
+    grid-template-columns:1fr 1.5fr;
+    gap:9px;
+    margin-top:14px;
+}
+
+.password-reset-cancel,
+.password-reset-send{
+    min-height:48px;
+    border-radius:10px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.password-reset-cancel{
+    border:1px solid var(--line);
+    background:#f8fafc;
+    color:#475569;
+}
+
+.password-reset-send{
+    border:1px solid #93c5fd;
+    background:var(--primary);
+    color:#fff;
+}
+
+.password-reset-cancel:disabled,
+.password-reset-send:disabled{
+    cursor:default;
+    opacity:.58;
+}
+
 .reapply-backdrop{
     position:fixed;
     inset:0;
@@ -213,12 +311,32 @@ button,input{font:inherit;}
     <input type="email" id="email" class="input" placeholder="이메일" autocomplete="email">
     <input type="password" id="password" class="input" placeholder="비밀번호" autocomplete="current-password">
     <button id="loginBtn" class="login-btn" type="button">로그인</button>
+    <div class="forgot-password-wrap">
+        <button id="forgotPasswordBtn" class="forgot-password-btn" type="button">비밀번호 찾기</button>
+    </div>
     <button class="pwa-install-login-btn" type="button" data-pwa-install hidden data-install-label="앱 설치" data-ios-label="홈 화면에 앱 추가">앱 설치</button>
 
     <div class="bottom">
         <a href="register_user.html" class="user-link">회원가입</a>
         <a href="register_admin.html" class="admin-link">관리자 회원가입</a>
     </div>
+</div>
+
+
+<div id="passwordResetModal" class="password-reset-backdrop modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="passwordResetTitle">
+    <section class="password-reset-dialog">
+        <header class="password-reset-head">
+            <h2 id="passwordResetTitle">비밀번호 찾기</h2>
+            <p>가입한 이메일을 입력하면<br>비밀번호 재설정 링크를 보내드립니다.</p>
+        </header>
+        <div class="password-reset-body">
+            <input id="passwordResetEmail" type="email" class="input" placeholder="이메일" autocomplete="email">
+            <div class="password-reset-actions">
+                <button id="passwordResetCancelBtn" class="password-reset-cancel" type="button" data-modal-close>취소</button>
+                <button id="passwordResetSendBtn" class="password-reset-send" type="button">재설정 이메일 보내기</button>
+            </div>
+        </div>
+    </section>
 </div>
 
 <div id="reapplyBackdrop" class="reapply-backdrop" role="dialog" aria-modal="true" aria-labelledby="reapplyTitle">
@@ -246,14 +364,86 @@ const ADMIN_HOME_PAGE="location_admin.html";
 const email=document.getElementById("email");
 const password=document.getElementById("password");
 const loginBtn=document.getElementById("loginBtn");
+const forgotPasswordBtn=document.getElementById("forgotPasswordBtn");
+const passwordResetModal=document.getElementById("passwordResetModal");
+const passwordResetEmail=document.getElementById("passwordResetEmail");
+const passwordResetCancelBtn=document.getElementById("passwordResetCancelBtn");
+const passwordResetSendBtn=document.getElementById("passwordResetSendBtn");
 const reapplyBackdrop=document.getElementById("reapplyBackdrop");
 const reapplyUnitSearch=document.getElementById("reapplyUnitSearch");
 const reapplyUnitList=document.getElementById("reapplyUnitList");
 const reapplyLogoutBtn=document.getElementById("reapplyLogoutBtn");
 
 let loggingIn=false;
+let passwordResetSending=false;
 let reapplying=false;
 let reapplySearchTimer=null;
+
+
+function openPasswordResetModal(){
+    if(passwordResetSending) return;
+    passwordResetEmail.value=email.value.trim();
+    passwordResetModal.classList.add("open");
+    passwordResetModal.setAttribute("aria-hidden","false");
+    document.body.style.overflow="hidden";
+    setTimeout(()=>passwordResetEmail.focus(),80);
+}
+
+function closePasswordResetModal(){
+    if(passwordResetSending) return;
+    passwordResetModal.classList.remove("open");
+    passwordResetModal.setAttribute("aria-hidden","true");
+    document.body.style.overflow="";
+}
+
+async function sendPasswordResetEmail(){
+    if(passwordResetSending) return;
+
+    const emailValue=passwordResetEmail.value.trim();
+    if(emailValue===""){
+        triggerToast("이메일을 입력하세요.");
+        passwordResetEmail.focus();
+        return;
+    }
+
+    if(!passwordResetEmail.checkValidity()){
+        triggerToast("올바른 이메일 주소를 입력하세요.");
+        passwordResetEmail.focus();
+        return;
+    }
+
+    passwordResetSending=true;
+    passwordResetEmail.disabled=true;
+    passwordResetCancelBtn.disabled=true;
+    passwordResetSendBtn.disabled=true;
+    passwordResetSendBtn.textContent="전송 중...";
+
+    try{
+        const redirectTo=new URL("./reset_password.html",window.location.href).href;
+        const {error}=await requestPasswordReset(emailValue,redirectTo);
+        if(error) throw error;
+
+        email.value=emailValue;
+        passwordResetModal.classList.remove("open");
+        passwordResetModal.setAttribute("aria-hidden","true");
+        document.body.style.overflow="";
+        triggerToast("비밀번호 재설정 이메일을 보냈습니다.\n메일함을 확인해주세요.");
+    }catch(error){
+        console.error("비밀번호 재설정 이메일 전송 실패:",error);
+        const message=String(error?.message||"").toLowerCase();
+        if(message.includes("rate") || message.includes("limit") || message.includes("too many")){
+            triggerToast("요청이 너무 많습니다.\n잠시 후 다시 시도해주세요.");
+        }else{
+            triggerToast("재설정 이메일을 보내지 못했습니다.\n잠시 후 다시 시도해주세요.");
+        }
+    }finally{
+        passwordResetSending=false;
+        passwordResetEmail.disabled=false;
+        passwordResetCancelBtn.disabled=false;
+        passwordResetSendBtn.disabled=false;
+        passwordResetSendBtn.textContent="재설정 이메일 보내기";
+    }
+}
 
 function confirmReapplyWithToast(unitName){
     return new Promise(resolve=>{
@@ -488,6 +678,22 @@ async function moveByRole(user){
     triggerToast("관리자 승인 대기중입니다.\n개발자의 승인을 기다려주세요.");
 }
 
+
+forgotPasswordBtn.addEventListener("click",openPasswordResetModal);
+passwordResetCancelBtn.addEventListener("click",closePasswordResetModal);
+passwordResetSendBtn.addEventListener("click",sendPasswordResetEmail);
+passwordResetEmail.addEventListener("keydown",event=>{
+    if(event.key==="Enter") sendPasswordResetEmail();
+});
+passwordResetModal.addEventListener("click",event=>{
+    if(event.target===passwordResetModal) closePasswordResetModal();
+});
+document.addEventListener("keydown",event=>{
+    if(event.key==="Escape" && passwordResetModal.classList.contains("open")){
+        closePasswordResetModal();
+    }
+});
+
 loginBtn.addEventListener("click",async()=>{
     if(loggingIn) return;
 
@@ -545,6 +751,13 @@ reapplyLogoutBtn.addEventListener("click",async()=>{
 });
 
 window.addEventListener("load",async()=>{
+    const url=new URL(window.location.href);
+    if(url.searchParams.get("password_reset")==="success"){
+        url.searchParams.delete("password_reset");
+        history.replaceState(history.state,document.title,url.pathname+url.search+url.hash);
+        setTimeout(()=>triggerToast("비밀번호가 변경되었습니다.\n새 비밀번호로 로그인해주세요."),120);
+    }
+
     const {data:{session},error}=await getSession();
     if(!error && session) await moveByRole(session.user);
 });

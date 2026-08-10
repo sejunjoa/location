@@ -1,9 +1,10 @@
-const APP_VERSION = '1.0.10';
+const APP_VERSION = '1.0.aad';
 const CACHE_NAME = `location-${APP_VERSION}`;
 
 const APP_SHELL = [
   './',
   './index.html',
+  './reset_password.html',
   './location_user.html',
   './location_admin.html',
   './register_user.html',
@@ -14,7 +15,7 @@ const APP_SHELL = [
   './admin-ui.js',
   './toast.js',
   './pwa.js',
-  './push.js?v=1.0.10',
+  './push.js?v=1.0.13',
   './mobile-back.js',
   './pwa.css',
   './manifest.webmanifest',
