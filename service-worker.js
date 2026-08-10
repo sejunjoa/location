@@ -1,4 +1,4 @@
-const APP_VERSION = '1.0.alpha';
+const APP_VERSION = '1.0.alpha.1';
 const CACHE_NAME = `location-${APP_VERSION}`;
 
 const APP_SHELL = [
