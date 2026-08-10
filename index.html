@@ -312,7 +312,7 @@ button,input{font:inherit;}
     <input type="password" id="password" class="input" placeholder="비밀번호" autocomplete="current-password">
     <button id="loginBtn" class="login-btn" type="button">로그인</button>
     <div class="forgot-password-wrap">
-        <button id="forgotPasswordBtn" class="forgot-password-btn" type="button">비밀번호 찾기</button>
+        <button id="forgotPasswordBtn" class="forgot-password-btn" type="button">비밀번호를 잊으셨나요?</button>
     </div>
     <button class="pwa-install-login-btn" type="button" data-pwa-install hidden data-install-label="앱 설치" data-ios-label="홈 화면에 앱 추가">앱 설치</button>
 
@@ -427,7 +427,7 @@ async function sendPasswordResetEmail(){
         passwordResetModal.classList.remove("open");
         passwordResetModal.setAttribute("aria-hidden","true");
         document.body.style.overflow="";
-        triggerToast("비밀번호 재설정 이메일을 보냈습니다.\n메일함을 확인해주세요.");
+        triggerToast("비밀번호 재설정 이메일을\n전송했습니다. 메일함에서\n'Supabase'로 부터 온 메일을\n확인해주세요.");
     }catch(error){
         console.error("비밀번호 재설정 이메일 전송 실패:",error);
         const message=String(error?.message||"").toLowerCase();
