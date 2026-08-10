@@ -14,9 +14,9 @@
     buttons().forEach(btn=>{
       if(installed){btn.hidden=true;return;}
       if(isIOS){btn.hidden=false;btn.textContent=btn.dataset.iosLabel||'홈 화면에 앱 추가';return;}
-      if(deferredInstallPrompt){btn.hidden=false;btn.textContent=btn.dataset.installLabel||'앱 설치';return;}
+      if(deferredInstallPrompt){btn.hidden=false;btn.textContent=btn.dataset.installLabel||'홈 화면에 앱 추가';return;}
       btn.hidden=!(isAndroid||window.matchMedia('(pointer: coarse)').matches);
-      if(!btn.hidden) btn.textContent=btn.dataset.installLabel||'앱 설치';
+      if(!btn.hidden) btn.textContent=btn.dataset.installLabel||'홈 화면에 앱 추가';
     });
   }
 
@@ -26,9 +26,10 @@
     backdrop=document.createElement('div');
     backdrop.id='pwaInstallDialogBackdrop';
     backdrop.className='pwa-install-dialog-backdrop';
-    backdrop.innerHTML='<section class="pwa-install-dialog" role="dialog" aria-modal="true" aria-labelledby="pwaInstallDialogTitle"><div class="pwa-install-dialog-head"><h2 class="pwa-install-dialog-title" id="pwaInstallDialogTitle">앱 설치</h2><button class="pwa-install-dialog-close" type="button" aria-label="닫기">✕</button></div><div class="pwa-install-dialog-body" id="pwaInstallDialogBody"></div></section>';
+    backdrop.setAttribute('aria-hidden','true');
+    backdrop.innerHTML='<section class="pwa-install-dialog" role="dialog" aria-modal="true" aria-labelledby="pwaInstallDialogTitle"><div class="pwa-install-dialog-head"><h2 class="pwa-install-dialog-title" id="pwaInstallDialogTitle">홈 화면에 앱 추가</h2><button class="pwa-install-dialog-close" type="button" aria-label="닫기">✕</button></div><div class="pwa-install-dialog-body" id="pwaInstallDialogBody"></div></section>';
     document.body.appendChild(backdrop);
-    const close=()=>{backdrop.classList.remove('open');document.body.style.overflow='';};
+    const close=()=>{backdrop.classList.remove('open');backdrop.setAttribute('aria-hidden','true');window.setTimeout(()=>{if(!backdrop.classList.contains('open'))document.body.style.overflow='';},240);};
     backdrop.querySelector('.pwa-install-dialog-close').addEventListener('click',close);
     backdrop.addEventListener('click',e=>{if(e.target===backdrop) close();});
     return backdrop;
@@ -44,6 +45,7 @@
     }
     body.querySelector('.pwa-install-dialog-ok').addEventListener('click',()=>backdrop.querySelector('.pwa-install-dialog-close').click(),{once:true});
     backdrop.classList.add('open');
+    backdrop.setAttribute('aria-hidden','false');
     document.body.style.overflow='hidden';
   }
 

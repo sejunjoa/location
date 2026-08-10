@@ -134,6 +134,21 @@ button,input{font:inherit;}
 .guide{color:var(--primary);}
 .error{color:#dc2626;visibility:hidden;}
 
+.admin-unit-guide{
+    margin:-4px 2px 15px;
+    padding:11px 12px;
+    border:1px solid #bfdbfe;
+    border-radius:10px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-size:12px;
+    font-weight:700;
+    line-height:1.55;
+    text-align:center;
+    word-break:keep-all;
+    overflow-wrap:break-word;
+}
+
 @media(max-width:420px){
     body{align-items:flex-start;}
     .register-box{padding:30px 20px;margin:auto 0;}
@@ -156,7 +171,8 @@ button,input{font:inherit;}
 
     <input type="text" id="name" class="input" placeholder="이름" autocomplete="name">
     <input type="tel" id="phone" class="input" placeholder="휴대폰 번호 (01012345678)" inputmode="numeric" autocomplete="tel">
-    <input type="text" id="unit" class="input" placeholder="부대 선택" readonly>
+    <input type="text" id="unit" class="input" placeholder="부대 선택 (선택하지 않아도 됨)" readonly>
+    <div class="admin-unit-guide">관리자는 소속 부대를 선택하지 않아도 회원가입할 수 있습니다. 로그인하여 새 부대를 만들거나<br>기존 부대로 이동할 수 있습니다.</div>
     <input type="text" id="position" class="input" placeholder="직책">
 
     <button id="registerBtn" class="register-btn" type="button">회원가입</button>
@@ -168,7 +184,7 @@ button,input{font:inherit;}
 
 <div id="unitModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center z-50 p-5">
     <div class="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col overflow-hidden shadow-2xl">
-        <div class="p-4 text-lg font-bold text-center border-b border-slate-200 text-slate-900">부대 선택(부대가 없다면 선택하지 말 것)</div>
+        <div class="p-4 text-lg font-bold text-center border-b border-slate-200 text-slate-900">부대 선택 (선택 사항)</div>
         <div class="p-4">
             <input id="unitSearch" type="text" placeholder="부대찾기" class="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-300">
         </div>

@@ -18,6 +18,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>
+  <script src="common.js"></script>
   <script src="toast.js"></script>
   <style>
     :root {
@@ -732,7 +733,7 @@
       width: min(100%, 480px);
       transform: translateX(-50%);
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
       padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
       border-top: 1px solid rgba(226,232,240,.92);
@@ -1221,7 +1222,7 @@
       width: min(100%, 480px);
       transform: translateX(-50%);
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 8px;
       padding: 9px 12px calc(9px + env(safe-area-inset-bottom));
       border-top: 1px solid rgba(226,232,240,.92);
@@ -1927,6 +1928,27 @@
     }
   </style>
 
+
+<style id="account-action-border-update-20260810">
+  #settingsDialog #logoutBtn{border:1px solid #c7d2fe!important;}
+  #settingsDialog #userDeleteAccountBtn{border:1px solid #fecaca!important;}
+</style>
+
+<style id="location-user-return-overdue-label-20260810">
+  .return-countdown-overdue{
+    padding:0!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:#f87171!important;
+    font-size:12px!important;
+    font-weight:950!important;
+    line-height:1.2!important;
+  }
+  @media (max-width:370px){
+    .return-countdown-overdue{font-size:10px!important;padding:0!important}
+  }
+</style>
 </head>
 <body>
   <div class="loading-cover" id="loadingCover">위치현황을 불러오는 중...</div>
@@ -1939,8 +1961,8 @@
           <p class="header-welcome" id="headerWelcome">사용자님, 환영합니다!</p>
           <div class="return-countdown-row" id="returnCountdownRow" aria-live="polite">
             <span class="return-countdown-label">복귀까지</span>
-            <strong class="return-countdown-timer" id="returnCountdownTimer">--:--:--</strong>
-            <span class="return-countdown-overdue" id="returnCountdownOverdue" hidden><span class="return-countdown-overdue-icon" aria-hidden="true">!</span>초과됨</span>
+            <strong class="return-countdown-timer" id="returnCountdownTimer">--시간 --분 --초</strong>
+            <span class="return-countdown-overdue" id="returnCountdownOverdue" hidden>지남</span>
           </div>
         </div>
         <div class="header-actions">
@@ -1980,24 +2002,6 @@
         </section>
       </section>
 
-      <section class="user-tab-view" id="view-dashboard" data-user-tab-view="dashboard" hidden>
-        <div class="sticky-dashboard">
-          <section class="metrics" aria-label="병력 현황표">
-            <article class="metric"><strong id="dashboardMetricTotal">0</strong><span>총원</span></article>
-            <article class="metric"><strong id="dashboardMetricInside">0</strong><span>현재원</span></article>
-            <article class="metric"><strong id="dashboardMetricDuty">0</strong><span>근무</span></article>
-            <article class="metric"><strong id="dashboardMetricOutside">0</strong><span>열외</span></article>
-            <article class="metric"><strong id="dashboardMetricBarracksOutside">0</strong><span>막사외부</span></article>
-          </section>
-        </div>
-        <section class="dashboard-content">
-          <div class="empty-location-state" id="dashboardEmptyState" hidden>
-            <strong>등록된 구역이 없습니다.</strong>
-          </div>
-          <div class="dashboard-zone-list" id="dashboardZoneList"></div>
-        </section>
-      </section>
-
       <section class="user-tab-view" id="view-records" data-user-tab-view="records" hidden>
         <div class="sticky-dashboard">
           <section class="metrics" aria-label="병력 현황표">
@@ -2023,7 +2027,6 @@
 
     <nav class="bottom-nav" aria-label="일반 사용자 하단 메뉴">
       <button class="nav-btn active" data-user-tab="detail" type="button" aria-current="page" aria-label="상세현황"><span class="nav-icon">▦</span>상세현황</button>
-      <button class="nav-btn" data-user-tab="dashboard" type="button" aria-label="현황판"><span class="nav-icon">⌂</span>현황판</button>
       <button class="nav-btn" data-user-tab="records" type="button" aria-label="이동 기록"><span class="nav-icon">☷</span>이동 기록</button>
     </nav>
   </div>
@@ -2184,15 +2187,11 @@
           </form>
         </section>
 
-        <section class="settings-section pwa-install-section">
-          <h4 class="settings-title">앱 설치</h4>
-          <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="앱 설치" data-ios-label="홈 화면에 앱 추가">앱 설치</button>
-        </section>
-
-        <section class="settings-section">
-          <h4 class="settings-title">로그아웃</h4>
-          <button class="danger-btn" id="logoutBtn" type="button" style="margin-top:14px;">로그아웃</button>
-        </section>
+        <div class="settings-account-actions">
+          <button class="settings-action-btn logout" id="logoutBtn" type="button">로그아웃</button>
+          <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="홈 화면에 앱 추가" data-ios-label="홈 화면에 앱 추가">홈 화면에 앱 추가</button>
+          <button class="settings-action-btn withdraw" id="userDeleteAccountBtn" type="button">회원탈퇴</button>
+        </div>
 
       </div>
       <div class="settings-dialog-footer">
@@ -2258,15 +2257,12 @@
     const loadingCover = document.getElementById('loadingCover');
     const locationList = document.getElementById('locationList');
     const emptyLocationState = document.getElementById('emptyLocationState');
-    const dashboardZoneList = document.getElementById('dashboardZoneList');
-    const dashboardEmptyState = document.getElementById('dashboardEmptyState');
     const recordsList = document.getElementById('recordsList');
     const recordsState = document.getElementById('recordsState');
     const returnHomeBtn = document.getElementById('returnHomeBtn');
 
     const metricGroups = [
       { total: document.getElementById('metricTotal'), inside: document.getElementById('metricInside'), duty: document.getElementById('metricDuty'), outside: document.getElementById('metricOutside'), barracksOutside: document.getElementById('metricBarracksOutside') },
-      { total: document.getElementById('dashboardMetricTotal'), inside: document.getElementById('dashboardMetricInside'), duty: document.getElementById('dashboardMetricDuty'), outside: document.getElementById('dashboardMetricOutside'), barracksOutside: document.getElementById('dashboardMetricBarracksOutside') },
       { total: document.getElementById('recordsMetricTotal'), inside: document.getElementById('recordsMetricInside'), duty: document.getElementById('recordsMetricDuty'), outside: document.getElementById('recordsMetricOutside'), barracksOutside: document.getElementById('recordsMetricBarracksOutside') }
     ];
 
@@ -2490,20 +2486,8 @@
       return minutes ? `${hours}시간 ${minutes}분` : `${hours}시간`;
     }
 
-    function formatTime(value) {
-      if (!value) return '-';
-      return new Intl.DateTimeFormat('ko-KR', {
-        month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
-      }).format(new Date(value));
-    }
-
-    function formatRecordDateTime(value) {
-      if (!value) return '-';
-      return new Intl.DateTimeFormat('ko-KR', {
-        year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
-      }).format(new Date(value));
-    }
-
+    
+    
     function updateReturnButton() {
       const homeZone = getHomeZone();
       const alreadyHome = Boolean(homeZone && ownLocation?.zoneId === homeZone.id);
@@ -2592,51 +2576,6 @@
         card.appendChild(button);
         if (isCurrent) card.appendChild(createCurrentMarker());
         locationList.appendChild(card);
-      });
-    }
-
-    function renderDashboardZones() {
-      dashboardZoneList.innerHTML = '';
-      dashboardEmptyState.hidden = zones.length > 0;
-
-      zones.forEach(zone => {
-        const zonePeople = getZonePeople(zone.id);
-        const card = document.createElement('article');
-        card.className = 'location-card dashboard-zone-card';
-        card.style.setProperty('--title-color', zone.color);
-        card.style.setProperty('--card-bg', hexToRgba(zone.color, .075));
-        card.style.setProperty('--card-border', hexToRgba(zone.color, .24));
-
-        const button = document.createElement('button');
-        button.className = 'dashboard-zone-main';
-        button.type = 'button';
-
-        const head = document.createElement('span');
-        head.className = 'dashboard-zone-head';
-        const title = document.createElement('span');
-        title.className = 'dashboard-zone-title';
-        title.textContent = zone.name;
-        const attribute = document.createElement('span');
-        attribute.className = 'dashboard-zone-attribute';
-        attribute.textContent = attributeLabel(zone.attribute);
-        head.append(title, attribute);
-        button.appendChild(head);
-
-        if (zonePeople.length) {
-          const grid = document.createElement('span');
-          grid.className = 'dashboard-person-grid';
-          zonePeople.forEach(person => {
-            const item = document.createElement('span');
-            item.className = 'dashboard-person-card';
-            item.textContent = person.name || '이름 없음';
-            grid.appendChild(item);
-          });
-          button.appendChild(grid);
-        }
-
-        button.addEventListener('click', () => openZoneSheet(zone.id));
-        card.appendChild(button);
-        dashboardZoneList.appendChild(card);
       });
     }
 
@@ -2750,7 +2689,6 @@
 
     function renderZones() {
       renderDetailZones();
-      renderDashboardZones();
       renderMovementRecords();
       updateMetrics();
       updateReturnButton();
@@ -4154,16 +4092,9 @@ async function loadOwnMovementLogs(unitId) {
   }
 
   function installDeleteAccountButton(){
-    if (document.getElementById('userDeleteAccountBtn')) return;
-    const logoutButton = document.getElementById('logoutBtn');
-    if (!logoutButton) return;
-    const button = document.createElement('button');
-    button.id = 'userDeleteAccountBtn';
-    button.type = 'button';
-    button.className = 'user-delete-account-btn';
-    button.textContent = '회원탈퇴';
-    logoutButton.insertAdjacentElement('afterend', button);
-
+    const button = document.getElementById('userDeleteAccountBtn');
+    if (!button || button.dataset.deleteActionBound === '1') return;
+    button.dataset.deleteActionBound = '1';
     button.addEventListener('click', () => {
       closeModal(settingsModal, settingsDialog);
       window.setTimeout(openUserDeleteToast, 220);
@@ -4187,7 +4118,7 @@ async function loadOwnMovementLogs(unitId) {
     const area = document.getElementById('userTabMain');
     if (!area || area.dataset.adminStyleSwipeReady) return;
     area.dataset.adminStyleSwipeReady = '1';
-    const order = ['detail','dashboard','records'];
+    const order = ['detail','records'];
     let animating = false;
     let startX=0, startY=0, lastX=0, lastTime=0, velocityX=0;
     let tracking=false, axisLocked=null, prepared=false;
@@ -4371,15 +4302,18 @@ async function loadOwnMovementLogs(unitId) {
     #view-detail .sticky-actions{grid-template-columns:minmax(0,2fr) minmax(0,1fr)!important;gap:10px!important}
     #view-detail .return-home-btn{width:100%!important;min-width:0!important}
 
-    /* 설정 로그아웃/회원탈퇴 동일 계열 디자인 */
-    #logoutBtn,#userDeleteAccountBtn{
-      width:100%!important;min-height:48px!important;margin-top:10px!important;border:0!important;
-      border-radius:15px!important;font-size:14px!important;font-weight:900!important;
-      transition:transform .12s ease,background-color .16s ease!important;
+    /* 설정 하단 계정/설치 버튼: 로그아웃 → 홈 화면에 앱 추가 → 회원탈퇴 */
+    #settingsDialog .settings-account-actions{
+      display:grid!important;grid-template-columns:1fr!important;gap:10px!important;margin-top:14px!important;
     }
-    #logoutBtn{background:#eef2ff!important;color:#3730a3!important}
-    #userDeleteAccountBtn{background:#fff1f2!important;color:#dc2626!important}
-    #logoutBtn:active,#userDeleteAccountBtn:active{transform:scale(.985)!important}
+    #settingsDialog .settings-account-actions > button{
+      width:100%!important;min-height:48px!important;margin:0!important;border-radius:15px!important;
+      font-size:14px!important;font-weight:900!important;transition:transform .12s ease,background-color .16s ease!important;
+    }
+    #logoutBtn{border:0!important;background:#eef2ff!important;color:#3730a3!important}
+    #userDeleteAccountBtn{border:0!important;background:#fff1f2!important;color:#dc2626!important}
+    #settingsDialog .settings-account-actions > .pwa-install-action{border:1px solid #bfdbfe!important;background:#eff6ff!important;color:#1d4ed8!important}
+    #logoutBtn:active,#userDeleteAccountBtn:active,#settingsDialog .settings-account-actions > .pwa-install-action:active{transform:scale(.985)!important}
 
     /* 긴 구역명 */
     .location-main > span:first-child{min-width:0!important;max-width:calc(100% - 44px)!important;overflow:hidden!important}
@@ -4704,7 +4638,7 @@ async function loadOwnMovementLogs(unitId) {
     const area=document.getElementById('userTabMain');
     if(!area||area.dataset.v13CaptureSwipe)return;
     area.dataset.v13CaptureSwipe='1';
-    const order=['detail','dashboard','records'];
+    const order=['detail','records'];
     let tracking=false,axis=null,startX=0,startY=0,lastX=0,lastTime=0,velocity=0;
     let prepared=false,current=null,target=null,targetType='',direction=0,width=1,wrap=null;
     let currentStyle=null,targetStyle=null,wrapStyle=null;
@@ -4862,15 +4796,7 @@ async function loadOwnMovementLogs(unitId) {
   `;
   document.head.appendChild(css);
 
-  function createV14HomeBadge(label, color){
-    const badge = document.createElement('span');
-    badge.className = 'sheet-home-badge';
-    badge.style.setProperty('--badge-color', color || '#64748b');
-    badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent = label || '미지정';
-    return badge;
-  }
-
+  
   // 헤더 복제 이후의 실제 DOM을 직접 조회하여 구역명/인원수를 갱신
   renderZonePeople = function(zoneId){
     const zone = getZone(zoneId);
@@ -4995,15 +4921,7 @@ async function loadOwnMovementLogs(unitId) {
   `;
   document.head.appendChild(css);
 
-  function makeHomeBadge(label,color){
-    const badge=document.createElement('span');
-    badge.className='sheet-home-badge';
-    badge.style.setProperty('--badge-color',color||'#64748b');
-    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent=label||'미지정';
-    return badge;
-  }
-
+  
   renderZonePeople=function(zoneId){
     const zone=getZone(zoneId);
     if(!zone)return;
@@ -5346,7 +5264,7 @@ async function loadOwnMovementLogs(unitId) {
   },{capture:true});
 
   /* 클릭과 터치 모두 동일한 한 장짜리 수평 슬라이드로 처리 */
-  const order=['detail','dashboard','records'];
+  const order=['detail','records'];
   const main=document.getElementById('userTabMain');
   let tabBusy=false;
   function activeType(){return document.querySelector('[data-user-tab-view]:not([hidden])')?.dataset.userTabView||'detail'}
@@ -5559,6 +5477,13 @@ async function loadOwnMovementLogs(unitId) {
         const arrival=returnHome?log.journeyArrivalTime:log.arrivalTime;
         const card=document.createElement('article');
         card.className='record-card';
+        card.dataset.recordDate=(()=>{
+          const raw=log.departureTime||log.departure_time||null;
+          if(!raw)return '';
+          const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(raw));
+          const map=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+          return `${map.year}-${map.month}-${map.day}`;
+        })();
         card.innerHTML=`
           <div class="record-route-badges">${userJourneyBadgeMarkup(originName,originColor)}<span class="route-arrow" aria-hidden="true">→</span>${userJourneyBadgeMarkup(destinationName,destinationColor)}</div>
           <dl class="record-card-info ${showFullTiming?'record-return-home-info':showExpected?'record-journey-departure-info':''}">
@@ -5575,7 +5500,7 @@ async function loadOwnMovementLogs(unitId) {
       });
   };
 
-  const tabOrder=['detail','dashboard','records'];
+  const tabOrder=['detail','records'];
   const tabMain=document.getElementById('userTabMain');
   let tabState=null;
 
@@ -5596,10 +5521,7 @@ async function loadOwnMovementLogs(unitId) {
       s.style.height='0px';
     });
   }
-  function restoreInline(element,value){
-    value===null?element.removeAttribute('style'):element.setAttribute('style',value);
-  }
-  function setupUserTransition(type,direction){
+    function setupUserTransition(type,direction){
     const from=activeUserTab();
     if(tabState||from===type||!tabOrder.includes(type)||document.querySelector('.modal-backdrop.open,.sheet-backdrop.open'))return null;
     const current=document.getElementById(`view-${from}`);
@@ -5931,15 +5853,17 @@ async function loadOwnMovementLogs(unitId) {
     const hours=Math.floor(totalSeconds/3600);
     const minutes=Math.floor((totalSeconds%3600)/60);
     const seconds=totalSeconds%60;
-    return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
+    return `${hours}시간 ${minutes}분 ${seconds}초`;
   }
   function updateReturnCountdown(){
     if(!timer||!overdue)return;
     const homeId=userAccess?.profile?.home_zone_id||null;
     const atHome=Boolean(homeId&&ownLocation?.zoneId===homeId);
     const expectedMs=ownLocation?.returnTime?new Date(ownLocation.returnTime).getTime():NaN;
-    let text='--:--:--';
+    let text='--시간 --분 --초';
     let isOverdue=false;
+    let statusText='';
+    let showStatus=false;
     let aria='복귀 예정 시간이 설정되지 않았습니다.';
 
     if(atHome){
@@ -5949,13 +5873,16 @@ async function loadOwnMovementLogs(unitId) {
       const remaining=expectedMs-Date.now();
       text=formatCountdownDuration(remaining);
       isOverdue=remaining<0;
+      statusText=isOverdue?'지남':'남음';
+      showStatus=true;
       aria=isOverdue?`복귀 예정 시간을 ${text} 초과했습니다.`:`복귀까지 ${text} 남았습니다.`;
     }
 
-    const state=`${text}|${isOverdue}`;
+    const state=`${text}|${statusText}|${showStatus}|${isOverdue}`;
     if(state!==lastTimerState){
       timer.textContent=text;
-      overdue.hidden=!isOverdue;
+      overdue.textContent=statusText;
+      overdue.hidden=!showStatus;
       const countdownRow=timer.closest('.return-countdown-row');
       countdownRow?.classList.toggle('is-overdue',isOverdue);
       countdownRow?.setAttribute('aria-label',aria);
@@ -5999,47 +5926,54 @@ async function loadOwnMovementLogs(unitId) {
       margin:0!important;
     }
 
-    /* 초과 배지가 타이머의 위치를 바꾸지 않도록 흐름에서 분리 */
+    /* 복귀 타이머를 자연스러운 문장형으로 표시 */
     .return-countdown-row{
       position:relative!important;
       display:flex!important;
       flex-wrap:nowrap!important;
       align-items:center!important;
       justify-content:flex-start!important;
+      gap:6px!important;
       min-width:0!important;
       overflow:visible!important;
+      white-space:nowrap!important;
     }
     .return-countdown-label{flex:0 0 auto!important}
     .return-countdown-timer{
-      flex:0 0 72px!important;
-      width:72px!important;
-      min-width:72px!important;
-      max-width:72px!important;
+      flex:0 0 auto!important;
+      width:auto!important;
+      min-width:0!important;
+      max-width:none!important;
       text-align:left!important;
+      letter-spacing:0!important;
       transition:color .16s ease,text-shadow .16s ease!important;
     }
     .return-countdown-overdue{
-      position:absolute!important;
-      left:121px!important;
-      top:50%!important;
-      transform:translateY(-50%)!important;
-      z-index:2!important;
-      margin:0!important;
+      position:static!important;
+      display:inline!important;
+      transform:none!important;
+      z-index:auto!important;
+      margin-left:-3px!important;
+      padding:0!important;
       white-space:nowrap!important;
       pointer-events:none!important;
+      font-size:12px!important;
+      font-weight:950!important;
+      line-height:inherit!important;
     }
-    .return-countdown-row.is-overdue .return-countdown-timer{
+    .return-countdown-row:not(.is-overdue) .return-countdown-overdue{
+      color:#fff!important;
+      text-shadow:none!important;
+    }
+    .return-countdown-row.is-overdue .return-countdown-timer,
+    .return-countdown-row.is-overdue .return-countdown-overdue{
       color:#f87171!important;
       text-shadow:0 0 10px rgba(248,113,113,.30)!important;
     }
-    .return-countdown-row.is-overdue .return-countdown-overdue-icon{
-      background:#ef4444!important;
-      box-shadow:0 0 0 3px rgba(248,113,113,.16)!important;
-    }
     @media (max-width:370px){
-      .return-countdown-row{gap:5px!important}
-      .return-countdown-timer{flex-basis:68px!important;width:68px!important;min-width:68px!important;max-width:68px!important;font-size:11px!important}
-      .return-countdown-overdue{left:113px!important;padding-right:5px!important;font-size:8px!important}
+      .return-countdown-row{gap:4px!important;font-size:10px!important}
+      .return-countdown-timer{font-size:10px!important}
+      .return-countdown-overdue{margin-left:-2px!important;font-size:10px!important}
     }
   `;
   document.head.appendChild(style);
@@ -6384,15 +6318,7 @@ async function loadOwnMovementLogs(unitId) {
 </style>
 <script>
 (function locationUserV23PersonCardRestore(){
-  function createHomeBadge(label,color){
-    const badge=document.createElement('span');
-    badge.className='sheet-home-badge';
-    badge.style.setProperty('--badge-color',color||'#64748b');
-    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent=label||'미지정';
-    return badge;
-  }
-  function createLegacyPersonCard(person){
+    function createLegacyPersonCard(person){
     const row=document.createElement('article');
     row.className='sheet-person person-summary-card legacy-person-card';
     row.tabIndex=0;
@@ -6625,15 +6551,7 @@ async function loadOwnMovementLogs(unitId) {
 </style>
 <script>
 (function locationV26PersonCardGridNoZoom(){
-  function createV26HomeBadge(label,color){
-    const badge=document.createElement('span');
-    badge.className='sheet-home-badge';
-    badge.style.setProperty('--badge-color',color||'#64748b');
-    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent=label||'미지정';
-    return badge;
-  }
-
+  
   function createV26PersonCard(person){
     const row=document.createElement('article');
     row.className='sheet-person person-summary-card legacy-person-card';
@@ -6925,6 +6843,449 @@ async function loadOwnMovementLogs(unitId) {
     min-height:0!important;
   }
 </style>
+
+
+<!-- 2026-08-10: 이동 기록 날짜별 책갈피 -->
+<style id="location-record-date-bookmarks">
+  #view-records .record-date-bookmark{
+    grid-column:1 / -1!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:8px 0 0!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:10px!important;
+    box-sizing:border-box!important;
+  }
+  #view-records .record-date-bookmark:first-child{
+    margin-top:0!important;
+  }
+  #view-records .record-date-bookmark-label{
+    position:relative!important;
+    flex:0 0 auto!important;
+    max-width:calc(100% - 36px)!important;
+    padding:7px 17px 7px 11px!important;
+    background:#2563eb!important;
+    color:#fff!important;
+    clip-path:polygon(0 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,0 100%)!important;
+    font-size:12px!important;
+    font-weight:950!important;
+    line-height:1.2!important;
+    letter-spacing:-.15px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    box-shadow:0 5px 13px rgba(37,99,235,.16)!important;
+  }
+  #view-records .record-date-bookmark-line{
+    flex:1 1 auto!important;
+    min-width:18px!important;
+    height:1px!important;
+    background:linear-gradient(90deg,#cbd5e1,rgba(203,213,225,0))!important;
+  }
+  #view-records .record-date-bookmark + .record-card{
+    margin-top:0!important;
+  }
+</style>
+<script>
+(function(){
+  function getKstDateValue(value=new Date()){
+    const date=value instanceof Date?value:new Date(value);
+    if(Number.isNaN(date.getTime()))return '';
+    const parts=new Intl.DateTimeFormat('en-CA',{
+      timeZone:'Asia/Seoul',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit'
+    }).formatToParts(date);
+    const map=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+    return `${map.year}-${map.month}-${map.day}`;
+  }
+
+  function shiftDateValue(value,days){
+    const [year,month,day]=String(value||'').split('-').map(Number);
+    if(!year||!month||!day)return '';
+    return new Date(Date.UTC(year,month-1,day+Number(days||0))).toISOString().slice(0,10);
+  }
+
+  function formatBookmarkLabel(dateValue){
+    const [year,month,day]=String(dateValue||'').split('-').map(Number);
+    if(!year||!month||!day)return '';
+    const today=getKstDateValue();
+    const yesterday=shiftDateValue(today,-1);
+    const date=new Date(`${dateValue}T00:00:00+09:00`);
+    const weekday=new Intl.DateTimeFormat('ko-KR',{
+      timeZone:'Asia/Seoul',
+      weekday:'short'
+    }).format(date);
+    const sameYear=String(today).slice(0,4)===String(year);
+    const dateText=sameYear
+      ?`${month}월 ${day}일 (${weekday})`
+      :`${year}년 ${month}월 ${day}일 (${weekday})`;
+    if(dateValue===today)return `오늘 · ${dateText}`;
+    if(dateValue===yesterday)return `어제 · ${dateText}`;
+    return dateText;
+  }
+
+  function decorateRecordDateBookmarks(list){
+    if(!list)return;
+    list.querySelectorAll('.record-date-bookmark').forEach(node=>node.remove());
+
+    let previousDate='';
+    const cards=Array.from(list.querySelectorAll(':scope > .record-card'));
+    cards.forEach(card=>{
+      const dateValue=String(card.dataset.recordDate||'').trim();
+      if(!dateValue||dateValue===previousDate)return;
+      previousDate=dateValue;
+
+      const bookmark=document.createElement('div');
+      bookmark.className='record-date-bookmark';
+      bookmark.dataset.recordDate=dateValue;
+      bookmark.setAttribute('role','separator');
+      bookmark.setAttribute('aria-label',`${dateValue} 이동 기록`);
+
+      const label=document.createElement('span');
+      label.className='record-date-bookmark-label';
+      label.textContent=formatBookmarkLabel(dateValue);
+
+      const line=document.createElement('span');
+      line.className='record-date-bookmark-line';
+      line.setAttribute('aria-hidden','true');
+
+      bookmark.append(label,line);
+      list.insertBefore(bookmark,card);
+    });
+  }
+
+  const list=document.getElementById('recordsList');
+  if(!list)return;
+
+  const renderName=typeof renderMovementLogs==='function'
+    ?'renderMovementLogs'
+    :(typeof renderMovementRecords==='function'?'renderMovementRecords':null);
+
+  if(renderName==='renderMovementLogs'){
+    const previous=renderMovementLogs;
+    renderMovementLogs=function(...args){
+      const result=previous.apply(this,args);
+      decorateRecordDateBookmarks(list);
+      return result;
+    };
+  }else if(renderName==='renderMovementRecords'){
+    const previous=renderMovementRecords;
+    renderMovementRecords=function(...args){
+      const result=previous.apply(this,args);
+      decorateRecordDateBookmarks(list);
+      return result;
+    };
+  }
+
+  decorateRecordDateBookmarks(list);
+})();
+</script>
+
+
+<!-- 2026-08-10: 기록 탭 우측 날짜 빠른 이동 북마크 -->
+<style id="location-record-date-quick-nav">
+  #view-records .record-date-quick-nav{
+    position:fixed!important;
+    top:52%!important;
+    right:max(4px,calc((100vw - 480px)/2 + 4px))!important;
+    transform:translate(112%,-50%)!important;
+    opacity:0!important;
+    visibility:hidden!important;
+    z-index:48!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-end!important;
+    gap:4px!important;
+    max-height:min(52dvh,360px)!important;
+    padding:6px 0 6px 5px!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+    scrollbar-width:none!important;
+    pointer-events:none!important;
+    transition:transform .2s ease,opacity .18s ease,visibility 0s linear .2s!important;
+  }
+  #view-records .record-date-quick-nav.is-open{
+    transform:translate(0,-50%)!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    transition:transform .2s ease,opacity .18s ease,visibility 0s!important;
+  }
+  #view-records .record-date-quick-nav::-webkit-scrollbar{
+    display:none!important;
+  }
+  #view-records[hidden] .record-date-quick-nav,
+  #view-records .record-date-quick-nav[hidden],
+  #view-records[hidden] .record-date-quick-trigger,
+  #view-records .record-date-quick-trigger[hidden]{
+    display:none!important;
+  }
+  #view-records .record-date-quick-trigger{
+    position:fixed!important;
+    top:52%!important;
+    right:max(0px,calc((100vw - 480px)/2))!important;
+    transform:translateY(-50%)!important;
+    z-index:49!important;
+    width:20px!important;
+    height:64px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:12px 0 0 12px!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    -webkit-tap-highlight-color:transparent!important;
+    touch-action:manipulation!important;
+    cursor:pointer!important;
+  }
+  #view-records .record-date-quick-trigger::before{
+    content:''!important;
+    position:absolute!important;
+    top:50%!important;
+    right:2px!important;
+    width:4px!important;
+    height:38px!important;
+    transform:translateY(-50%)!important;
+    border-radius:999px!important;
+    background:#94a3b8!important;
+    opacity:.34!important;
+    transition:height .18s ease,background .18s ease,opacity .18s ease!important;
+  }
+  #view-records .record-date-quick-trigger:active::before,
+  #view-records .record-date-quick-trigger.is-open::before{
+    height:44px!important;
+    background:#2563eb!important;
+    opacity:.88!important;
+  }
+  #view-records .record-date-quick-button{
+    position:relative!important;
+    min-width:42px!important;
+    height:30px!important;
+    padding:0 7px 0 9px!important;
+    border:1px solid #cbd5e1!important;
+    border-right:0!important;
+    border-radius:10px 0 0 10px!important;
+    background:rgba(255,255,255,.96)!important;
+    color:#64748b!important;
+    box-shadow:0 4px 12px rgba(15,23,42,.08)!important;
+    font-size:10px!important;
+    font-weight:900!important;
+    line-height:1!important;
+    letter-spacing:-.2px!important;
+    white-space:nowrap!important;
+    -webkit-tap-highlight-color:transparent!important;
+    touch-action:manipulation!important;
+    transition:transform .16s ease,background .16s ease,color .16s ease,border-color .16s ease!important;
+  }
+  #view-records .record-date-quick-button:active{
+    transform:translateX(-2px)!important;
+  }
+  #view-records .record-date-quick-button.is-active{
+    min-width:48px!important;
+    background:#2563eb!important;
+    border-color:#2563eb!important;
+    color:#fff!important;
+    box-shadow:0 5px 14px rgba(37,99,235,.22)!important;
+  }
+  @media (max-width:360px){
+    #view-records .record-date-quick-nav{
+      right:2px!important;
+    }
+    #view-records .record-date-quick-trigger{
+      right:0!important;
+      width:18px!important;
+    }
+    #view-records .record-date-quick-button{
+      min-width:38px!important;
+      height:28px!important;
+      padding:0 5px 0 7px!important;
+      font-size:9px!important;
+    }
+    #view-records .record-date-quick-button.is-active{
+      min-width:43px!important;
+    }
+  }
+</style>
+<script>
+(function(){
+  const view=document.getElementById('view-records');
+  const list=document.getElementById('recordsList');
+  if(!view||!list)return;
+
+  let nav=view.querySelector('.record-date-quick-nav');
+  if(!nav){
+    nav=document.createElement('nav');
+    nav.className='record-date-quick-nav';
+    nav.setAttribute('aria-label','이동 기록 날짜 바로가기');
+    view.appendChild(nav);
+  }
+
+  let trigger=view.querySelector('.record-date-quick-trigger');
+  if(!trigger){
+    trigger=document.createElement('button');
+    trigger.type='button';
+    trigger.className='record-date-quick-trigger';
+    trigger.setAttribute('aria-label','날짜 북마크 열기');
+    trigger.setAttribute('aria-expanded','false');
+    view.appendChild(trigger);
+  }
+
+  function setOpen(open){
+    const next=Boolean(open)&&!nav.hidden;
+    nav.classList.toggle('is-open',next);
+    trigger.classList.toggle('is-open',next);
+    trigger.setAttribute('aria-expanded',next?'true':'false');
+    trigger.setAttribute('aria-label',next?'날짜 북마크 닫기':'날짜 북마크 열기');
+    if(next)updateActiveFromScroll();
+  }
+
+  trigger.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    setOpen(!nav.classList.contains('is-open'));
+  });
+
+  nav.addEventListener('click',event=>event.stopPropagation());
+  document.addEventListener('click',event=>{
+    if(!nav.classList.contains('is-open'))return;
+    if(nav.contains(event.target)||trigger.contains(event.target))return;
+    setOpen(false);
+  });
+
+  function getKstDateValue(value=new Date()){
+    const date=value instanceof Date?value:new Date(value);
+    if(Number.isNaN(date.getTime()))return '';
+    const parts=new Intl.DateTimeFormat('en-CA',{
+      timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'
+    }).formatToParts(date);
+    const map=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+    return `${map.year}-${map.month}-${map.day}`;
+  }
+
+  function shiftDateValue(value,days){
+    const [year,month,day]=String(value||'').split('-').map(Number);
+    if(!year||!month||!day)return '';
+    return new Date(Date.UTC(year,month-1,day+Number(days||0))).toISOString().slice(0,10);
+  }
+
+  function compactDateLabel(dateValue){
+    const today=getKstDateValue();
+    const yesterday=shiftDateValue(today,-1);
+    if(dateValue===today)return '오늘';
+    if(dateValue===yesterday)return '어제';
+    const [,month,day]=String(dateValue||'').split('-');
+    return month&&day?`${Number(month)}/${Number(day)}`:dateValue;
+  }
+
+  function fullDateLabel(dateValue){
+    const [year,month,day]=String(dateValue||'').split('-').map(Number);
+    if(!year||!month||!day)return dateValue;
+    const date=new Date(`${dateValue}T00:00:00+09:00`);
+    const weekday=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',weekday:'short'}).format(date);
+    return `${year}년 ${month}월 ${day}일 (${weekday})`;
+  }
+
+  function scrollToBookmark(target){
+    if(!target)return;
+    let offset=12;
+    const sticky=view.querySelector('.sticky-dashboard');
+    if(sticky){
+      const style=getComputedStyle(sticky);
+      const rect=sticky.getBoundingClientRect();
+      if((style.position==='fixed'||style.position==='sticky')&&rect.height>0&&rect.bottom>0){
+        offset=Math.max(offset,rect.bottom+10);
+      }
+    }
+    const y=window.scrollY+target.getBoundingClientRect().top-offset;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+  }
+
+  function buildQuickNav(){
+    const bookmarks=Array.from(list.querySelectorAll(':scope > .record-date-bookmark'));
+    const wasOpen=nav.classList.contains('is-open');
+    nav.innerHTML='';
+    nav.hidden=bookmarks.length===0;
+    trigger.hidden=bookmarks.length===0;
+    if(!bookmarks.length){
+      setOpen(false);
+      return;
+    }
+
+    bookmarks.forEach(bookmark=>{
+      const dateValue=String(bookmark.dataset.recordDate||'').trim();
+      if(!dateValue)return;
+      if(!bookmark.id)bookmark.id=`record-date-${dateValue}`;
+
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='record-date-quick-button';
+      button.dataset.recordDate=dateValue;
+      button.textContent=compactDateLabel(dateValue);
+      button.title=fullDateLabel(dateValue);
+      button.setAttribute('aria-label',`${fullDateLabel(dateValue)} 이동 기록으로 이동`);
+      button.addEventListener('click',()=>{
+        scrollToBookmark(bookmark);
+        setActive(dateValue);
+        setOpen(false);
+      });
+      nav.appendChild(button);
+    });
+    updateActiveFromScroll();
+    setOpen(wasOpen);
+  }
+
+  function setActive(dateValue){
+    nav.querySelectorAll('.record-date-quick-button').forEach(button=>{
+      const active=button.dataset.recordDate===dateValue;
+      button.classList.toggle('is-active',active);
+      button.setAttribute('aria-current',active?'date':'false');
+      if(active&&nav.classList.contains('is-open')){
+        const top=button.offsetTop-nav.clientHeight/2+button.offsetHeight/2;
+        nav.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+      }
+    });
+  }
+
+  function updateActiveFromScroll(){
+    const bookmarks=Array.from(list.querySelectorAll(':scope > .record-date-bookmark'));
+    if(!bookmarks.length)return;
+    let guideY=18;
+    const sticky=view.querySelector('.sticky-dashboard');
+    if(sticky){
+      const style=getComputedStyle(sticky);
+      const rect=sticky.getBoundingClientRect();
+      if((style.position==='fixed'||style.position==='sticky')&&rect.height>0&&rect.bottom>0){
+        guideY=rect.bottom+14;
+      }
+    }
+    let active=bookmarks[0];
+    for(const bookmark of bookmarks){
+      if(bookmark.getBoundingClientRect().top<=guideY)active=bookmark;
+      else break;
+    }
+    setActive(String(active.dataset.recordDate||''));
+  }
+
+  let rebuildFrame=0;
+  const observer=new MutationObserver(()=>{
+    cancelAnimationFrame(rebuildFrame);
+    rebuildFrame=requestAnimationFrame(buildQuickNav);
+  });
+  observer.observe(list,{childList:true});
+
+  let scrollFrame=0;
+  window.addEventListener('scroll',()=>{
+    cancelAnimationFrame(scrollFrame);
+    scrollFrame=requestAnimationFrame(updateActiveFromScroll);
+  },{passive:true});
+
+  buildQuickNav();
+})();
+</script>
 
 </body>
 </html>

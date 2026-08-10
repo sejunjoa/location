@@ -18,7 +18,10 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>
+  <script src="common.js"></script>
+  <script src="admin-ui.js" defer></script>
   <script src="toast.js"></script>
+  <script src="./push.js" defer></script>
   <style>
     :root {
       --bg: #eef2f7;
@@ -3398,15 +3401,54 @@
       font-size: 9px !important;
     }
 
+    .push-settings-section {
+      margin-top: 12px;
+    }
+
+    .push-notification-action {
+      margin-top: 12px;
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    .push-notification-action.is-enabled {
+      border-color: #bbf7d0;
+      background: #f0fdf4;
+      color: #15803d;
+    }
+
+    .push-notification-action.is-blocked {
+      border-color: #fecaca;
+      background: #fff1f2;
+      color: #dc2626;
+    }
+
     .settings-account-actions {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 10px;
       margin-top: 14px;
     }
 
-    .settings-account-actions .settings-action-btn {
+    .settings-account-actions > button {
+      width: 100%;
+      min-height: 48px;
       margin: 0 !important;
+      border-radius: 15px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .settings-account-actions > .pwa-install-action {
+      border: 1px solid #bfdbfe;
+      background: #eff6ff;
+      color: #1d4ed8;
+    }
+
+    #profileSettingsTitle {
+      margin: 0 0 14px !important;
+      line-height: 1.25 !important;
     }
 
   </style>
@@ -3531,6 +3573,27 @@
       color: #fff !important;
     }
   </style>
+
+<style id="unit-create-and-account-border-update-20260810">
+  #settingsDialog #logoutSettingsBtn{border:1px solid #c7d2fe!important;}
+  #settingsDialog #deleteAccountSettingsBtn{border:1px solid #fecaca!important;}
+  .unit-primary-actions{display:grid;grid-template-columns:1fr;gap:10px;margin-top:0;}
+  .unit-create-btn{width:100%;min-height:46px;border:1px solid #2563eb;border-radius:14px;background:#eff6ff;color:#1d4ed8;font-size:13px;font-weight:950;cursor:pointer;transition:transform .12s ease,background-color .16s ease;}
+  .unit-create-btn:active{transform:scale(.985);background:#dbeafe;}
+  .unit-create-btn:disabled{cursor:not-allowed;opacity:.55;}
+  .unit-create-dialog{max-width:440px;}
+  .unit-create-error{min-height:18px;margin:9px 2px 0;}
+  .unit-create-success-dialog{max-width:400px;text-align:center;}
+  .unit-create-success-dialog .dialog-head{padding:22px 20px 18px;text-align:center;}
+  .unit-create-success-dialog .dialog-head h3{font-size:20px;font-weight:950;line-height:1.35;}
+  .unit-create-success-dialog .dialog-body{padding:20px;}
+  .unit-create-success-info{display:grid;gap:12px;margin-bottom:18px;}
+  .unit-create-success-item{padding:14px 16px;border:1px solid #dbeafe;border-radius:16px;background:#f8fbff;text-align:center;}
+  .unit-create-success-label{display:block;margin-bottom:5px;color:#64748b;font-size:11px;font-weight:850;line-height:1.25;}
+  .unit-create-success-value{display:block;color:#0f172a;font-size:20px;font-weight:950;line-height:1.25;overflow-wrap:anywhere;}
+  .unit-create-success-code{font-size:28px;letter-spacing:.08em;color:#1d4ed8;}
+  .unit-create-success-confirm{width:100%;}
+</style>
 </head>
 <body class="detail-tab-active">
   <div class="app">
@@ -3796,7 +3859,10 @@
             </div>
           </section>
 
-          <button class="unit-delete-request-btn" id="unitDeleteRequestBtn" type="button">현재 부대 삭제 신청</button>
+          <div class="unit-primary-actions">
+            <button class="unit-create-btn" id="unitCreateBtn" type="button">부대 만들기</button>
+            <button class="unit-delete-request-btn" id="unitDeleteRequestBtn" type="button">현재 부대 삭제 신청</button>
+          </div>
         </div>
       </section>
     </main>
@@ -4000,6 +4066,44 @@
     </section>
   </div>
 
+  <div class="modal-backdrop" id="unitCreateModal" aria-hidden="true">
+    <section class="dialog unit-create-dialog" id="unitCreateDialog" role="dialog" aria-modal="true" aria-labelledby="unitCreateTitle">
+      <div class="dialog-head">
+        <h3 id="unitCreateTitle">부대 만들기</h3>
+      </div>
+      <div class="dialog-body">
+        <label class="field-label" for="unitCreateNameInput">부대명</label>
+        <input class="text-input" id="unitCreateNameInput" type="text" minlength="2" maxlength="50" autocomplete="organization" placeholder="새 부대명 입력" />
+        <p class="action-toast-error unit-create-error" id="unitCreateError" aria-live="polite"></p>
+        <div class="dialog-actions">
+          <button class="cancel-btn" id="unitCreateCancelBtn" type="button">취소</button>
+          <button class="confirm-btn" id="unitCreateConfirmBtn" type="button">만들기</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" id="unitCreateSuccessModal" aria-hidden="true">
+    <section class="dialog unit-create-success-dialog" id="unitCreateSuccessDialog" role="dialog" aria-modal="true" aria-labelledby="unitCreateSuccessTitle">
+      <div class="dialog-head">
+        <h3 id="unitCreateSuccessTitle">부대가 생성되었습니다!</h3>
+      </div>
+      <div class="dialog-body">
+        <div class="unit-create-success-info">
+          <div class="unit-create-success-item">
+            <span class="unit-create-success-label">부대명</span>
+            <strong class="unit-create-success-value" id="unitCreateSuccessName"></strong>
+          </div>
+          <div class="unit-create-success-item">
+            <span class="unit-create-success-label">부대코드</span>
+            <strong class="unit-create-success-value unit-create-success-code" id="unitCreateSuccessCode"></strong>
+          </div>
+        </div>
+        <button class="confirm-btn unit-create-success-confirm" id="unitCreateSuccessConfirmBtn" type="button">확인</button>
+      </div>
+    </section>
+  </div>
+
   <div class="modal-backdrop" id="settingsModal">
     <section class="dialog settings-dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsDialogTitle">
       <div class="dialog-head settings-dialog-head">
@@ -4038,13 +4142,15 @@
           </form>
         </section>
 
-        <section class="settings-section pwa-install-section">
-          <h4 class="settings-section-title">앱 설치</h4>
-          <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="앱 설치" data-ios-label="홈 화면에 앱 추가">앱 설치</button>
+        <section class="settings-section push-settings-section" aria-labelledby="pushSettingsTitle">
+          <h4 class="settings-section-title" id="pushSettingsTitle">푸시 알림</h4>
+          <p class="settings-section-description" id="pushNotificationStatus">이동 기록과 신규 가입 신청 알림 상태를 확인하는 중입니다.</p>
+          <button class="settings-action-btn push-notification-action" id="pushNotificationSettingsBtn" type="button">푸시 알림 켜기</button>
         </section>
 
         <div class="settings-account-actions">
           <button class="settings-action-btn logout" id="logoutSettingsBtn" type="button">로그아웃</button>
+          <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="홈 화면에 앱 추가" data-ios-label="홈 화면에 앱 추가">홈 화면에 앱 추가</button>
           <button class="settings-action-btn withdraw" id="deleteAccountSettingsBtn" type="button">회원탈퇴</button>
         </div>
 
@@ -4506,6 +4612,13 @@
     }
 
     async function loadPendingUnitApplications({ quiet = false } = {}) {
+      if (!adminAccess?.profile?.unit_id) {
+        unitApprovalCount.textContent = '0명';
+        unitApprovalList.innerHTML = '';
+        unitApprovalList.appendChild(createUnitApprovalState('소속 부대를 만든 뒤 가입 신청을 관리할 수 있습니다.'));
+        return;
+      }
+
       if (!quiet) {
         unitApprovalCount.textContent = '...';
         unitApprovalList.innerHTML = '';
@@ -4542,6 +4655,21 @@
     }
 
     async function loadUnitManagementState({ quiet = false } = {}) {
+      if (!adminAccess?.profile?.unit_id) {
+        unitManagementState = null;
+        unitCurrentName.textContent = '소속 부대 없음';
+        unitCurrentCode.textContent = '부대 만들기 또는 부대 이동을 이용해주세요.';
+        unitNameInput.value = '';
+        unitNameInput.disabled = true;
+        unitRenameBtn.disabled = true;
+        unitDeleteRequestBtn.disabled = true;
+        unitDeleteRequestBtn.textContent = '현재 부대 삭제 신청';
+        return null;
+      }
+
+      unitNameInput.disabled = false;
+      unitRenameBtn.disabled = false;
+
       if (!quiet) {
         unitCurrentName.textContent = '불러오는 중...';
         unitCurrentCode.textContent = '부대 코드 확인 중';
@@ -4962,7 +5090,7 @@
         selectedUnitId = null;
         updatePageTitle();
         updateManagementControls();
-        throw new Error('관리자 프로필에 소속 부대가 설정되어 있지 않습니다.');
+        return null;
       }
 
       const { data, error } = await sb
@@ -5384,18 +5512,7 @@ replaceArray(movementLogs, normalizedMovementLogs);
       return labels[attribute] || '생활관';
     }
 
-    function formatTime(value) {
-      if (!value) return '-';
-
-      return new Intl.DateTimeFormat('ko-KR', {
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }).format(new Date(value));
-    }
-
+    
     function getElapsedText(returnTime) {
       if (!returnTime) return '-';
 
@@ -5643,12 +5760,6 @@ function renderPersonnel() {
     return;
   }
 
-  const formatDate = value => {
-    const raw = String(value || '').slice(0, 10);
-    const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-    return match ? `${match[1]}. ${match[2]}. ${match[3]}.` : '미입력';
-  };
-
   matches.forEach(person => {
     const zone = getZone(person.zoneId);
     const card = document.createElement('article');
@@ -5663,10 +5774,6 @@ function renderPersonnel() {
       <dl class="personnel-card-info">
         <dt>중대</dt>
         <dd class="personnel-company"></dd>
-        <dt>입대일</dt>
-        <dd class="personnel-enlist-date personnel-date-value"></dd>
-        <dt>전역일</dt>
-        <dd class="personnel-discharge-date personnel-date-value"></dd>
         <dt>생활관</dt>
         <dd class="personnel-home-zone personnel-location-badge"></dd>
         <dt>현위치</dt>
@@ -5679,8 +5786,6 @@ function renderPersonnel() {
     card.querySelector('.personnel-card-name').textContent = person.name || '-';
     card.querySelector('.personnel-card-phone').textContent = formatPersonnelPhone(person.phone);
     card.querySelector('.personnel-company').textContent = person.company || '미입력';
-    card.querySelector('.personnel-enlist-date').textContent = formatDate(person.enlistDate);
-    card.querySelector('.personnel-discharge-date').textContent = formatDate(person.dischargeDate);
     const homeZoneBadge = card.querySelector('.personnel-home-zone');
     homeZoneBadge.textContent = person.homeZoneName || '미지정';
     homeZoneBadge.style.setProperty('--badge-color', homeZone?.color || '#64748b');
@@ -5691,18 +5796,6 @@ function renderPersonnel() {
   });
 }
 
-function formatRecordDateTime(value) {
-      if (!value) return '-';
-
-      return new Intl.DateTimeFormat('ko-KR', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }).format(new Date(value));
-    }
 
     function getRecordOverdueMinutes(expectedReturnTime, arrivalTime = null) {
       if (!expectedReturnTime) return '-';
@@ -6752,6 +6845,10 @@ function formatRecordDateTime(value) {
         closeRecordsPeriodModal();
       } else if (zoneFilterModal.classList.contains('open')) {
         closeZoneFilterModal();
+      } else if (document.getElementById('unitCreateSuccessModal')?.classList.contains('open')) {
+        closeUnitCreateSuccessModal();
+      } else if (unitCreateModal.classList.contains('open')) {
+        closeUnitCreateModal();
       } else if (settingsModal.classList.contains('open')) {
         closeSettingsModal();
       }
@@ -7578,6 +7675,125 @@ function formatRecordDateTime(value) {
       }
     }
 
+    const unitCreateBtn = document.getElementById('unitCreateBtn');
+    const unitCreateModal = document.getElementById('unitCreateModal');
+    const unitCreateDialog = document.getElementById('unitCreateDialog');
+    const unitCreateNameInput = document.getElementById('unitCreateNameInput');
+    const unitCreateError = document.getElementById('unitCreateError');
+    const unitCreateCancelBtn = document.getElementById('unitCreateCancelBtn');
+    const unitCreateConfirmBtn = document.getElementById('unitCreateConfirmBtn');
+    const unitCreateSuccessModal = document.getElementById('unitCreateSuccessModal');
+    const unitCreateSuccessDialog = document.getElementById('unitCreateSuccessDialog');
+    const unitCreateSuccessName = document.getElementById('unitCreateSuccessName');
+    const unitCreateSuccessCode = document.getElementById('unitCreateSuccessCode');
+    const unitCreateSuccessConfirmBtn = document.getElementById('unitCreateSuccessConfirmBtn');
+    let unitCreateBusy = false;
+
+    function openUnitCreateModal() {
+      if (!adminAccess?.admin?.isadmin) {
+        showMessage('승인된 관리자만 부대를 만들 수 있습니다.', '권한 확인');
+        return;
+      }
+
+      unitCreateNameInput.value = '';
+      unitCreateError.textContent = '';
+      unitCreateConfirmBtn.disabled = false;
+      unitCreateConfirmBtn.textContent = '만들기';
+      unitCreateModal.setAttribute('aria-hidden', 'false');
+      animateOpen(unitCreateModal, unitCreateDialog);
+      setTimeout(() => unitCreateNameInput.focus(), 80);
+    }
+
+    function closeUnitCreateModal() {
+      if (unitCreateBusy || !unitCreateModal.classList.contains('open')) return;
+      animateClose(unitCreateModal, unitCreateDialog);
+      setTimeout(() => unitCreateModal.setAttribute('aria-hidden', 'true'), 230);
+    }
+
+    function openUnitCreateSuccessModal(unitName, unitCode) {
+      unitCreateSuccessName.textContent = String(unitName || '').trim() || '-';
+      unitCreateSuccessCode.textContent = String(unitCode || '').trim() || '-';
+      unitCreateSuccessModal.setAttribute('aria-hidden', 'false');
+      animateOpen(unitCreateSuccessModal, unitCreateSuccessDialog);
+    }
+
+    function closeUnitCreateSuccessModal() {
+      if (!unitCreateSuccessModal.classList.contains('open')) return;
+      animateClose(unitCreateSuccessModal, unitCreateSuccessDialog);
+      setTimeout(() => unitCreateSuccessModal.setAttribute('aria-hidden', 'true'), 230);
+    }
+
+    async function createAdminUnit() {
+      if (unitCreateBusy) return;
+
+      const unitName = unitCreateNameInput.value.trim();
+      unitCreateError.textContent = '';
+
+      if (unitName.length < 2 || unitName.length > 50) {
+        unitCreateError.textContent = '부대명은 2자 이상 50자 이하로 입력해주세요.';
+        unitCreateNameInput.focus();
+        return;
+      }
+
+      unitCreateBusy = true;
+      unitCreateConfirmBtn.disabled = true;
+      unitCreateCancelBtn.disabled = true;
+      unitCreateConfirmBtn.textContent = '생성 중...';
+
+      try {
+        const { data, error } = await sb.rpc('create_unit_for_admin', {
+          p_unit_name: unitName
+        });
+        if (error) throw error;
+
+        const created = getUnitRpcRow(data);
+        if (!created?.unit_id) throw new Error('생성된 부대 정보를 확인하지 못했습니다.');
+
+        adminAccess.profile = {
+          ...adminAccess.profile,
+          unit_id: created.unit_id
+        };
+
+        unitCreateBusy = false;
+        unitCreateCancelBtn.disabled = false;
+        closeUnitCreateModal();
+
+        await loadAvailableUnits();
+        await loadUnitData();
+        await loadUnitManagementState({ quiet: true });
+        await loadUnitAdmins({ quiet: true });
+        await loadPendingUnitApplications({ quiet: true });
+        await searchUnitsForManagement({ quiet: true });
+
+        openUnitCreateSuccessModal(created.unit_name || unitName, created.unit_code || '');
+      } catch (error) {
+        console.error('부대 생성 실패:', error);
+        unitCreateError.textContent = error?.message || '부대를 만들지 못했습니다.';
+      } finally {
+        unitCreateBusy = false;
+        unitCreateConfirmBtn.disabled = false;
+        unitCreateCancelBtn.disabled = false;
+        unitCreateConfirmBtn.textContent = '만들기';
+      }
+    }
+
+    unitCreateBtn?.addEventListener('click', openUnitCreateModal);
+    unitCreateCancelBtn?.addEventListener('click', closeUnitCreateModal);
+    unitCreateConfirmBtn?.addEventListener('click', createAdminUnit);
+    unitCreateNameInput?.addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        createAdminUnit();
+      }
+    });
+    unitCreateModal?.addEventListener('click', event => {
+      if (event.target === unitCreateModal) closeUnitCreateModal();
+    });
+    unitCreateSuccessConfirmBtn?.addEventListener('click', closeUnitCreateSuccessModal);
+    unitCreateSuccessModal?.addEventListener('click', event => {
+      if (event.target === unitCreateSuccessModal) closeUnitCreateSuccessModal();
+    });
+
     initializeAdminPage();
   </script>
 <script>
@@ -8047,15 +8263,7 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
 
 <script>
 (function(){
-  function createV14HomeBadge(label, color){
-    const badge = document.createElement('span');
-    badge.className = 'sheet-home-badge';
-    badge.style.setProperty('--badge-color', color || '#64748b');
-    badge.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent = label || '미지정';
-    return badge;
-  }
-
+  
   // 마지막 렌더러가 다른 IIFE 내부 함수(adminV13HomeBadge)를 참조하던 오류 제거
   renderZonePeople = function(zoneId){
     const preserveOpenedState = sheetBackdrop.classList.contains('open');
@@ -8118,13 +8326,6 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
 (function locationAdminV15Final(){
   const css = document.createElement('style');
   css.textContent = `
-    #view-personnel .personnel-date-value{
-      color:#334155!important;
-      font-size:11px!important;
-      font-weight:850!important;
-      text-align:right!important;
-      white-space:nowrap!important;
-    }
 
     /* 과거 팝업 카드 디자인: 이름 / 중대 / 생활관을 같은 행에 표시 */
     #zonePeopleContent{
@@ -8223,15 +8424,7 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
   `;
   document.head.appendChild(css);
 
-  function makeHomeBadge(label,color){
-    const badge=document.createElement('span');
-    badge.className='sheet-home-badge';
-    badge.style.setProperty('--badge-color',color||'#64748b');
-    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent=label||'미지정';
-    return badge;
-  }
-
+  
   renderZonePeople=function(zoneId){
     const zone=getZone(zoneId);
     if(!zone)return;
@@ -8581,10 +8774,17 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
     return anchor;
   }
   function releaseAdminSticky(){
+    if(window.LocationAdminUI?.releaseStickyLayouts){
+      window.LocationAdminUI.releaseStickyLayouts();
+      return;
+    }
     document.querySelectorAll('.admin-tab-view>.sticky-dashboard').forEach(dashboard=>{
-      dashboard.classList.remove('admin-final-fixed','admin-v16-fixed','admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed');
+      dashboard.classList.remove('admin-final-fixed','admin-v16-fixed','admin-v13-fixed','admin-js-fixed','tab-dashboard-fixed','js-sticky-fixed');
     });
-    document.querySelectorAll('.admin-final-sticky-anchor').forEach(anchor=>{anchor.style.height='0px'});
+    document.querySelectorAll('.admin-final-sticky-anchor,.sticky-dashboard-spacer').forEach(spacer=>{
+      spacer.classList.remove('active');
+      spacer.style.height='0px';
+    });
   }
   function syncFinalAdminSticky(){
     stickyFrame=0;
@@ -8739,6 +8939,13 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
       const arrival=returnHome?log.journeyArrivalTime:log.arrivalTime;
       const card=document.createElement('article');
       card.className='record-card';
+      card.dataset.recordDate=(()=>{
+        const raw=log.departureTime||log.departure_time||null;
+        if(!raw)return '';
+        const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date(raw));
+        const map=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+        return `${map.year}-${map.month}-${map.day}`;
+      })();
       card.dataset.logKey=String(log.id??`${log.userId||''}|${log.departureTime||''}|${destinationId||''}`);
       card.innerHTML=`
         <div class="record-card-head"><h3 class="record-card-name"></h3><span class="record-header-company"></span>${adminJourneyBadgeMarkup(homeName,homeColor)}</div>
@@ -8780,10 +8987,7 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
       active?button.setAttribute('aria-current','page'):button.removeAttribute('aria-current');
     });
   }
-  function restoreInline(element,value){
-    value===null?element.removeAttribute('style'):element.setAttribute('style',value);
-  }
-  function refreshUnitManagementAfterTransition(){
+    function refreshUnitManagementAfterTransition(){
     const jobs=[];
     try{jobs.push(Promise.resolve(loadUnitManagementState({quiet:true})))}catch(_){}
     try{jobs.push(Promise.resolve(loadUnitAdmins({quiet:true})))}catch(_){}
@@ -8801,6 +9005,7 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
     if(!current||!target)return null;
 
     /* 애니메이션 중 다른 비동기 렌더링이 패널 높이와 DOM 순서를 바꾸지 않도록 한다. */
+    document.body.classList.add('admin-final-tab-moving');
     document.querySelectorAll('[data-admin-tab-view]').forEach(view=>{
       if(view!==current&&view!==target)view.hidden=true;
     });
@@ -8809,16 +9014,17 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
     const currentRect=current.getBoundingClientRect();
     const wrapRect=wrap.getBoundingClientRect();
     const width=Math.max(currentRect.width,1);
-    const currentHeight=Math.max(current.scrollHeight,currentRect.height,1);
+    const wrapDocumentTop=wrapRect.top+window.scrollY;
+    const viewportCoverage=Math.max(1,window.scrollY+window.innerHeight-wrapDocumentTop+2);
+    const currentHeight=Math.max(current.scrollHeight,currentRect.height,viewportCoverage,1);
     const saved={current:current.getAttribute('style'),target:target.getAttribute('style'),wrap:wrap.getAttribute('style'),targetHidden:target.hidden};
     target.hidden=false;
-    const targetHeight=Math.max(target.scrollHeight,target.getBoundingClientRect().height,1);
+    const targetHeight=Math.max(target.scrollHeight,target.getBoundingClientRect().height,viewportCoverage,1);
     if(getComputedStyle(wrap).position==='static')wrap.style.position='relative';
     wrap.style.overflow='hidden';
     wrap.style.minHeight=`${Math.max(currentHeight,targetHeight)}px`;
     Object.assign(current.style,{position:'relative',zIndex:'2',width:'100%',height:`${currentHeight}px`,overflow:'hidden',contain:'layout paint',transition:'none',transform:'translate3d(0,0,0)',willChange:'transform',pointerEvents:'none'});
     Object.assign(target.style,{position:'absolute',left:`${currentRect.left-wrapRect.left}px`,top:`${currentRect.top-wrapRect.top}px`,zIndex:'3',width:`${width}px`,minWidth:`${width}px`,maxWidth:`${width}px`,height:`${targetHeight}px`,overflow:'hidden',contain:'layout paint',margin:'0',boxSizing:'border-box',transition:'none',transform:`translate3d(${direction*width}px,0,0)`,willChange:'transform',pointerEvents:'none'});
-    document.body.classList.add('admin-final-tab-moving');
     tabState={from,type,direction,current,target,wrap,width,saved,done:false,refreshUnit:type==='unit'};
     return tabState;
   }
@@ -10121,11 +10327,11 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
 
   .filter-collapse-toggle{
     position:relative!important;
-    width:100%!important;
+    width:calc(100% + 28px)!important;
     height:24px!important;
     min-height:24px!important;
     max-height:24px!important;
-    margin:1px 0 -3px!important;
+    margin:1px -14px -3px!important;
     padding:0 9px 0 7px!important;
     border:1px solid #cbd5e1!important;
     border-top-color:#e2e8f0!important;
@@ -10192,7 +10398,6 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
 
   @media(max-width:360px){
     .filter-collapse-toggle{
-      width:100%!important;
       font-size:9px!important;
     }
   }
@@ -10358,15 +10563,7 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
 </style>
 <script>
 (function locationAdminV26FilterCollapseDesign(){
-  function createHomeBadge(label,color){
-    const badge=document.createElement('span');
-    badge.className='sheet-home-badge';
-    badge.style.setProperty('--badge-color',color||'#64748b');
-    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent=label||'미지정';
-    return badge;
-  }
-
+  
   function createLegacyPersonCard(person){
     const row=document.createElement('article');
     row.className='sheet-person person-summary-card legacy-person-card';
@@ -10416,73 +10613,6 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
     zonePeople.forEach(person=>content.appendChild(createLegacyPersonCard(person)));
   };
 
-  function refreshStickyLayout(){
-    requestAnimationFrame(()=>{
-      window.dispatchEvent(new Event('resize'));
-      window.dispatchEvent(new Event('scroll'));
-    });
-  }
-
-  function installFilterCollapse(viewId,storageName){
-    const view=document.getElementById(viewId);
-    const dashboard=view?.querySelector(':scope > .sticky-dashboard');
-    const filters=dashboard?.querySelector('.tab-search-actions');
-    if(!dashboard||!filters||dashboard.querySelector('.filter-collapse-toggle'))return;
-
-    if(!filters.id){
-      filters.id=`${viewId}-filter-panel`;
-    }
-
-    const button=document.createElement('button');
-    button.type='button';
-    button.className='filter-collapse-toggle';
-    button.setAttribute('aria-controls',filters.id);
-    button.innerHTML='<span class="filter-collapse-toggle-grip" aria-hidden="true"></span><span class="filter-collapse-toggle-label">필터 접기</span><span class="filter-collapse-toggle-arrow" aria-hidden="true"></span>';
-    filters.insertAdjacentElement('afterend',button);
-
-    /* 페이지에 처음 진입할 때 필터는 항상 접힌 상태로 시작합니다. */
-    let expanded=false;
-
-    const scheduleLayoutRefresh=()=>{
-      refreshStickyLayout();
-      setTimeout(refreshStickyLayout,90);
-      setTimeout(refreshStickyLayout,320);
-    };
-
-    const apply=(animate=true)=>{
-      if(!animate){
-        filters.style.setProperty('transition','none','important');
-      }
-      dashboard.classList.toggle('filter-dashboard-collapsed',!expanded);
-      filters.classList.toggle('filter-panel-collapsed',!expanded);
-      filters.setAttribute('aria-hidden',expanded?'false':'true');
-      try{filters.inert=!expanded}catch(_){ }
-      button.setAttribute('aria-expanded',expanded?'true':'false');
-      button.setAttribute('aria-label',expanded?'검색 및 필터 접기':'검색 및 필터 펼치기');
-      button.querySelector('.filter-collapse-toggle-label').textContent=expanded?'필터 접기':'필터 펼치기';
-      scheduleLayoutRefresh();
-      if(!animate){
-        requestAnimationFrame(()=>{
-          filters.style.removeProperty('transition');
-          scheduleLayoutRefresh();
-        });
-      }
-    };
-
-    button.addEventListener('click',()=>{
-      expanded=!expanded;
-      apply(true);
-    });
-    filters.addEventListener('transitionend',event=>{
-      if(event.target===filters&&(event.propertyName==='max-height'||event.propertyName==='transform')){
-        refreshStickyLayout();
-      }
-    });
-    apply(false);
-  }
-
-  installFilterCollapse('view-personnel','location-admin-personnel-filter-state');
-  installFilterCollapse('view-records','location-admin-records-filter-state');
 })();
 </script>
 
@@ -10678,15 +10808,7 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
 </style>
 <script>
 (function locationV26PersonCardGridNoZoom(){
-  function createV26HomeBadge(label,color){
-    const badge=document.createElement('span');
-    badge.className='sheet-home-badge';
-    badge.style.setProperty('--badge-color',color||'#64748b');
-    badge.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a7 7 0 0 0-7 7c0 5.25 7 12.5 7 12.5s7-7.25 7-12.5a7 7 0 0 0-7-7Zm0 9.65a2.65 2.65 0 1 1 0-5.3 2.65 2.65 0 0 1 0 5.3Z"/></svg><span></span>';
-    badge.querySelector('span').textContent=label||'미지정';
-    return badge;
-  }
-
+  
   function createV26PersonCard(person){
     const row=document.createElement('article');
     row.className='sheet-person person-summary-card legacy-person-card';
@@ -10915,12 +11037,471 @@ function makeFilterButton(id, label, targetKey){ let button = document.getElemen
     isolation:isolate!important;
     backface-visibility:hidden!important;
     transform-style:flat!important;
+    contain:none!important;
+    background:var(--bg,#eef2f7)!important;
+  }
+  body.admin-final-tab-moving .admin-tab-view > .sticky-dashboard{
+    position:relative!important;
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+    transform:none!important;
+  }
+  body.admin-final-tab-moving .sticky-dashboard-spacer,
+  body.admin-final-tab-moving .admin-final-sticky-anchor{
+    display:none!important;
+    height:0!important;
+    min-height:0!important;
   }
   body.admin-final-tab-moving .unit-management-shell,
   body.admin-final-tab-moving .unit-management-card{
-    contain:layout paint!important;
+    contain:none!important;
+    isolation:isolate!important;
   }
 </style>
+
+
+<!-- 2026-08-10: 이동 기록 날짜별 책갈피 -->
+<style id="location-record-date-bookmarks">
+  #view-records .record-date-bookmark{
+    grid-column:1 / -1!important;
+    width:100%!important;
+    min-width:0!important;
+    margin:8px 0 0!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:10px!important;
+    box-sizing:border-box!important;
+  }
+  #view-records .record-date-bookmark:first-child{
+    margin-top:0!important;
+  }
+  #view-records .record-date-bookmark-label{
+    position:relative!important;
+    flex:0 0 auto!important;
+    max-width:calc(100% - 36px)!important;
+    padding:7px 17px 7px 11px!important;
+    background:#2563eb!important;
+    color:#fff!important;
+    clip-path:polygon(0 0,calc(100% - 9px) 0,100% 50%,calc(100% - 9px) 100%,0 100%)!important;
+    font-size:12px!important;
+    font-weight:950!important;
+    line-height:1.2!important;
+    letter-spacing:-.15px!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    box-shadow:0 5px 13px rgba(37,99,235,.16)!important;
+  }
+  #view-records .record-date-bookmark-line{
+    flex:1 1 auto!important;
+    min-width:18px!important;
+    height:1px!important;
+    background:linear-gradient(90deg,#cbd5e1,rgba(203,213,225,0))!important;
+  }
+  #view-records .record-date-bookmark + .record-card{
+    margin-top:0!important;
+  }
+</style>
+<script>
+(function(){
+  function getKstDateValue(value=new Date()){
+    const date=value instanceof Date?value:new Date(value);
+    if(Number.isNaN(date.getTime()))return '';
+    const parts=new Intl.DateTimeFormat('en-CA',{
+      timeZone:'Asia/Seoul',
+      year:'numeric',
+      month:'2-digit',
+      day:'2-digit'
+    }).formatToParts(date);
+    const map=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+    return `${map.year}-${map.month}-${map.day}`;
+  }
+
+  function shiftDateValue(value,days){
+    const [year,month,day]=String(value||'').split('-').map(Number);
+    if(!year||!month||!day)return '';
+    return new Date(Date.UTC(year,month-1,day+Number(days||0))).toISOString().slice(0,10);
+  }
+
+  function formatBookmarkLabel(dateValue){
+    const [year,month,day]=String(dateValue||'').split('-').map(Number);
+    if(!year||!month||!day)return '';
+    const today=getKstDateValue();
+    const yesterday=shiftDateValue(today,-1);
+    const date=new Date(`${dateValue}T00:00:00+09:00`);
+    const weekday=new Intl.DateTimeFormat('ko-KR',{
+      timeZone:'Asia/Seoul',
+      weekday:'short'
+    }).format(date);
+    const sameYear=String(today).slice(0,4)===String(year);
+    const dateText=sameYear
+      ?`${month}월 ${day}일 (${weekday})`
+      :`${year}년 ${month}월 ${day}일 (${weekday})`;
+    if(dateValue===today)return `오늘 · ${dateText}`;
+    if(dateValue===yesterday)return `어제 · ${dateText}`;
+    return dateText;
+  }
+
+  function decorateRecordDateBookmarks(list){
+    if(!list)return;
+    list.querySelectorAll('.record-date-bookmark').forEach(node=>node.remove());
+
+    let previousDate='';
+    const cards=Array.from(list.querySelectorAll(':scope > .record-card'));
+    cards.forEach(card=>{
+      const dateValue=String(card.dataset.recordDate||'').trim();
+      if(!dateValue||dateValue===previousDate)return;
+      previousDate=dateValue;
+
+      const bookmark=document.createElement('div');
+      bookmark.className='record-date-bookmark';
+      bookmark.dataset.recordDate=dateValue;
+      bookmark.setAttribute('role','separator');
+      bookmark.setAttribute('aria-label',`${dateValue} 이동 기록`);
+
+      const label=document.createElement('span');
+      label.className='record-date-bookmark-label';
+      label.textContent=formatBookmarkLabel(dateValue);
+
+      const line=document.createElement('span');
+      line.className='record-date-bookmark-line';
+      line.setAttribute('aria-hidden','true');
+
+      bookmark.append(label,line);
+      list.insertBefore(bookmark,card);
+    });
+  }
+
+  const list=document.getElementById('recordsList');
+  if(!list)return;
+
+  const renderName=typeof renderMovementLogs==='function'
+    ?'renderMovementLogs'
+    :(typeof renderMovementRecords==='function'?'renderMovementRecords':null);
+
+  if(renderName==='renderMovementLogs'){
+    const previous=renderMovementLogs;
+    renderMovementLogs=function(...args){
+      const result=previous.apply(this,args);
+      decorateRecordDateBookmarks(list);
+      return result;
+    };
+  }else if(renderName==='renderMovementRecords'){
+    const previous=renderMovementRecords;
+    renderMovementRecords=function(...args){
+      const result=previous.apply(this,args);
+      decorateRecordDateBookmarks(list);
+      return result;
+    };
+  }
+
+  decorateRecordDateBookmarks(list);
+})();
+</script>
+
+
+<!-- 2026-08-10: 기록 탭 우측 날짜 빠른 이동 북마크 -->
+<style id="location-record-date-quick-nav">
+  #view-records .record-date-quick-nav{
+    position:fixed!important;
+    top:52%!important;
+    right:max(4px,calc((100vw - 480px)/2 + 4px))!important;
+    transform:translate(112%,-50%)!important;
+    opacity:0!important;
+    visibility:hidden!important;
+    z-index:48!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:flex-end!important;
+    gap:4px!important;
+    max-height:min(52dvh,360px)!important;
+    padding:6px 0 6px 5px!important;
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+    overscroll-behavior:contain!important;
+    scrollbar-width:none!important;
+    pointer-events:none!important;
+    transition:transform .2s ease,opacity .18s ease,visibility 0s linear .2s!important;
+  }
+  #view-records .record-date-quick-nav.is-open{
+    transform:translate(0,-50%)!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+    transition:transform .2s ease,opacity .18s ease,visibility 0s!important;
+  }
+  #view-records .record-date-quick-nav::-webkit-scrollbar{
+    display:none!important;
+  }
+  #view-records[hidden] .record-date-quick-nav,
+  #view-records .record-date-quick-nav[hidden],
+  #view-records[hidden] .record-date-quick-trigger,
+  #view-records .record-date-quick-trigger[hidden]{
+    display:none!important;
+  }
+  #view-records .record-date-quick-trigger{
+    position:fixed!important;
+    top:52%!important;
+    right:max(0px,calc((100vw - 480px)/2))!important;
+    transform:translateY(-50%)!important;
+    z-index:49!important;
+    width:20px!important;
+    height:64px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:12px 0 0 12px!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    -webkit-tap-highlight-color:transparent!important;
+    touch-action:manipulation!important;
+    cursor:pointer!important;
+  }
+  #view-records .record-date-quick-trigger::before{
+    content:''!important;
+    position:absolute!important;
+    top:50%!important;
+    right:2px!important;
+    width:4px!important;
+    height:38px!important;
+    transform:translateY(-50%)!important;
+    border-radius:999px!important;
+    background:#94a3b8!important;
+    opacity:.34!important;
+    transition:height .18s ease,background .18s ease,opacity .18s ease!important;
+  }
+  #view-records .record-date-quick-trigger:active::before,
+  #view-records .record-date-quick-trigger.is-open::before{
+    height:44px!important;
+    background:#2563eb!important;
+    opacity:.88!important;
+  }
+  #view-records .record-date-quick-button{
+    position:relative!important;
+    min-width:42px!important;
+    height:30px!important;
+    padding:0 7px 0 9px!important;
+    border:1px solid #cbd5e1!important;
+    border-right:0!important;
+    border-radius:10px 0 0 10px!important;
+    background:rgba(255,255,255,.96)!important;
+    color:#64748b!important;
+    box-shadow:0 4px 12px rgba(15,23,42,.08)!important;
+    font-size:10px!important;
+    font-weight:900!important;
+    line-height:1!important;
+    letter-spacing:-.2px!important;
+    white-space:nowrap!important;
+    -webkit-tap-highlight-color:transparent!important;
+    touch-action:manipulation!important;
+    transition:transform .16s ease,background .16s ease,color .16s ease,border-color .16s ease!important;
+  }
+  #view-records .record-date-quick-button:active{
+    transform:translateX(-2px)!important;
+  }
+  #view-records .record-date-quick-button.is-active{
+    min-width:48px!important;
+    background:#2563eb!important;
+    border-color:#2563eb!important;
+    color:#fff!important;
+    box-shadow:0 5px 14px rgba(37,99,235,.22)!important;
+  }
+  @media (max-width:360px){
+    #view-records .record-date-quick-nav{
+      right:2px!important;
+    }
+    #view-records .record-date-quick-trigger{
+      right:0!important;
+      width:18px!important;
+    }
+    #view-records .record-date-quick-button{
+      min-width:38px!important;
+      height:28px!important;
+      padding:0 5px 0 7px!important;
+      font-size:9px!important;
+    }
+    #view-records .record-date-quick-button.is-active{
+      min-width:43px!important;
+    }
+  }
+</style>
+<script>
+(function(){
+  const view=document.getElementById('view-records');
+  const list=document.getElementById('recordsList');
+  if(!view||!list)return;
+
+  let nav=view.querySelector('.record-date-quick-nav');
+  if(!nav){
+    nav=document.createElement('nav');
+    nav.className='record-date-quick-nav';
+    nav.setAttribute('aria-label','이동 기록 날짜 바로가기');
+    view.appendChild(nav);
+  }
+
+  let trigger=view.querySelector('.record-date-quick-trigger');
+  if(!trigger){
+    trigger=document.createElement('button');
+    trigger.type='button';
+    trigger.className='record-date-quick-trigger';
+    trigger.setAttribute('aria-label','날짜 북마크 열기');
+    trigger.setAttribute('aria-expanded','false');
+    view.appendChild(trigger);
+  }
+
+  function setOpen(open){
+    const next=Boolean(open)&&!nav.hidden;
+    nav.classList.toggle('is-open',next);
+    trigger.classList.toggle('is-open',next);
+    trigger.setAttribute('aria-expanded',next?'true':'false');
+    trigger.setAttribute('aria-label',next?'날짜 북마크 닫기':'날짜 북마크 열기');
+    if(next)updateActiveFromScroll();
+  }
+
+  trigger.addEventListener('click',event=>{
+    event.preventDefault();
+    event.stopPropagation();
+    setOpen(!nav.classList.contains('is-open'));
+  });
+
+  nav.addEventListener('click',event=>event.stopPropagation());
+  document.addEventListener('click',event=>{
+    if(!nav.classList.contains('is-open'))return;
+    if(nav.contains(event.target)||trigger.contains(event.target))return;
+    setOpen(false);
+  });
+
+  function getKstDateValue(value=new Date()){
+    const date=value instanceof Date?value:new Date(value);
+    if(Number.isNaN(date.getTime()))return '';
+    const parts=new Intl.DateTimeFormat('en-CA',{
+      timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'
+    }).formatToParts(date);
+    const map=Object.fromEntries(parts.map(part=>[part.type,part.value]));
+    return `${map.year}-${map.month}-${map.day}`;
+  }
+
+  function shiftDateValue(value,days){
+    const [year,month,day]=String(value||'').split('-').map(Number);
+    if(!year||!month||!day)return '';
+    return new Date(Date.UTC(year,month-1,day+Number(days||0))).toISOString().slice(0,10);
+  }
+
+  function compactDateLabel(dateValue){
+    const today=getKstDateValue();
+    const yesterday=shiftDateValue(today,-1);
+    if(dateValue===today)return '오늘';
+    if(dateValue===yesterday)return '어제';
+    const [,month,day]=String(dateValue||'').split('-');
+    return month&&day?`${Number(month)}/${Number(day)}`:dateValue;
+  }
+
+  function fullDateLabel(dateValue){
+    const [year,month,day]=String(dateValue||'').split('-').map(Number);
+    if(!year||!month||!day)return dateValue;
+    const date=new Date(`${dateValue}T00:00:00+09:00`);
+    const weekday=new Intl.DateTimeFormat('ko-KR',{timeZone:'Asia/Seoul',weekday:'short'}).format(date);
+    return `${year}년 ${month}월 ${day}일 (${weekday})`;
+  }
+
+  function scrollToBookmark(target){
+    if(!target)return;
+    let offset=12;
+    const sticky=view.querySelector('.sticky-dashboard');
+    if(sticky){
+      const style=getComputedStyle(sticky);
+      const rect=sticky.getBoundingClientRect();
+      if((style.position==='fixed'||style.position==='sticky')&&rect.height>0&&rect.bottom>0){
+        offset=Math.max(offset,rect.bottom+10);
+      }
+    }
+    const y=window.scrollY+target.getBoundingClientRect().top-offset;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+  }
+
+  function buildQuickNav(){
+    const bookmarks=Array.from(list.querySelectorAll(':scope > .record-date-bookmark'));
+    const wasOpen=nav.classList.contains('is-open');
+    nav.innerHTML='';
+    nav.hidden=bookmarks.length===0;
+    trigger.hidden=bookmarks.length===0;
+    if(!bookmarks.length){
+      setOpen(false);
+      return;
+    }
+
+    bookmarks.forEach(bookmark=>{
+      const dateValue=String(bookmark.dataset.recordDate||'').trim();
+      if(!dateValue)return;
+      if(!bookmark.id)bookmark.id=`record-date-${dateValue}`;
+
+      const button=document.createElement('button');
+      button.type='button';
+      button.className='record-date-quick-button';
+      button.dataset.recordDate=dateValue;
+      button.textContent=compactDateLabel(dateValue);
+      button.title=fullDateLabel(dateValue);
+      button.setAttribute('aria-label',`${fullDateLabel(dateValue)} 이동 기록으로 이동`);
+      button.addEventListener('click',()=>{
+        scrollToBookmark(bookmark);
+        setActive(dateValue);
+        setOpen(false);
+      });
+      nav.appendChild(button);
+    });
+    updateActiveFromScroll();
+    setOpen(wasOpen);
+  }
+
+  function setActive(dateValue){
+    nav.querySelectorAll('.record-date-quick-button').forEach(button=>{
+      const active=button.dataset.recordDate===dateValue;
+      button.classList.toggle('is-active',active);
+      button.setAttribute('aria-current',active?'date':'false');
+      if(active&&nav.classList.contains('is-open')){
+        const top=button.offsetTop-nav.clientHeight/2+button.offsetHeight/2;
+        nav.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+      }
+    });
+  }
+
+  function updateActiveFromScroll(){
+    const bookmarks=Array.from(list.querySelectorAll(':scope > .record-date-bookmark'));
+    if(!bookmarks.length)return;
+    let guideY=18;
+    const sticky=view.querySelector('.sticky-dashboard');
+    if(sticky){
+      const style=getComputedStyle(sticky);
+      const rect=sticky.getBoundingClientRect();
+      if((style.position==='fixed'||style.position==='sticky')&&rect.height>0&&rect.bottom>0){
+        guideY=rect.bottom+14;
+      }
+    }
+    let active=bookmarks[0];
+    for(const bookmark of bookmarks){
+      if(bookmark.getBoundingClientRect().top<=guideY)active=bookmark;
+      else break;
+    }
+    setActive(String(active.dataset.recordDate||''));
+  }
+
+  let rebuildFrame=0;
+  const observer=new MutationObserver(()=>{
+    cancelAnimationFrame(rebuildFrame);
+    rebuildFrame=requestAnimationFrame(buildQuickNav);
+  });
+  observer.observe(list,{childList:true});
+
+  let scrollFrame=0;
+  window.addEventListener('scroll',()=>{
+    cancelAnimationFrame(scrollFrame);
+    scrollFrame=requestAnimationFrame(updateActiveFromScroll);
+  },{passive:true});
+
+  buildQuickNav();
+})();
+</script>
 
 </body>
 </html>
