@@ -4,7 +4,6 @@
   const VAPID_PUBLIC_KEY = 'BEgPJKQnyeHSknIPIwEnxvwoLttja4te8FALzNO34TOpzodB4KhZBgLRepUbH8pRwVEyIeSitSONqrw64N-AZ34';
   const BUTTON_ID = 'pushNotificationSettingsBtn';
   const STATUS_ID = 'pushNotificationStatus';
-  const PUSH_CLIENT_VERSION = '1.0.9';
 
   function button(){ return document.getElementById(BUTTON_ID); }
   function status(){ return document.getElementById(STATUS_ID); }
@@ -14,24 +13,40 @@
     const label = status();
     if (!btn || !label) return;
 
-    btn.classList.remove('is-enabled','is-blocked');
+    const wasChecked = btn.getAttribute('aria-checked') === 'true';
+
+    btn.classList.remove('is-enabled','is-blocked','is-busy');
     btn.disabled = false;
+    btn.removeAttribute('aria-busy');
 
     if (mode === 'enabled') {
-      btn.textContent = '푸시 알림 끄기';
       btn.classList.add('is-enabled');
+      btn.setAttribute('aria-checked', 'true');
+      btn.setAttribute('aria-label', '푸시 알림 끄기');
+      btn.title = '푸시 알림 끄기';
     } else if (mode === 'blocked') {
-      btn.textContent = '알림 권한이 차단됨';
       btn.classList.add('is-blocked');
+      btn.setAttribute('aria-checked', 'false');
+      btn.setAttribute('aria-label', '알림 권한이 차단됨');
+      btn.title = '알림 권한이 차단됨';
       btn.disabled = true;
     } else if (mode === 'unsupported') {
-      btn.textContent = '이 기기에서는 사용할 수 없음';
+      btn.setAttribute('aria-checked', 'false');
+      btn.setAttribute('aria-label', '이 기기에서는 푸시 알림을 사용할 수 없음');
+      btn.title = '이 기기에서는 푸시 알림을 사용할 수 없음';
       btn.disabled = true;
     } else if (mode === 'busy') {
-      btn.textContent = '처리 중...';
+      if (wasChecked) btn.classList.add('is-enabled');
+      btn.classList.add('is-busy');
+      btn.setAttribute('aria-checked', wasChecked ? 'true' : 'false');
+      btn.setAttribute('aria-busy', 'true');
+      btn.setAttribute('aria-label', '푸시 알림 처리 중');
+      btn.title = '처리 중';
       btn.disabled = true;
     } else {
-      btn.textContent = '푸시 알림 켜기';
+      btn.setAttribute('aria-checked', 'false');
+      btn.setAttribute('aria-label', '푸시 알림 켜기');
+      btn.title = '푸시 알림 켜기';
     }
 
     label.textContent = message;
@@ -145,8 +160,8 @@
         setUi('enabled', '새 이동 기록과 신규 가입 신청을 이 기기에서 알림으로 받습니다.');
       } else {
         setUi('disabled', Notification.permission === 'granted'
-          ? '알림 권한은 허용되어 있습니다. 아래 버튼을 눌러 이 기기를 등록하세요.'
-          : '아래 버튼을 눌러 알림 권한을 허용하고 이 기기를 등록하세요.');
+          ? '알림 권한은 허용되어 있습니다. 오른쪽 스위치를 켜 이 기기를 등록하세요.'
+          : '오른쪽 스위치를 켜 알림 권한을 허용하고 이 기기를 등록하세요.');
       }
     } catch (error) {
       console.warn('푸시 알림 상태 확인 실패:', error);
@@ -220,7 +235,8 @@
   async function clearSubscriptionBeforeLogout(){
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
     try {
-      const registration = await navigator.serviceWorker.ready;
+      const registration = await getRegistration({ timeoutMs: 4000, ensure: false });
+      if (!registration) return;
       const subscription = await registration.pushManager.getSubscription();
       if (!subscription) return;
       const endpoint = subscription.endpoint;
@@ -259,128 +275,23 @@
     }, 350);
   }
 
-
-  function diagnosticStatus(){ return document.getElementById('pushDiagnosticStatus'); }
-
-  function setDiagnosticText(message){
-    const el = diagnosticStatus();
-    if (el) el.textContent = message;
-  }
-
-  async function showLocalTestNotification(){
-    setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 로컬 테스트 준비 중...`);
-    try {
-      if (!window.isSecureContext) {
-        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 실패: HTTPS 보안 연결이 아닙니다.`);
-        return;
-      }
-      if (!('Notification' in window)) {
-        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 실패: Notification API를 지원하지 않습니다.`);
-        return;
-      }
-      if (Notification.permission !== 'granted') {
-        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 알림 권한=${Notification.permission}. 먼저 푸시 알림을 켜주세요.`);
-        return;
-      }
-      if (!('serviceWorker' in navigator)) {
-        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 실패: Service Worker를 지원하지 않습니다.`);
-        return;
-      }
-
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 확인 중...`);
-      const registration = await getRegistration({ timeoutMs: 6000, ensure: true });
-      if (!registration) throw new Error('Service Worker 등록 정보를 찾지 못했습니다.');
-      if (!registration.active) throw new Error('활성 Service Worker가 없습니다.');
-      if (typeof registration.showNotification !== 'function') throw new Error('showNotification API를 사용할 수 없습니다.');
-
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 알림 표시 API 호출 중...`);
-      await withTimeout(
-        registration.showNotification('푸시 알림 표시 테스트', {
-          body: '이 알림이 보이면 휴대전화의 알림 표시 기능은 정상입니다.',
-          icon: './icons/icon-192.png',
-          badge: './icons/icon-96.png',
-          tag: `location-local-test-${Date.now()}`,
-          data: { url: './location_admin.html' }
-        }),
-        6000,
-        '알림 표시 API 응답 시간이 초과되었습니다.'
-      );
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 로컬 알림 표시 요청 성공 · SW active=${registration.active?.state || 'unknown'} · controller=${navigator.serviceWorker.controller ? 'yes' : 'no'}`);
-    } catch (error) {
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 로컬 테스트 실패: ${error?.message || String(error)}`);
-    }
-  }
-
-  async function requestPushDiagnostic(){
-    if (!('serviceWorker' in navigator)) {
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 미지원`);
-      return;
-    }
-    try {
-      const registration = await getRegistration({ timeoutMs: 4000, ensure: true });
-      const worker = navigator.serviceWorker.controller || registration?.active;
-      if (!worker) {
-        setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 활성 Service Worker를 찾지 못했습니다.`);
-        return;
-      }
-      worker.postMessage({ type: 'GET_PUSH_DIAGNOSTIC' });
-      window.setTimeout(() => {
-        const el = diagnosticStatus();
-        if (el && el.textContent.includes('Service Worker 진단 응답 대기 중')) {
-          setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 진단 응답 없음 · controller=${navigator.serviceWorker.controller ? 'yes' : 'no'} · active=${registration?.active?.state || 'no'}`);
-        }
-      }, 2500);
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 진단 응답 대기 중...`);
-    } catch (error) {
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker 확인 실패: ${error?.message || String(error)}`);
-    }
-  }
-
-  navigator.serviceWorker?.addEventListener?.('message', event => {
-    if (event.data?.type !== 'LOCATION_PUSH_DIAGNOSTIC') return;
-    const version = event.data?.serviceWorkerVersion || '?';
-    const diag = event.data?.diagnostic;
-    if (!diag) {
-      setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker ${version} · 아직 실제 Push 수신 기록이 없습니다.`);
-      return;
-    }
-    const stateMap = {
-      received: '실제 Push 수신됨 · 알림 표시 처리 중',
-      shown: '실제 Push 수신 및 알림 표시 성공',
-      'fallback-shown': '실제 Push 수신됨 · 기본 알림으로 표시 성공',
-      'show-error': '실제 Push 수신됨 · 알림 표시 오류',
-      'fallback-error': '실제 Push 수신됨 · 기본 알림 표시도 실패'
-    };
-    const state = stateMap[diag.state] || diag.state || '알 수 없음';
-    const error = diag.detail?.message ? ` · ${diag.detail.message}` : '';
-    setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · Service Worker ${version} · ${state}${error} · ${diag.at || ''}`);
-  });
-
   function initializePushUi(){
     installLogoutCleanup();
     openPushTargetTab();
-
-    setDiagnosticText(`Push 진단 ${PUSH_CLIENT_VERSION} · 스크립트 로드됨 · Service Worker 확인 대기`);
 
     const btn = button();
     if (btn && !btn.dataset.locationPushBound) {
       btn.dataset.locationPushBound = '1';
       btn.addEventListener('click', toggle);
     }
-    const testBtn = document.getElementById('pushNotificationTestBtn');
-    if (testBtn && !testBtn.dataset.locationPushBound) {
-      testBtn.dataset.locationPushBound = '1';
-      testBtn.addEventListener('click', showLocalTestNotification);
-    }
 
     refresh().catch(() => {});
-    window.setTimeout(requestPushDiagnostic, 300);
 
     const settingsButton = document.getElementById('settingsBtn');
     if (settingsButton && !settingsButton.dataset.locationPushBound) {
       settingsButton.dataset.locationPushBound = '1';
       settingsButton.addEventListener('click', () => {
-        window.setTimeout(() => { refresh().catch(() => {}); requestPushDiagnostic(); }, 80);
+        window.setTimeout(() => refresh().catch(() => {}), 80);
       });
     }
   }
@@ -391,5 +302,5 @@
     initializePushUi();
   }
 
-  window.LocationPush = { refresh, showLocalTestNotification, requestPushDiagnostic, version: PUSH_CLIENT_VERSION };
+  window.LocationPush = { refresh };
 })();
