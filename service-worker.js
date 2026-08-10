@@ -1,4 +1,4 @@
-const APP_VERSION = '1.0.7';
+const APP_VERSION = '1.0.8';
 const CACHE_NAME = `location-${APP_VERSION}`;
 
 const APP_SHELL = [
@@ -14,6 +14,7 @@ const APP_SHELL = [
   './admin-ui.js',
   './toast.js',
   './pwa.js',
+  './push.js',
   './mobile-back.js',
   './pwa.css',
   './manifest.webmanifest',
@@ -89,4 +90,124 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => caches.match(request))
   );
+});
+
+
+// Web Push: 앱이 열려 있지 않아도 관리자에게 알림을 표시합니다.
+const PUSH_DIAG_CACHE = 'location-push-diagnostic';
+const PUSH_DIAG_KEY = './__location_push_diagnostic__';
+
+async function writePushDiagnostic(state, detail = {}) {
+  try {
+    const cache = await caches.open(PUSH_DIAG_CACHE);
+    await cache.put(PUSH_DIAG_KEY, new Response(JSON.stringify({
+      state,
+      detail,
+      at: new Date().toISOString(),
+      serviceWorkerVersion: APP_VERSION
+    }), { headers: { 'Content-Type': 'application/json' } }));
+  } catch (_) {}
+}
+
+async function readPushDiagnostic() {
+  try {
+    const cache = await caches.open(PUSH_DIAG_CACHE);
+    const response = await cache.match(PUSH_DIAG_KEY);
+    return response ? await response.json() : null;
+  } catch (_) {
+    return null;
+  }
+}
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'GET_PUSH_DIAGNOSTIC') {
+    event.waitUntil((async () => {
+      const diagnostic = await readPushDiagnostic();
+      event.source?.postMessage?.({
+        type: 'LOCATION_PUSH_DIAGNOSTIC',
+        diagnostic,
+        serviceWorkerVersion: APP_VERSION
+      });
+    })());
+  }
+});
+
+self.addEventListener('push', event => {
+  event.waitUntil((async () => {
+    let payload = {};
+    try {
+      payload = event.data ? event.data.json() : {};
+    } catch (_) {
+      try {
+        payload = { body: event.data ? event.data.text() : '' };
+      } catch (_) {
+        payload = {};
+      }
+    }
+
+    const title = payload.title || '부대 병력 위치현황';
+    const scope = self.registration.scope;
+    const options = {
+      body: payload.body || '새 알림이 도착했습니다.',
+      icon: payload.icon || new URL('./icons/icon-192.png', scope).href,
+      badge: payload.badge || new URL('./icons/icon-96.png', scope).href,
+      tag: payload.tag || 'location-push',
+      data: {
+        url: payload.url || './location_admin.html',
+        type: payload.type || 'general',
+        ...(payload.data || {})
+      }
+    };
+
+    await writePushDiagnostic('received', {
+      title,
+      hasData: Boolean(event.data),
+      payloadType: payload.type || 'general'
+    });
+
+    try {
+      await self.registration.showNotification(title, options);
+      await writePushDiagnostic('shown', {
+        title,
+        payloadType: payload.type || 'general'
+      });
+    } catch (error) {
+      await writePushDiagnostic('show-error', {
+        title,
+        message: error instanceof Error ? error.message : String(error)
+      });
+      try {
+        await self.registration.showNotification(title, {
+          body: options.body,
+          data: options.data
+        });
+        await writePushDiagnostic('fallback-shown', { title });
+      } catch (fallbackError) {
+        await writePushDiagnostic('fallback-error', {
+          title,
+          message: fallbackError instanceof Error ? fallbackError.message : String(fallbackError)
+        });
+      }
+    }
+  })());
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const target = new URL(event.notification?.data?.url || './location_admin.html', self.location.href).href;
+
+  event.waitUntil((async () => {
+    const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const client of windows) {
+      try {
+        const current = new URL(client.url);
+        const wanted = new URL(target);
+        if (current.origin === wanted.origin) {
+          if ('navigate' in client) await client.navigate(target);
+          if ('focus' in client) return client.focus();
+        }
+      } catch (_) {}
+    }
+    return self.clients.openWindow(target);
+  })());
 });

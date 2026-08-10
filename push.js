@@ -226,6 +226,57 @@
     }, 350);
   }
 
+
+  function diagnosticStatus(){ return document.getElementById('pushDiagnosticStatus'); }
+
+  function setDiagnosticText(message){
+    const el = diagnosticStatus();
+    if (el) el.textContent = message;
+  }
+
+  async function showLocalTestNotification(){
+    try {
+      if (Notification.permission !== 'granted') {
+        setDiagnosticText('알림 권한이 허용되어 있지 않습니다. 먼저 푸시 알림을 켜주세요.');
+        return;
+      }
+      const registration = await getRegistration();
+      await registration.showNotification('푸시 알림 표시 테스트', {
+        body: '이 알림이 보이면 휴대전화의 알림 표시 기능은 정상입니다.',
+        icon: './icons/icon-192.png',
+        tag: `location-local-test-${Date.now()}`,
+        data: { url: './location_admin.html' }
+      });
+      setDiagnosticText('로컬 테스트 알림 표시를 요청했습니다. 휴대전화 알림창을 확인하세요.');
+    } catch (error) {
+      setDiagnosticText(`로컬 테스트 실패: ${error?.message || String(error)}`);
+    }
+  }
+
+  function requestPushDiagnostic(){
+    navigator.serviceWorker?.controller?.postMessage?.({ type: 'GET_PUSH_DIAGNOSTIC' });
+  }
+
+  navigator.serviceWorker?.addEventListener?.('message', event => {
+    if (event.data?.type !== 'LOCATION_PUSH_DIAGNOSTIC') return;
+    const version = event.data?.serviceWorkerVersion || '?';
+    const diag = event.data?.diagnostic;
+    if (!diag) {
+      setDiagnosticText(`Service Worker ${version} · 아직 실제 Push 수신 기록이 없습니다.`);
+      return;
+    }
+    const stateMap = {
+      received: '실제 Push 수신됨 · 알림 표시 처리 중',
+      shown: '실제 Push 수신 및 알림 표시 성공',
+      'fallback-shown': '실제 Push 수신됨 · 기본 알림으로 표시 성공',
+      'show-error': '실제 Push 수신됨 · 알림 표시 오류',
+      'fallback-error': '실제 Push 수신됨 · 기본 알림 표시도 실패'
+    };
+    const state = stateMap[diag.state] || diag.state || '알 수 없음';
+    const error = diag.detail?.message ? ` · ${diag.detail.message}` : '';
+    setDiagnosticText(`Service Worker ${version} · ${state}${error} · ${diag.at || ''}`);
+  });
+
   document.addEventListener('DOMContentLoaded', () => {
     installLogoutCleanup();
     openPushTargetTab();
@@ -233,11 +284,13 @@
     const btn = button();
     if (!btn) return;
     btn.addEventListener('click', toggle);
+    document.getElementById('pushNotificationTestBtn')?.addEventListener('click', showLocalTestNotification);
     refresh().catch(() => {});
+    window.setTimeout(requestPushDiagnostic, 300);
 
     const settingsButton = document.getElementById('settingsBtn');
     settingsButton?.addEventListener('click', () => {
-      window.setTimeout(() => refresh().catch(() => {}), 80);
+      window.setTimeout(() => { refresh().catch(() => {}); requestPushDiagnostic(); }, 80);
     });
   });
 
