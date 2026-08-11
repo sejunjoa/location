@@ -18,6 +18,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>
+<script src="legal-content.js"></script>
+<script src="consent.js"></script>
   <script src="common.js"></script>
   <script src="toast.js"></script>
   <style>
@@ -1737,7 +1739,21 @@
       font-size:14px;font-weight:900
     }
 
-  </style>
+  
+.settings-legal-links{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  margin-top:9px;
+  color:#94a3b8;
+  font-size:11px;
+  line-height:1.4;
+}
+.settings-legal-links a{color:#64748b;text-decoration:none;font-weight:650;}
+.settings-legal-links a:hover{text-decoration:underline;}
+
+</style>
 
   <style id="requested-ui-updates-20260807">
     .header-welcome {
@@ -2296,6 +2312,9 @@
           <button class="settings-action-btn logout" id="logoutBtn" type="button">로그아웃</button>
           <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="홈 화면에 앱 추가" data-ios-label="홈 화면에 앱 추가">홈 화면에 앱 추가</button>
           <button class="settings-action-btn withdraw" id="userDeleteAccountBtn" type="button">회원탈퇴</button>
+          <div class="settings-legal-links" aria-label="이용약관 및 개인정보 처리방침">
+            <a href="#" data-legal-picker="agreements">이용약관</a><span aria-hidden="true">·</span><a href="#" data-legal-doc="privacy_policy">개인정보 처리방침</a>
+          </div>
         </div>
 
       </div>
@@ -7527,6 +7546,102 @@ async function loadOwnMovementLogs(unitId) {
   modal.addEventListener('click', event => {
     if (event.target === modal) closeTransferModal();
   });
+})();
+</script>
+
+
+<!-- 2026-08-11 개인정보 최소화: 일반 사용자는 타 사용자 식별정보를 내려받지 않음 -->
+<script>
+(function locationUserPrivacyMinimization(){
+  function expandZoneCounts(rows){
+    const anonymous=[];
+    (rows||[]).forEach(row=>{
+      const zoneId=row.zone_id||row.zoneId||null;
+      const count=Math.max(0,Number(row.person_count ?? row.count ?? 0)||0);
+      if(!zoneId)return;
+      for(let i=0;i<count;i++) anonymous.push({zoneId});
+    });
+    return anonymous;
+  }
+
+  /* 일반 사용자 화면의 구역 상세는 개인정보 없이 인원수만 표시 */
+  renderZonePeople=function(zoneId){
+    const zone=getZone(zoneId);
+    if(!zone)return;
+    const count=getZonePeople(zoneId).length;
+    const title=bottomSheet?.querySelector('#sheetTitle')||sheetTitle;
+    const subtitle=bottomSheet?.querySelector('#sheetSubtitle')||sheetSubtitle;
+    const content=document.getElementById('zonePeopleContent');
+    if(title)title.textContent=zone.name;
+    if(subtitle)subtitle.textContent=`등록된 인원 ${count}명`;
+    if(content){
+      content.innerHTML='<div class="sheet-empty-state">일반 사용자는 구역별 인원수만 확인할 수 있습니다.</div>';
+    }
+  };
+
+  /* 타 사용자 profile/user_locations fallback을 제거하고 집계 RPC + 본인 행만 조회 */
+  loadLocationMembers=async function(){
+    return {data:[],error:null};
+  };
+
+  loadPageData=async function({quiet=false}={}){
+    if(!userAccess?.profile?.unit_id) throw new Error('소속 부대가 지정되어 있지 않습니다.');
+    const requestId=++loadSequence;
+    const unitId=userAccess.profile.unit_id;
+    if(!quiet)setSyncStatus('동기화 중...');
+
+    const [unitResult,zoneResult]=await Promise.all([
+      sb.from('units').select('id,unit_name,unit_code').eq('id',unitId).single(),
+      sb.from('location_zones').select('id,unit_id,name,attribute,color,sort_order,created_at')
+        .eq('unit_id',unitId).order('sort_order',{ascending:true}).order('created_at',{ascending:true})
+    ]);
+    const firstError=unitResult.error||zoneResult.error;
+    if(firstError)throw firstError;
+    if(requestId!==loadSequence)return;
+
+    currentUnit=unitResult.data;
+    zones=(zoneResult.data||[]).map(zone=>({
+      id:zone.id,unitId:zone.unit_id,name:zone.name,attribute:zone.attribute,
+      color:zone.color,sortOrder:zone.sort_order
+    }));
+
+    await ensureInitialLocation();
+
+    const [snapshotResult,movementResult,ownLocationResult]=await Promise.all([
+      sb.rpc('get_location_snapshot',{p_unit_id:unitId}),
+      loadOwnMovementLogs(unitId),
+      sb.from('user_locations')
+        .select('user_id,unit_id,zone_id,departure_time,return_time,updated_at')
+        .eq('user_id',userAccess.user.id)
+        .eq('unit_id',unitId)
+        .maybeSingle()
+    ]);
+
+    const error=snapshotResult.error||ownLocationResult.error;
+    if(error)throw error;
+    if(requestId!==loadSequence)return;
+
+    people=expandZoneCounts(snapshotResult.data||[]);
+    movementLogs=Array.isArray(movementResult)?movementResult:[];
+    const ownRow=ownLocationResult.data||null;
+    ownLocation=ownRow?{
+      zoneId:ownRow.zone_id,
+      departureTime:ownRow.departure_time,
+      returnTime:ownRow.return_time,
+      updatedAt:ownRow.updated_at
+    }:null;
+
+    updatePageTitle();
+    renderZones();
+    renderHomeZoneChoices();
+    setSyncStatus(formatSyncTime());
+  };
+
+  /* 타 사용자 행을 구독하지 않고 집계 RPC를 주기적으로 새로 조회 */
+  window.setInterval(()=>{
+    if(document.visibilityState!=='visible' || !userAccess?.user?.id) return;
+    loadPageData({quiet:true}).catch(error=>console.warn('구역 인원수 동기화 실패:',error));
+  },10000);
 })();
 </script>
 

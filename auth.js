@@ -63,6 +63,11 @@ async function requireUser(){
     const user = await requireLogin();
     if(!user) return null;
 
+    if(typeof requireCurrentPolicyConsent === "function"){
+        const consentReady = await requireCurrentPolicyConsent(user);
+        if(!consentReady) return null;
+    }
+
     const { data:profile, error } = await getProfile(user.id);
 
     if(
@@ -84,6 +89,11 @@ async function requireUser(){
 async function requireAdmin(){
     const user = await requireLogin();
     if(!user) return null;
+
+    if(typeof requireCurrentPolicyConsent === "function"){
+        const consentReady = await requireCurrentPolicyConsent(user);
+        if(!consentReady) return null;
+    }
 
     const { data:profile, error:profileError } = await getProfile(user.id);
 

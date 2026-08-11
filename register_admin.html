@@ -21,6 +21,8 @@
 <script src="config.js"></script>
 <script src="toast.js"></script>
 <script src="auth.js"></script>
+<script src="legal-content.js"></script>
+<script src="consent.js"></script>
 
 <style>
 :root{
@@ -149,6 +151,64 @@ button,input{font:inherit;}
     overflow-wrap:break-word;
 }
 
+
+.policy-consent-list{
+    display:grid;
+    gap:8px;
+    margin:2px 0 18px;
+}
+.policy-consent-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:12px;
+    min-height:48px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:#f8fafc;
+}
+.policy-consent-label{
+    min-width:0;
+    color:#0f172a;
+    font-size:13px;
+    font-weight:700;
+    line-height:1.4;
+    word-break:keep-all;
+}
+.policy-consent-options{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    white-space:nowrap;
+}
+.policy-consent-view{
+    color:#2563eb;
+    font-size:11px;
+    font-weight:700;
+    text-decoration:none;
+}
+.policy-consent-view:hover{text-decoration:underline;}
+.policy-consent-check{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    color:#475569;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+}
+.policy-consent-check input{
+    width:18px;
+    height:18px;
+    margin:0;
+    accent-color:#2563eb;
+}
+@media(max-width:420px){
+    .policy-consent-row{grid-template-columns:1fr;gap:7px;}
+    .policy-consent-options{justify-content:space-between;}
+}
+
 @media(max-width:420px){
     body{align-items:flex-start;}
     .register-box{padding:30px 20px;margin:auto 0;}
@@ -174,6 +234,21 @@ button,input{font:inherit;}
     <input type="text" id="unit" class="input" placeholder="부대 선택 (선택하지 않아도 됨)" readonly>
     <div class="admin-unit-guide">관리자는 소속 부대를 선택하지 않아도 회원가입할 수 있습니다. 로그인하여 새 부대를 만들거나<br>기존 부대로 이동할 수 있습니다.</div>
     <input type="text" id="position" class="input" placeholder="직책">
+
+    <div class="policy-consent-list" aria-label="필수 약관 동의">
+        <div class="policy-consent-row">
+            <span class="policy-consent-label">서비스 이용약관</span>
+            <span class="policy-consent-options"><a class="policy-consent-view" href="#" data-legal-doc="terms">전문보기</a><label class="policy-consent-check"><span>동의</span><input id="termsConsent" type="checkbox"></label></span>
+        </div>
+        <div class="policy-consent-row">
+            <span class="policy-consent-label">개인정보 수집·이용 동의</span>
+            <span class="policy-consent-options"><a class="policy-consent-view" href="#" data-legal-doc="privacy_consent">전문보기</a><label class="policy-consent-check"><span>동의</span><input id="privacyConsent" type="checkbox"></label></span>
+        </div>
+        <div class="policy-consent-row">
+            <span class="policy-consent-label">개인정보 제3자 제공 동의</span>
+            <span class="policy-consent-options"><a class="policy-consent-view" href="#" data-legal-doc="third_party_consent">전문보기</a><label class="policy-consent-check"><span>동의</span><input id="thirdPartyConsent" type="checkbox"></label></span>
+        </div>
+    </div>
 
     <button id="registerBtn" class="register-btn" type="button">회원가입</button>
 
@@ -203,6 +278,9 @@ const unit=document.getElementById("unit");
 const position=document.getElementById("position");
 const registerBtn=document.getElementById("registerBtn");
 const pwCheckMsg=document.getElementById("pwCheckMsg");
+const termsConsent=document.getElementById("termsConsent");
+const privacyConsent=document.getElementById("privacyConsent");
+const thirdPartyConsent=document.getElementById("thirdPartyConsent");
 
 const unitModal=document.getElementById("unitModal");
 const unitSearch=document.getElementById("unitSearch");
@@ -353,6 +431,11 @@ registerBtn.addEventListener("click",async()=>{
         return;
     }
 
+    if(!termsConsent.checked || !privacyConsent.checked || !thirdPartyConsent.checked){
+        triggerToast("약관에 모두 동의해야 회원가입할 수 있습니다.");
+        return;
+    }
+
     registering=true;
     registerBtn.disabled=true;
     registerBtn.textContent="신청 중...";
@@ -403,6 +486,14 @@ registerBtn.addEventListener("click",async()=>{
 
         if(!ready){
             triggerToast("프로필 생성에 실패했습니다.\n잠시 후 다시 시도해주세요.");
+            return;
+        }
+
+        const {error:consentError}=await savePolicyConsents(data.user.id,["terms","privacy","third_party"]);
+
+        if(consentError){
+            console.error("약관 동의 저장 실패:",consentError);
+            triggerToast("약관 동의 정보를 저장하지 못했습니다.\n잠시 후 다시 시도해주세요.");
             return;
         }
 

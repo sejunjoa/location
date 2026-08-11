@@ -18,6 +18,8 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="config.js"></script>
   <script src="auth.js"></script>
+<script src="legal-content.js"></script>
+<script src="consent.js"></script>
   <script src="common.js"></script>
   <script src="admin-ui.js" defer></script>
   <script src="toast.js"></script>
@@ -3505,7 +3507,21 @@
       line-height: 1.25 !important;
     }
 
-  </style>
+  
+.settings-legal-links{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:7px;
+  margin-top:9px;
+  color:#94a3b8;
+  font-size:11px;
+  line-height:1.4;
+}
+.settings-legal-links a{color:#64748b;text-decoration:none;font-weight:650;}
+.settings-legal-links a:hover{text-decoration:underline;}
+
+</style>
 
   <style id="requested-ui-updates-20260807">
     .header-welcome {
@@ -4212,6 +4228,9 @@
           <button class="settings-action-btn logout" id="logoutSettingsBtn" type="button">로그아웃</button>
           <button class="pwa-install-action" type="button" data-pwa-install hidden data-install-label="홈 화면에 앱 추가" data-ios-label="홈 화면에 앱 추가">홈 화면에 앱 추가</button>
           <button class="settings-action-btn withdraw" id="deleteAccountSettingsBtn" type="button">회원탈퇴</button>
+          <div class="settings-legal-links" aria-label="이용약관 및 개인정보 처리방침">
+            <a href="#" data-legal-picker="agreements">이용약관</a><span aria-hidden="true">·</span><a href="#" data-legal-doc="privacy_policy">개인정보 처리방침</a>
+          </div>
         </div>
 
       </div>

@@ -21,6 +21,8 @@
 <script src="config.js"></script>
 <script src="toast.js"></script>
 <script src="auth.js"></script>
+<script src="legal-content.js"></script>
+<script src="consent.js"></script>
 
 <style>
 :root{
@@ -140,34 +142,55 @@ button,input{font:inherit;}
 
 .forgot-password-wrap{
     margin-top:12px;
-    text-align:center;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
 }
 
-.forgot-password-btn{
+.forgot-password-btn,
+.privacy-policy-link{
     border:0;
     background:transparent;
     color:var(--primary);
-    font-size:14px;
+    font-size:13px;
     font-weight:700;
     cursor:pointer;
+    text-decoration:none;
+    white-space:nowrap;
 }
 
-.forgot-password-btn:hover{text-decoration:underline;}
-.forgot-password-btn:active{opacity:.72;}
+.forgot-password-btn{padding:0;}
+.privacy-policy-link{margin-left:auto;}
+.forgot-password-btn:hover,.privacy-policy-link:hover{text-decoration:underline;}
+.forgot-password-btn:active,.privacy-policy-link:active{opacity:.72;}
 
 .password-reset-backdrop{
     position:fixed;
     inset:0;
     z-index:80;
-    display:none;
+    display:flex;
     align-items:center;
     justify-content:center;
     padding:20px;
-    background:rgba(15,23,42,.56);
-    backdrop-filter:blur(3px);
+    background:rgba(15,23,42,0);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    -webkit-backdrop-filter:blur(0);
+    backdrop-filter:blur(0);
+    transition:opacity .2s ease,background-color .2s ease,backdrop-filter .2s ease,visibility 0s linear .24s;
 }
 
-.password-reset-backdrop.open{display:flex;}
+.password-reset-backdrop.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    background:rgba(15,23,42,.56);
+    -webkit-backdrop-filter:blur(3px);
+    backdrop-filter:blur(3px);
+    transition-delay:0s;
+}
 
 .password-reset-dialog{
     width:100%;
@@ -177,6 +200,14 @@ button,input{font:inherit;}
     border-radius:18px;
     background:#fff;
     box-shadow:0 24px 60px rgba(15,23,42,.24);
+    opacity:0;
+    transform:translateY(18px) scale(.985);
+    transition:opacity .2s ease,transform .24s cubic-bezier(.22,.8,.28,1);
+}
+
+.password-reset-backdrop.open .password-reset-dialog{
+    opacity:1;
+    transform:translateY(0) scale(1);
 }
 
 .password-reset-head{
@@ -232,6 +263,17 @@ button,input{font:inherit;}
 .password-reset-send:disabled{
     cursor:default;
     opacity:.58;
+}
+
+@media (max-width:480px){
+    .password-reset-backdrop{align-items:flex-end;padding:0;}
+    .password-reset-dialog{max-width:none;border-radius:18px 18px 0 0;transform:translateY(38px);}
+    .password-reset-backdrop.open .password-reset-dialog{transform:translateY(0);}
+    .password-reset-body{padding-bottom:calc(20px + env(safe-area-inset-bottom));}
+}
+
+@media (prefers-reduced-motion:reduce){
+    .password-reset-backdrop,.password-reset-dialog{transition:none!important;}
 }
 
 .reapply-backdrop{
@@ -314,6 +356,7 @@ button,input{font:inherit;}
     <button class="pwa-install-login-btn" type="button" data-pwa-install hidden data-install-label="앱 설치" data-ios-label="홈 화면에 앱 추가">앱 설치</button>
     <div class="forgot-password-wrap">
         <button id="forgotPasswordBtn" class="forgot-password-btn" type="button">비밀번호를 잊으셨나요?</button>
+        <a href="#" class="privacy-policy-link" data-legal-doc="privacy_policy">개인정보 처리방침</a>
     </div>
 
     <div class="bottom">
@@ -376,24 +419,38 @@ const reapplyLogoutBtn=document.getElementById("reapplyLogoutBtn");
 
 let loggingIn=false;
 let passwordResetSending=false;
+let passwordResetCloseTimer=null;
 let reapplying=false;
 let reapplySearchTimer=null;
 
 
 function openPasswordResetModal(){
     if(passwordResetSending) return;
+    if(passwordResetCloseTimer){
+        clearTimeout(passwordResetCloseTimer);
+        passwordResetCloseTimer=null;
+    }
     passwordResetEmail.value=email.value.trim();
-    passwordResetModal.classList.add("open");
     passwordResetModal.setAttribute("aria-hidden","false");
     document.body.style.overflow="hidden";
-    setTimeout(()=>passwordResetEmail.focus(),80);
+    void passwordResetModal.offsetWidth;
+    passwordResetModal.classList.add("open");
+    setTimeout(()=>passwordResetEmail.focus(),100);
+}
+
+function finishPasswordResetModalClose(){
+    passwordResetModal.classList.remove("open");
+    passwordResetModal.setAttribute("aria-hidden","true");
+    if(passwordResetCloseTimer) clearTimeout(passwordResetCloseTimer);
+    passwordResetCloseTimer=setTimeout(()=>{
+        document.body.style.overflow="";
+        passwordResetCloseTimer=null;
+    },250);
 }
 
 function closePasswordResetModal(){
     if(passwordResetSending) return;
-    passwordResetModal.classList.remove("open");
-    passwordResetModal.setAttribute("aria-hidden","true");
-    document.body.style.overflow="";
+    finishPasswordResetModalClose();
 }
 
 async function sendPasswordResetEmail(){
@@ -424,9 +481,7 @@ async function sendPasswordResetEmail(){
         if(error) throw error;
 
         email.value=emailValue;
-        passwordResetModal.classList.remove("open");
-        passwordResetModal.setAttribute("aria-hidden","true");
-        document.body.style.overflow="";
+        finishPasswordResetModalClose();
         triggerToast("비밀번호 재설정 이메일을\n전송했습니다. 메일함에서\n'Supabase'로 부터 온 메일을\n확인해주세요.");
     }catch(error){
         console.error("비밀번호 재설정 이메일 전송 실패:",error);
@@ -635,6 +690,9 @@ async function moveByRole(user){
         return;
     }
 
+    const consentReady=await ensureCurrentPolicyConsentInteractive(user);
+    if(!consentReady) return;
+
     if(profile.role==="user"){
         if(
             profile.user_approved===true &&
@@ -752,6 +810,11 @@ reapplyLogoutBtn.addEventListener("click",async()=>{
 
 window.addEventListener("load",async()=>{
     const url=new URL(window.location.href);
+    if(url.searchParams.get("policy_consent_error")==="1"){
+        url.searchParams.delete("policy_consent_error");
+        history.replaceState(history.state,document.title,url.pathname+url.search+url.hash);
+        setTimeout(()=>triggerToast("약관 동의 저장용 Supabase 설정이 필요합니다."),120);
+    }
     if(url.searchParams.get("password_reset")==="success"){
         url.searchParams.delete("password_reset");
         history.replaceState(history.state,document.title,url.pathname+url.search+url.hash);
