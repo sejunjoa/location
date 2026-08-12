@@ -3031,6 +3031,17 @@ async function saveHomeZone(zoneId, setCurrentLocation = false) {
   return zoneId;
 }
 
+// 설정의 개인정보 수정에서 생활관만 변경할 때 사용합니다.
+// 현재 위치나 이동 기록을 건드리지 않고 profiles.home_zone_id만 변경합니다.
+async function saveProfileHomeZoneWithoutMovement(zoneId) {
+  const rpcResult = await sb.rpc('set_my_home_zone_profile_only', {
+    p_zone_id: zoneId
+  });
+  if (rpcResult.error) throw rpcResult.error;
+  userAccess.profile.home_zone_id = zoneId;
+  return zoneId;
+}
+
 
 
     
@@ -3366,7 +3377,7 @@ async function loadOwnMovementLogs(unitId) {
       if (!zoneId) return;
       settingsHomeZoneSaveBtn.disabled = true;
       try {
-        await saveHomeZone(zoneId, false);
+        await saveProfileHomeZoneWithoutMovement(zoneId);
         await loadPageData({ quiet: true });
         fillSettings();
         triggerToast('생활관이 수정되었습니다.');
@@ -3883,29 +3894,78 @@ async function loadOwnMovementLogs(unitId) {
       if (!selectedHomeZone || selectedHomeZone.attribute !== 'inside') { showMessage('생활관 속성의 구역을 선택해주세요.', '입력 확인'); return; }
       if (enlistDate && dischargeDate && dischargeDate < enlistDate) { showMessage('전역일은 입대일보다 빠를 수 없습니다.', '입력 확인'); return; }
       if (phone && !/^01\d{8,9}$/.test(phone)) { showMessage('휴대폰 번호를 정확히 입력해주세요.', '입력 확인'); return; }
+      const currentName = String(userAccess?.profile?.name || '').trim();
+      const currentCompany = String(userAccess?.profile?.company || '').trim();
+      const currentPhone = String(userAccess?.profile?.phone || userAccess?.user?.user_metadata?.phone || '').replace(/\D/g,'');
+      const currentHomeZoneId = userAccess?.profile?.home_zone_id || null;
+      const currentEnlistDate = userAccess?.profile?.enlist_date || userAccess?.profile?.enlistment_date || userAccess?.user?.user_metadata?.enlist_date || null;
+      const currentDischargeDate = userAccess?.profile?.discharge_date || userAccess?.user?.user_metadata?.discharge_date || userAccess?.profile?.transfer_date || null;
+
+      const changed = {
+        name: name !== currentName,
+        company: company !== currentCompany,
+        phone: phone !== currentPhone,
+        homeZone: homeZoneId !== currentHomeZoneId,
+        enlistDate: enlistDate !== currentEnlistDate,
+        dischargeDate: dischargeDate !== currentDischargeDate
+      };
+      if (!Object.values(changed).some(Boolean)) {
+        document.getElementById('enhancedSettingsPassword').value = '';
+        showMessage('변경된 정보가 없습니다.', '안내');
+        return;
+      }
+
       saveBtn.disabled = true;
       try {
         const verify = await sb.auth.signInWithPassword({ email: userAccess.user.email, password });
         if (verify.error) throw new Error('현재 비밀번호가 올바르지 않습니다.');
-        const previousHomeZoneId = userAccess?.profile?.home_zone_id || null;
-        const updateResult = await sb.rpc('update_my_profile', {
+
+        // 실제로 바뀐 필드만 각각 UPDATE하는 RPC입니다.
+        // 변경하지 않은 컬럼의 UNIQUE/INDEX 제약을 불필요하게 다시 건드리지 않습니다.
+        // 생활관 변경은 profiles.home_zone_id 정정으로만 처리하며 현재 위치와 이동 로그는 변경하지 않습니다.
+        const updateResult = await sb.rpc('update_my_profile_settings_v3', {
           p_name: name,
           p_company: company,
           p_phone: phone || null,
-          // 생활관 변경은 set_my_home_zone()에서 처리합니다.
-          // 최초 선택일 때만 통합 RPC에도 선택값을 전달합니다.
-          p_home_zone_id: previousHomeZoneId || homeZoneId
+          p_home_zone_id: homeZoneId,
+          p_enlist_date: enlistDate,
+          p_discharge_date: dischargeDate,
+          p_change_name: changed.name,
+          p_change_company: changed.company,
+          p_change_phone: changed.phone,
+          p_change_home_zone: changed.homeZone,
+          p_change_enlist_date: changed.enlistDate,
+          p_change_discharge_date: changed.dischargeDate
         });
-        if (updateResult.error) throw updateResult.error;
-
-        if (homeZoneId !== previousHomeZoneId) {
-          await saveHomeZone(homeZoneId, previousHomeZoneId === null);
+        if (updateResult.error) {
+          const errorMessage = String(updateResult.error.message || '');
+          if (updateResult.error.code === '23505' || errorMessage.includes('profiles_phone_normalized_unique_idx')) {
+            throw new Error('이미 사용 중인 휴대폰 번호입니다.');
+          }
+          throw updateResult.error;
         }
 
-        await saveUserServiceDates(enlistDate, dischargeDate);
-        const authResult = await sb.auth.updateUser({ data: { display_name: name, name, phone: phone || null, company, home_zone_id: homeZoneId, enlist_date: enlistDate, discharge_date: dischargeDate, transfer_date: null } });
-        if (authResult.error) console.warn('인증 메타데이터 동기화 실패:', authResult.error);
-        userAccess.profile = { ...userAccess.profile, name, company, phone: phone || null, home_zone_id: homeZoneId, enlist_date: enlistDate, discharge_date: dischargeDate, transfer_date: null };
+        const metadataPatch = {};
+        if (changed.name) Object.assign(metadataPatch, { display_name: name, name });
+        if (changed.company) metadataPatch.company = company;
+        if (changed.phone) metadataPatch.phone = phone || null;
+        if (changed.homeZone) metadataPatch.home_zone_id = homeZoneId;
+        if (changed.enlistDate) metadataPatch.enlist_date = enlistDate;
+        if (changed.dischargeDate) Object.assign(metadataPatch, { discharge_date: dischargeDate, transfer_date: null });
+        if (Object.keys(metadataPatch).length) {
+          const authResult = await sb.auth.updateUser({ data: metadataPatch });
+          if (authResult.error) console.warn('인증 메타데이터 동기화 실패:', authResult.error);
+        }
+
+        userAccess.profile = {
+          ...userAccess.profile,
+          ...(changed.name ? { name } : {}),
+          ...(changed.company ? { company } : {}),
+          ...(changed.phone ? { phone: phone || null } : {}),
+          ...(changed.homeZone ? { home_zone_id: homeZoneId } : {}),
+          ...(changed.enlistDate ? { enlist_date: enlistDate } : {}),
+          ...(changed.dischargeDate ? { discharge_date: dischargeDate, transfer_date: null } : {})
+        };
         updateWelcomeMessage();
         document.getElementById('enhancedSettingsPassword').value = '';
         showMessage('개인정보가 수정되었습니다.', '수정 완료');

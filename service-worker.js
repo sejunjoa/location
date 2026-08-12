@@ -1,4 +1,4 @@
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.0.aak';
 const CACHE_NAME = `location-${APP_VERSION}`;
 
 const APP_SHELL = [
@@ -10,6 +10,8 @@ const APP_SHELL = [
   './register_user.html',
   './register_admin.html',
   './auth.js',
+  './legal-content.js',
+  './consent.js',
   './config.js',
   './common.js',
   './admin-ui.js',

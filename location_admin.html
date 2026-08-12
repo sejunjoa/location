@@ -4957,30 +4957,48 @@
         return;
       }
 
+      const currentName = String(adminAccess?.profile?.name || adminAccess?.user?.user_metadata?.display_name || '').trim();
+      const currentPhone = String(adminAccess?.profile?.phone || adminAccess?.user?.user_metadata?.phone || '').replace(/\D/g, '');
+      const currentPosition = String(adminAccess?.profile?.position || adminAccess?.user?.user_metadata?.position || '').trim();
+      const changed = {
+        name: name !== currentName,
+        phone: phone !== currentPhone,
+        position: position !== currentPosition
+      };
+
+      if (!Object.values(changed).some(Boolean)) {
+        settingsCurrentPasswordInput.value = '';
+        showMessage('변경된 정보가 없습니다.', '안내');
+        return;
+      }
+
       setPendingButton(saveProfileSettingsBtn, true, '저장 중...', '개인정보 저장');
 
       try {
-        await invokeAccountSettings({
+        const result = await invokeAccountSettings({
           action: 'update_profile',
           current_password: currentPassword,
           name,
           phone,
           position
         });
+        const savedProfile = result?.profile || { name, phone, position };
 
         adminAccess.profile = {
           ...adminAccess.profile,
-          name,
-          phone,
-          position
+          name: savedProfile.name ?? name,
+          phone: savedProfile.phone ?? phone,
+          position: savedProfile.position ?? position
         };
 
         if (adminAccess.user) {
+          const metadataPatch = {};
+          if (changed.name) metadataPatch.display_name = name;
+          if (changed.phone) metadataPatch.phone = phone;
+          if (changed.position) metadataPatch.position = position;
           adminAccess.user.user_metadata = {
             ...(adminAccess.user.user_metadata || {}),
-            display_name: name,
-            phone,
-            position
+            ...metadataPatch
           };
         }
 
